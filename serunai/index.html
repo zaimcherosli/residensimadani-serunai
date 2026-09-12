@@ -42,19 +42,68 @@
         padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
       }
     }
+    @keyframes ticker {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: ticker 36s linear infinite;
+    }
+    .marquee-track:hover,
+    .marquee-track:active {
+      animation-play-state: paused;
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans antialiased pb-20 md:pb-0">
 
-  <!-- Pengumuman Atas (Top Banner Ringkas & Padat) -->
-  <header class="bg-slate-950 text-white text-[11px] sm:text-xs py-1.5 px-3 sm:px-4 border-b border-emerald-500/20">
-    <div class="max-w-6xl mx-auto flex items-center justify-between sm:justify-center gap-2">
-      <div class="flex items-center gap-2 min-w-0 truncate">
-        <span class="bg-emerald-500 text-slate-950 font-extrabold px-1.5 py-0.5 rounded text-[10px] tracking-wider shrink-0">RASMI</span>
-        <span class="text-slate-300 font-medium truncate">587 Unit Dibuka · Presint 5, Putrajaya</span>
+  <!-- Pengumuman Atas (Ticker Gerak Perlahan & Urgensi) -->
+  <header class="bg-slate-950 text-white text-[11px] sm:text-xs py-2 border-b border-emerald-500/20 overflow-hidden relative select-none">
+    <!-- Gradient shadow kiri & kanan untuk transisi halus -->
+    <div class="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-slate-950 to-transparent z-10"></div>
+    <div class="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-slate-950 to-transparent z-10"></div>
+
+    <a href="#semak-kelayakan" class="block">
+      <div class="marquee-track flex items-center gap-6 whitespace-nowrap">
+        <!-- Item Set 1 -->
+        <div class="flex items-center gap-6 shrink-0">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="bg-amber-500 text-slate-950 font-extrabold px-1.5 py-0.5 rounded text-[10px] tracking-wider uppercase shrink-0">PERHATIAN</span>
+            <span class="text-slate-100 font-bold">Kuota 587 Unit Terhad</span>
+            <span class="text-slate-400">Pendaftaran dibuka sekarang untuk warga Wilayah Persekutuan</span>
+          </span>
+          <span class="text-emerald-400 font-black">·</span>
+          <span class="text-amber-300 font-semibold">Tindakan Segera: Permohonan semakin meningkat, semak kelayakan sebelum kuota penuh</span>
+          <span class="text-emerald-400 font-black">·</span>
+          <span class="text-slate-200">Kediaman 3 Bilik 800 kps Presint 5 Putrajaya pada harga RM200,000 sahaja</span>
+          <span class="text-emerald-400 font-black">·</span>
+          <span class="text-emerald-400 font-extrabold underline underline-offset-4">Klik Di Sini Untuk Semak Kelayakan Percuma</span>
+          <span class="text-emerald-400 font-black">·</span>
+        </div>
+
+        <!-- Item Set 2 (Duplikasi untuk putaran infiniti lancar tanpa putus) -->
+        <div class="flex items-center gap-6 shrink-0" aria-hidden="true">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="bg-amber-500 text-slate-950 font-extrabold px-1.5 py-0.5 rounded text-[10px] tracking-wider uppercase shrink-0">PERHATIAN</span>
+            <span class="text-slate-100 font-bold">Kuota 587 Unit Terhad</span>
+            <span class="text-slate-400">Pendaftaran dibuka sekarang untuk warga Wilayah Persekutuan</span>
+          </span>
+          <span class="text-emerald-400 font-black">·</span>
+          <span class="text-amber-300 font-semibold">Tindakan Segera: Permohonan semakin meningkat, semak kelayakan sebelum kuota penuh</span>
+          <span class="text-emerald-400 font-black">·</span>
+          <span class="text-slate-200">Kediaman 3 Bilik 800 kps Presint 5 Putrajaya pada harga RM200,000 sahaja</span>
+          <span class="text-emerald-400 font-black">·</span>
+          <span class="text-emerald-400 font-extrabold underline underline-offset-4">Klik Di Sini Untuk Semak Kelayakan Percuma</span>
+          <span class="text-emerald-400 font-black">·</span>
+        </div>
       </div>
-      <a href="#semak-kelayakan" class="shrink-0 font-bold text-emerald-400 hover:text-emerald-300 text-[11px] sm:text-xs underline underline-offset-2">Semak Kelayakan</a>
-    </div>
+    </a>
   </header>
 
   <!-- Bar Navigasi Utama (Kemas & Responsif) -->
