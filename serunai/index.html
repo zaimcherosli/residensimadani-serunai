@@ -146,35 +146,35 @@
             <form id="hero-quick-form" onsubmit="handleQuickSubmit(event)" class="space-y-4">
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Penuh</label>
-                <input type="text" required placeholder="Nama penuh anda" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                <input id="quick-name" type="text" required placeholder="Nama penuh anda" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
               </div>
 
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nombor WhatsApp</label>
-                <input type="tel" required placeholder="01X-XXXXXXX" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                <input id="quick-phone" type="tel" required placeholder="01X-XXXXXXX" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
               </div>
 
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Sektor Pekerjaan</label>
-                <select class="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
-                  <option value="kerajaan">Kakitangan Kerajaan</option>
-                  <option value="swasta">Sektor Swasta</option>
-                  <option value="sendiri">Bekerja Sendiri / Perniagaan</option>
-                  <option value="glc">Badan Berkanun / GLC</option>
+                <select id="quick-sector" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                  <option value="Kakitangan Kerajaan">Kakitangan Kerajaan</option>
+                  <option value="Sektor Swasta">Sektor Swasta</option>
+                  <option value="Bekerja Sendiri / Perniagaan">Bekerja Sendiri / Perniagaan</option>
+                  <option value="Badan Berkanun / GLC">Badan Berkanun / GLC</option>
                 </select>
               </div>
 
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Gaji Bersih Bulanan</label>
-                <select class="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
-                  <option value="bawah-2500">Bawah RM 2,500</option>
-                  <option value="2500-4000" selected>RM 2,500 - RM 4,000</option>
-                  <option value="4001-6000">RM 4,001 - RM 6,000</option>
-                  <option value="atas-6000">Lebih RM 6,000</option>
+                <select id="quick-income" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                  <option value="Bawah RM 2,500">Bawah RM 2,500</option>
+                  <option value="RM 2,500 - RM 4,000" selected>RM 2,500 - RM 4,000</option>
+                  <option value="RM 4,001 - RM 6,000">RM 4,001 - RM 6,000</option>
+                  <option value="Lebih RM 6,000">Lebih RM 6,000</option>
                 </select>
               </div>
 
-              <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-md">
+              <button id="quick-submit-btn" type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-md">
                 Semak Kelayakan Saya Sekarang
               </button>
 
@@ -182,6 +182,21 @@
                 <span class="text-[11px] text-slate-400">Unit terhad kepada 587 pemohon yang layak sahaja</span>
               </div>
             </form>
+
+            <div id="quick-form-success" class="hidden text-center py-6 space-y-3">
+              <div class="bg-emerald-100 text-emerald-800 w-12 h-12 rounded-full mx-auto flex items-center justify-center font-black text-xl">
+                OK
+              </div>
+              <h4 class="text-lg font-extrabold text-slate-900">Maklumat Berjaya Diterima</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Permohonan anda telah direkodkan ke dalam sistem. Pegawai penasihat kami sedia membantu anda sekarang melalui WhatsApp.
+              </p>
+              <div class="pt-2">
+                <a id="quick-wa-btn" href="#" target="_blank" class="inline-block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition shadow">
+                  Hubungi Pegawai via WhatsApp Sekarang
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -741,53 +756,53 @@
           <div class="grid sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nama Penuh (Seperti MyKad)</label>
-              <input type="text" required placeholder="Nama penuh anda" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <input id="main-name" type="text" required placeholder="Nama penuh anda" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nombor WhatsApp / Telefon</label>
-              <input type="tel" required placeholder="Contoh: 0123456789" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <input id="main-phone" type="tel" required placeholder="Contoh: 0123456789" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
             </div>
           </div>
 
           <div class="grid sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Alamat Emel</label>
-              <input type="email" placeholder="nama@email.com" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <input id="main-email" type="email" placeholder="nama@email.com" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Umur Pemohon</label>
-              <input type="number" min="21" max="75" placeholder="Contoh: 29" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <input id="main-age" type="number" min="21" max="75" placeholder="Contoh: 29" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
             </div>
           </div>
 
           <div class="grid sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Sektor Pekerjaan</label>
-              <select class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
-                <option value="kerajaan">Kakitangan Kerajaan</option>
-                <option value="swasta">Sektor Swasta</option>
-                <option value="sendiri">Bekerja Sendiri / Perniagaan</option>
-                <option value="glc">Badan Berkanun / GLC</option>
+              <select id="main-sector" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                <option value="Kakitangan Kerajaan">Kakitangan Kerajaan</option>
+                <option value="Sektor Swasta">Sektor Swasta</option>
+                <option value="Bekerja Sendiri / Perniagaan">Bekerja Sendiri / Perniagaan</option>
+                <option value="Badan Berkanun / GLC">Badan Berkanun / GLC</option>
               </select>
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Pendapatan Bersih Bulanan</label>
-              <select class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
-                <option value="bawah-2500">Bawah RM 2,500</option>
-                <option value="2500-4000" selected>RM 2,500 - RM 4,000</option>
-                <option value="4001-6000">RM 4,001 - RM 6,000</option>
-                <option value="atas-6000">Lebih RM 6,000</option>
+              <select id="main-income" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                <option value="Bawah RM 2,500">Bawah RM 2,500</option>
+                <option value="RM 2,500 - RM 4,000" selected>RM 2,500 - RM 4,000</option>
+                <option value="RM 4,001 - RM 6,000">RM 4,001 - RM 6,000</option>
+                <option value="Lebih RM 6,000">Lebih RM 6,000</option>
               </select>
             </div>
           </div>
 
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kaitan Anda Dengan Wilayah Persekutuan</label>
-            <select class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
-              <option value="bekerja">Saya Sedang Bekerja di Wilayah Persekutuan</option>
-              <option value="menetap">Saya Sedang Menetap di Wilayah Persekutuan</option>
-              <option value="lahir">Saya Dilahirkan di Wilayah Persekutuan</option>
-              <option value="semua">Semua Di Atas Berkaitan</option>
+            <select id="main-wp" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+              <option value="Saya Sedang Bekerja di Wilayah Persekutuan">Saya Sedang Bekerja di Wilayah Persekutuan</option>
+              <option value="Saya Sedang Menetap di Wilayah Persekutuan">Saya Sedang Menetap di Wilayah Persekutuan</option>
+              <option value="Saya Dilahirkan di Wilayah Persekutuan">Saya Dilahirkan di Wilayah Persekutuan</option>
+              <option value="Semua Di Atas Berkaitan">Semua Di Atas Berkaitan</option>
             </select>
           </div>
 
@@ -795,18 +810,18 @@
             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Adakah Ini Rumah Pertama Anda di Wilayah Persekutuan?</label>
             <div class="grid grid-cols-2 gap-3">
               <label class="flex items-center gap-2 p-3 border border-slate-300 rounded-xl cursor-pointer hover:bg-slate-50 text-sm">
-                <input type="radio" name="first_home" value="ya" checked class="text-emerald-600 focus:ring-emerald-500">
+                <input type="radio" name="first_home" value="Ya, Rumah Pertama" checked class="text-emerald-600 focus:ring-emerald-500">
                 <span class="font-medium text-slate-800">Ya, Rumah Pertama</span>
               </label>
               <label class="flex items-center gap-2 p-3 border border-slate-300 rounded-xl cursor-pointer hover:bg-slate-50 text-sm">
-                <input type="radio" name="first_home" value="tidak" class="text-emerald-600 focus:ring-emerald-500">
+                <input type="radio" name="first_home" value="Bukan Rumah Pertama" class="text-emerald-600 focus:ring-emerald-500">
                 <span class="font-medium text-slate-800">Bukan Rumah Pertama</span>
               </label>
             </div>
           </div>
 
           <div class="pt-3">
-            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base sm:text-lg py-4 px-8 rounded-xl shadow-lg transition transform hover:-translate-y-0.5">
+            <button id="main-submit-btn" type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base sm:text-lg py-4 px-8 rounded-xl shadow-lg transition transform hover:-translate-y-0.5">
               Hantar Permohonan Semakan Kelayakan Percuma
             </button>
           </div>
@@ -823,9 +838,14 @@
             OK
           </div>
           <h3 class="text-2xl font-black text-slate-900">Maklumat Berjaya Diterima!</h3>
-          <p class="text-slate-600 max-w-md mx-auto text-sm">
-            Pegawai penasihat perumahan kami akan menghubungi anda melalui WhatsApp dalam tempoh 24 jam untuk memaklumkan keputusan semakan kelayakan dan panduan langkah seterusnya.
+          <p class="text-slate-600 max-w-md mx-auto text-sm leading-relaxed">
+            Maklumat permohonan semakan anda telah direkodkan ke dalam sistem. Pegawai penasihat perumahan kami akan menghubungi anda melalui WhatsApp dalam tempoh 24 jam untuk memaklumkan keputusan semakan.
           </p>
+          <div class="pt-3">
+            <a id="main-wa-btn" href="#" target="_blank" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base py-4 px-8 rounded-xl shadow-lg transition transform hover:-translate-y-0.5">
+              Hubungi Pegawai via WhatsApp Sekarang
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -915,16 +935,122 @@
   </footer>
 
   <script>
-    function handleQuickSubmit(e) {
+    const CRM_API_ENDPOINT = "https://lead-tracker-crm-api.huzaimrosli.workers.dev/api/public-lead";
+    const CRM_USER_ID = "usr_g_178653672339098";
+    const WA_PHONE = "60108118559";
+
+    async function handleQuickSubmit(e) {
       e.preventDefault();
-      const el = document.getElementById('semak-kelayakan');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
+      const btn = document.getElementById('quick-submit-btn');
+      const originalText = btn.innerText;
+      btn.disabled = true;
+      btn.innerText = "Menghantar Maklumat...";
+
+      const name = document.getElementById('quick-name').value.trim();
+      const phone = document.getElementById('quick-phone').value.trim();
+      const sector = document.getElementById('quick-sector').value;
+      const income = document.getElementById('quick-income').value;
+
+      const payload = {
+        userId: CRM_USER_ID,
+        name: name,
+        phone: phone,
+        niche: "Hartanah",
+        product: "Residensi MADANI Serunai",
+        source: "Landing Page - Kad Semakan Pantas (Hero)",
+        notes: `Sektor: ${sector} | Gaji Bersih: ${income}`
+      };
+
+      try {
+        await fetch(CRM_API_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.warn("CRM connection notice:", err);
       }
+
+      const waMsg = encodeURIComponent(
+        `Salam Tuan, saya telah menghantar maklumat semakan pantas bagi Residensi MADANI Serunai di laman web.\n\n` +
+        `Nama: ${name}\n` +
+        `Telefon: ${phone}\n` +
+        `Sektor: ${sector}\n` +
+        `Gaji Bersih: ${income}\n\n` +
+        `Mohon semakan kelayakan pembiayaan saya. Terima kasih!`
+      );
+      const waUrl = `https://wa.me/${WA_PHONE}?text=${waMsg}`;
+
+      const waBtn = document.getElementById('quick-wa-btn');
+      if (waBtn) waBtn.setAttribute('href', waUrl);
+
+      document.getElementById('hero-quick-form').classList.add('hidden');
+      document.getElementById('quick-form-success').classList.remove('hidden');
     }
 
-    function handleMainSubmit(e) {
+    async function handleMainSubmit(e) {
       e.preventDefault();
+      const btn = document.getElementById('main-submit-btn');
+      const originalText = btn.innerText;
+      btn.disabled = true;
+      btn.innerText = "Menghantar Permohonan...";
+
+      const name = document.getElementById('main-name').value.trim();
+      const phone = document.getElementById('main-phone').value.trim();
+      const email = document.getElementById('main-email').value.trim();
+      const age = document.getElementById('main-age').value.trim();
+      const sector = document.getElementById('main-sector').value;
+      const income = document.getElementById('main-income').value;
+      const wp = document.getElementById('main-wp').value;
+      const firstHomeInput = document.querySelector('input[name="first_home"]:checked');
+      const firstHome = firstHomeInput ? firstHomeInput.value : "Ya, Rumah Pertama";
+
+      const notesParts = [];
+      if (age) notesParts.push(`Umur: ${age} tahun`);
+      notesParts.push(`Sektor: ${sector}`);
+      notesParts.push(`Gaji Bersih: ${income}`);
+      notesParts.push(`Kaitan WP: ${wp}`);
+      notesParts.push(`Status Rumah: ${firstHome}`);
+      const notes = notesParts.join(" | ");
+
+      const payload = {
+        userId: CRM_USER_ID,
+        name: name,
+        phone: phone,
+        email: email || null,
+        niche: "Hartanah",
+        product: "Residensi MADANI Serunai",
+        source: "Landing Page - Borang Penuh Semakan Kelayakan",
+        notes: notes
+      };
+
+      try {
+        await fetch(CRM_API_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.warn("CRM connection notice:", err);
+      }
+
+      const waMsg = encodeURIComponent(
+        `Salam Tuan, saya telah mengisi borang permohonan semakan kelayakan penuh bagi projek Residensi MADANI Serunai Presint 5 Putrajaya.\n\n` +
+        `Nama: ${name}\n` +
+        `Telefon: ${phone}\n` +
+        (email ? `Emel: ${email}\n` : '') +
+        (age ? `Umur: ${age} tahun\n` : '') +
+        `Sektor: ${sector}\n` +
+        `Gaji Bersih: ${income}\n` +
+        `Kaitan WP: ${wp}\n` +
+        `Status Rumah: ${firstHome}\n\n` +
+        `Mohon panduan pegawai penasihat untuk semakan kelayakan dan langkah seterusnya. Terima kasih!`
+      );
+      const waUrl = `https://wa.me/${WA_PHONE}?text=${waMsg}`;
+
+      const waBtn = document.getElementById('main-wa-btn');
+      if (waBtn) waBtn.setAttribute('href', waUrl);
+
       document.getElementById('main-lead-form').classList.add('hidden');
       document.getElementById('form-success').classList.remove('hidden');
     }
