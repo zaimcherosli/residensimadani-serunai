@@ -123,6 +123,9 @@
           <a href="#lokasi" class="hover:text-slate-900 transition">Lokasi</a>
           <a href="#kelayakan" class="hover:text-slate-900 transition">Kelayakan</a>
         </div>
+        <button onclick="openPwaBannerManual()" class="hidden sm:inline-flex items-center text-xs font-bold text-slate-700 hover:text-emerald-700 py-2 px-3 rounded-lg border border-slate-200 hover:border-emerald-500 transition">
+          Pasang App
+        </button>
         <a href="#semak-kelayakan" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold py-2 px-3.5 sm:px-5 rounded-lg shadow-sm transition whitespace-nowrap">
           Daftar Minat
         </a>
@@ -1248,6 +1251,130 @@
         navigator.serviceWorker.register('/sw.js').catch(() => {});
       });
     }
+
+    // ----------------------------------------------------
+    // PWA INSTALLER & PLATFORM DETECTION
+    // ----------------------------------------------------
+    let deferredPrompt = null;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isAndroid = /Android/.test(navigator.userAgent);
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const nativeBtn = document.getElementById('pwa-native-install-btn');
+      if (nativeBtn) {
+        nativeBtn.classList.remove('hidden');
+      }
+      checkAndShowPwaBanner();
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      dismissPwaBanner();
+      console.log('PWA berjaya dipasang.');
+    });
+
+    function checkAndShowPwaBanner() {
+      if (isStandalone) return;
+
+      const lastDismissed = localStorage.getItem('pwa_banner_dismissed');
+      if (lastDismissed) {
+        const timeDiff = Date.now() - parseInt(lastDismissed, 10);
+        if (timeDiff < 24 * 60 * 60 * 1000) {
+          return;
+        }
+      }
+
+      setTimeout(() => {
+        showPwaBanner();
+      }, 3500);
+    }
+
+    function showPwaBanner() {
+      const banner = document.getElementById('pwa-install-banner');
+      if (banner && !isStandalone) {
+        banner.classList.remove('hidden');
+        setTimeout(() => {
+          banner.classList.remove('translate-y-4', 'opacity-0');
+          banner.classList.add('translate-y-0', 'opacity-100');
+        }, 50);
+      }
+    }
+
+    function dismissPwaBanner() {
+      const banner = document.getElementById('pwa-install-banner');
+      if (banner) {
+        banner.classList.add('translate-y-4', 'opacity-0');
+        banner.classList.remove('translate-y-0', 'opacity-100');
+        setTimeout(() => {
+          banner.classList.add('hidden');
+        }, 300);
+        localStorage.setItem('pwa_banner_dismissed', Date.now().toString());
+      }
+    }
+
+    function openPwaBannerManual() {
+      if (isIOS) {
+        showPwaGuide('ios');
+      } else if (deferredPrompt) {
+        triggerNativeInstall();
+      } else {
+        showPwaGuide('android');
+      }
+    }
+
+    async function triggerNativeInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          dismissPwaBanner();
+        }
+        deferredPrompt = null;
+      } else {
+        showPwaGuide('android');
+      }
+    }
+
+    function showPwaGuide(platform) {
+      const modal = document.getElementById('pwa-guide-modal');
+      if (modal) {
+        switchGuideTab(platform);
+        modal.classList.remove('hidden');
+      }
+    }
+
+    function closePwaGuide() {
+      const modal = document.getElementById('pwa-guide-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function switchGuideTab(platform) {
+      const iosTab = document.getElementById('tab-btn-ios');
+      const androidTab = document.getElementById('tab-btn-android');
+      const iosContent = document.getElementById('guide-content-ios');
+      const androidContent = document.getElementById('guide-content-android');
+
+      if (platform === 'ios') {
+        iosTab.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition bg-white text-slate-900 shadow-sm text-center';
+        androidTab.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-500 hover:text-slate-900 text-center';
+        iosContent.classList.remove('hidden');
+        androidContent.classList.add('hidden');
+      } else {
+        androidTab.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition bg-white text-slate-900 shadow-sm text-center';
+        iosTab.className = 'flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-500 hover:text-slate-900 text-center';
+        androidContent.classList.remove('hidden');
+        iosContent.classList.add('hidden');
+      }
+    }
+
+    window.addEventListener('load', () => {
+      checkAndShowPwaBanner();
+    });
   </script>
 
   <!-- PWA Mobile Bottom Navigation Dock (Menu Bawah Aplikasi) -->
@@ -1284,5 +1411,143 @@
       </a>
     </div>
   </aside>
+
+  <!-- PWA INSTALLER BANNER (FLOATING NOTIFICATION) -->
+  <div id="pwa-install-banner" class="hidden fixed bottom-20 md:bottom-6 left-3 right-3 md:left-auto md:right-6 md:max-w-md z-50 bg-slate-900 text-white rounded-2xl p-5 shadow-2xl border border-emerald-500/30 transition-all duration-300 transform translate-y-4 opacity-0">
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-emerald-600 flex items-center justify-center font-black text-white text-base shrink-0 shadow-md">
+          RM
+        </div>
+        <div>
+          <h4 class="text-sm font-extrabold text-white leading-tight">Pasang Aplikasi Residensi MADANI</h4>
+          <p class="text-[11px] text-slate-300 mt-0.5">Akses pantas terus dari skrin telefon tanpa perlu buka pelayar web.</p>
+        </div>
+      </div>
+      <button onclick="dismissPwaBanner()" class="text-slate-400 hover:text-white p-1 rounded-lg transition" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Pilihan Butang Tindakan -->
+    <div class="mt-4 flex flex-col gap-2">
+      <!-- Butang Pemasangan Terus (Chrome / Android Native Prompt) -->
+      <button id="pwa-native-install-btn" onclick="triggerNativeInstall()" class="hidden w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-2.5 px-4 rounded-xl text-xs transition shadow text-center">
+        Pasang Aplikasi Sekarang
+      </button>
+      
+      <!-- Butang Buka Panduan iOS / Android Manual -->
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="showPwaGuide('ios')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2 px-3 rounded-xl text-xs transition border border-slate-700 text-center">
+          Panduan iPhone (iOS)
+        </button>
+        <button onclick="showPwaGuide('android')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2 px-3 rounded-xl text-xs transition border border-slate-700 text-center">
+          Panduan Android
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PANDUAN PEMASANGAN TERPERINCI (IOS & ANDROID) -->
+  <div id="pwa-guide-modal" onclick="if(event.target === this) closePwaGuide()" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm transition-opacity">
+    <div class="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-200">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <h3 id="pwa-guide-title" class="text-base font-extrabold text-slate-900">
+          Panduan Pasang Aplikasi di Telefon
+        </h3>
+        <button onclick="closePwaGuide()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg transition" aria-label="Tutup">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Tab Penukar Panduan (iOS vs Android) -->
+      <div class="flex rounded-xl bg-slate-100 p-1 mb-5">
+        <button id="tab-btn-ios" onclick="switchGuideTab('ios')" class="flex-1 py-2 text-xs font-bold rounded-lg transition bg-white text-slate-900 shadow-sm text-center">
+          Apple iPhone / iPad
+        </button>
+        <button id="tab-btn-android" onclick="switchGuideTab('android')" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-500 hover:text-slate-900 text-center">
+          Android / Chrome
+        </button>
+      </div>
+
+      <!-- Kandungan Panduan iOS -->
+      <div id="guide-content-ios" class="space-y-4 text-xs text-slate-700">
+        <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl">
+          <p class="font-bold text-emerald-950 text-xs mb-1">Peringatan Penting</p>
+          <p class="text-emerald-800 leading-relaxed text-[11px]">
+            Sila pastikan anda membuka pautan ini menggunakan pelayar Safari pada peranti iPhone atau iPad anda.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="w-6 h-6 rounded-full bg-slate-900 text-white font-black text-xs flex items-center justify-center shrink-0">1</span>
+            <div>
+              <p class="font-bold text-slate-900">Tekan Butang Kongsi (Share)</p>
+              <p class="text-slate-500 mt-0.5 text-[11px]">Tekan butang kotak dengan anak panah ke atas di bar menu bawah pelayar Safari.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="w-6 h-6 rounded-full bg-slate-900 text-white font-black text-xs flex items-center justify-center shrink-0">2</span>
+            <div>
+              <p class="font-bold text-slate-900">Pilih 'Tambah ke Skrin Utama'</p>
+              <p class="text-slate-500 mt-0.5 text-[11px]">Skrol senarai pilihan ke bawah dan tekan 'Add to Home Screen'.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="w-6 h-6 rounded-full bg-slate-900 text-white font-black text-xs flex items-center justify-center shrink-0">3</span>
+            <div>
+              <p class="font-bold text-slate-900">Sahkan Pemasangan</p>
+              <p class="text-slate-500 mt-0.5 text-[11px]">Tekan butang 'Tambah' (Add) di sudut kanan atas skrin. Aplikasi siap dipasang pada skrin telefon anda.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kandungan Panduan Android -->
+      <div id="guide-content-android" class="hidden space-y-4 text-xs text-slate-700">
+        <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl">
+          <p class="font-bold text-emerald-950 text-xs mb-1">Pelayar Disyorkan</p>
+          <p class="text-emerald-800 leading-relaxed text-[11px]">
+            Buka laman ini menggunakan Google Chrome atau Samsung Internet untuk pengalaman pemasangan terbaik.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="w-6 h-6 rounded-full bg-slate-900 text-white font-black text-xs flex items-center justify-center shrink-0">1</span>
+            <div>
+              <p class="font-bold text-slate-900">Tekan Menu Tiga Titik</p>
+              <p class="text-slate-500 mt-0.5 text-[11px]">Tekan butang tiga titik menegak di penjuru atas kanan pelayar Google Chrome.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="w-6 h-6 rounded-full bg-slate-900 text-white font-black text-xs flex items-center justify-center shrink-0">2</span>
+            <div>
+              <p class="font-bold text-slate-900">Pilih 'Pasang Aplikasi'</p>
+              <p class="text-slate-500 mt-0.5 text-[11px]">Tekan pilihan 'Install App' atau 'Tambah ke Skrin Utama' (Add to Home screen).</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <span class="w-6 h-6 rounded-full bg-slate-900 text-white font-black text-xs flex items-center justify-center shrink-0">3</span>
+            <div>
+              <p class="font-bold text-slate-900">Sahkan 'Pasang'</p>
+              <p class="text-slate-500 mt-0.5 text-[11px]">Tekan butang 'Install'. Aplikasi Residensi MADANI akan muncul di skrin telefon anda seperti aplikasi biasa.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 pt-3 border-t border-slate-100">
+        <button onclick="closePwaGuide()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 px-4 rounded-xl text-xs transition shadow text-center">
+          Saya Faham, Tutup Panduan
+        </button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
