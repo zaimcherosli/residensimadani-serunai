@@ -1295,6 +1295,23 @@
     function showPwaBanner() {
       const banner = document.getElementById('pwa-install-banner');
       if (banner && !isStandalone) {
+        const androidBox = document.getElementById('pwa-action-android');
+        const iosBox = document.getElementById('pwa-action-ios');
+        const bannerTitle = document.getElementById('pwa-banner-title');
+        const bannerSub = document.getElementById('pwa-banner-sub');
+
+        if (isIOS) {
+          if (androidBox) androidBox.classList.add('hidden');
+          if (iosBox) iosBox.classList.remove('hidden');
+          if (bannerTitle) bannerTitle.innerText = "Pasang Aplikasi di iPhone";
+          if (bannerSub) bannerSub.innerText = "Akses pantas terus dari skrin telefon tanpa perlu buka Safari setiap kali.";
+        } else {
+          if (iosBox) iosBox.classList.add('hidden');
+          if (androidBox) androidBox.classList.remove('hidden');
+          if (bannerTitle) bannerTitle.innerText = "Pasang Aplikasi Residensi MADANI";
+          if (bannerSub) bannerSub.innerText = "Akses pantas terus dari skrin telefon tanpa perlu buka pelayar web.";
+        }
+
         banner.classList.remove('hidden');
         setTimeout(() => {
           banner.classList.remove('translate-y-4', 'opacity-0');
@@ -1420,8 +1437,8 @@
           RM
         </div>
         <div>
-          <h4 class="text-sm font-extrabold text-white leading-tight">Pasang Aplikasi Residensi MADANI</h4>
-          <p class="text-[11px] text-slate-300 mt-0.5">Akses pantas terus dari skrin telefon tanpa perlu buka pelayar web.</p>
+          <h4 id="pwa-banner-title" class="text-sm font-extrabold text-white leading-tight">Pasang Aplikasi Residensi MADANI</h4>
+          <p id="pwa-banner-sub" class="text-[11px] text-slate-300 mt-0.5">Akses pantas terus dari skrin telefon tanpa perlu buka pelayar web.</p>
         </div>
       </div>
       <button onclick="dismissPwaBanner()" class="text-slate-400 hover:text-white p-1 rounded-lg transition" aria-label="Tutup">
@@ -1429,21 +1446,28 @@
       </button>
     </div>
 
-    <!-- Pilihan Butang Tindakan -->
-    <div class="mt-4 flex flex-col gap-2">
-      <!-- Butang Pemasangan Terus (Chrome / Android Native Prompt) -->
-      <button id="pwa-native-install-btn" onclick="triggerNativeInstall()" class="hidden w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-2.5 px-4 rounded-xl text-xs transition shadow text-center">
-        Pasang Aplikasi Sekarang
-      </button>
-      
-      <!-- Butang Buka Panduan iOS / Android Manual -->
-      <div class="grid grid-cols-2 gap-2">
-        <button onclick="showPwaGuide('ios')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2 px-3 rounded-xl text-xs transition border border-slate-700 text-center">
-          Panduan iPhone (iOS)
+    <!-- Pilihan Butang Tindakan Mengikut Peranti -->
+    <div class="mt-4">
+      <!-- Paparan Android / Chrome: Terus Butang 'Pasang Sekarang' -->
+      <div id="pwa-action-android" class="space-y-2">
+        <button onclick="triggerNativeInstall()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 px-4 rounded-xl text-xs transition shadow-lg text-center">
+          Pasang Sekarang
         </button>
-        <button onclick="showPwaGuide('android')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2 px-3 rounded-xl text-xs transition border border-slate-700 text-center">
-          Panduan Android
+        <div class="text-center">
+          <button onclick="showPwaGuide('android')" class="text-[11px] text-slate-400 hover:text-slate-200 underline underline-offset-2">
+            Lihat Panduan Pemasangan Android
+          </button>
+        </div>
+      </div>
+
+      <!-- Paparan iOS (iPhone / iPad): Butang Panduan Pemasangan -->
+      <div id="pwa-action-ios" class="hidden space-y-2">
+        <button onclick="showPwaGuide('ios')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 px-4 rounded-xl text-xs transition shadow-lg text-center">
+          Panduan Pasang di iPhone
         </button>
+        <div class="text-center">
+          <span class="text-[11px] text-slate-400">Tekan butang Share di Safari & Tambah ke Skrin Utama</span>
+        </div>
       </div>
     </div>
   </div>
