@@ -1,0 +1,25 @@
+{
+  "name": "Residensi MADANI Serunai Putrajaya",
+  "short_name": "Serunai Madani",
+  "description": "Laman Jualan Rasmi Residensi MADANI Serunai Presint 5 Putrajaya - Kediaman Mampu Milik RM200,000",
+  "start_url": "/serunai/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "icons": [
+    {
+      "src": "https://residensimadani.jwp.gov.my/images/residensi_madani_h50.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://residensimadani.jwp.gov.my/images/residensi_madani_h50.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,8 +1,14 @@
 <!DOCTYPE html>
 <html lang="ms" class="scroll-smooth">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- PWA Meta Tags & Mobile Enhancements -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#020617">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Serunai Madani">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="https://residensimadani.jwp.gov.my/images/residensi_madani_h50.png">
   <title>Residensi MADANI Serunai | Kediaman Mampu Milik Presint 5 Putrajaya</title>
   <meta name="description" content="Peluang keemasan miliki rumah 3 bilik 800 kps di Presint 5 Putrajaya pada harga RM200,000 sahaja. Ansuran serendah RM900 sebulan. Semak kelayakan anda hari ini.">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -31,9 +37,14 @@
       text-transform: uppercase;
       font-weight: 700;
     }
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      .safe-bottom {
+        padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
+      }
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans antialiased">
+<body class="bg-slate-50 text-slate-900 font-sans antialiased pb-20 md:pb-0">
 
   <!-- Pengumuman Atas (Top Banner Ringkas & Padat) -->
   <header class="bg-slate-950 text-white text-[11px] sm:text-xs py-1.5 px-3 sm:px-4 border-b border-emerald-500/20">
@@ -1012,6 +1023,77 @@
 
     // Start auto scroll on page load
     startAutoScroll();
+
+    // PWA Bottom Nav Scroll Spy (Highlight active bottom tab)
+    const navTabs = document.querySelectorAll('.pwa-nav-tab');
+    const sections = ['top', 'spesifikasi', 'kiraan-sewa', 'lokasi', 'semak-kelayakan'];
+
+    window.addEventListener('scroll', () => {
+      let currentSection = 'top';
+      const scrollPos = window.scrollY + 200;
+
+      sections.forEach((id) => {
+        if (id === 'top') return;
+        const el = document.getElementById(id);
+        if (el && el.offsetTop <= scrollPos) {
+          currentSection = id;
+        }
+      });
+
+      navTabs.forEach((tab) => {
+        const target = tab.getAttribute('data-target');
+        if (target === 'semak-kelayakan') return; // Keep CTA button distinct
+        if (target === currentSection) {
+          tab.classList.add('text-emerald-400');
+          tab.classList.remove('text-slate-400');
+        } else {
+          tab.classList.remove('text-emerald-400');
+          tab.classList.add('text-slate-400');
+        }
+      });
+    }, { passive: true });
+
+    // Register PWA Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
   </script>
+
+  <!-- PWA Mobile Bottom Navigation Dock (Menu Bawah Aplikasi) -->
+  <aside class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800/90 px-2 pt-2 safe-bottom shadow-[0_-8px_25px_rgba(0,0,0,0.6)]">
+    <div class="max-w-md mx-auto grid grid-cols-5 items-center text-center gap-1">
+      <!-- Tab 1: Utama -->
+      <a href="#" class="pwa-nav-tab flex flex-col items-center justify-center py-1 text-emerald-400 active:scale-95 transition" data-target="top">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span class="text-[10px] font-bold tracking-tight">Utama</span>
+      </a>
+
+      <!-- Tab 2: Spesifikasi -->
+      <a href="#spesifikasi" class="pwa-nav-tab flex flex-col items-center justify-center py-1 text-slate-400 hover:text-emerald-400 active:scale-95 transition" data-target="spesifikasi">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        <span class="text-[10px] font-semibold tracking-tight">Rumah</span>
+      </a>
+
+      <!-- Tab 3: Kiraan Sewa vs Beli -->
+      <a href="#kiraan-sewa" class="pwa-nav-tab flex flex-col items-center justify-center py-1 text-slate-400 hover:text-emerald-400 active:scale-95 transition" data-target="kiraan-sewa">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+        <span class="text-[10px] font-semibold tracking-tight">Kiraan</span>
+      </a>
+
+      <!-- Tab 4: Lokasi -->
+      <a href="#lokasi" class="pwa-nav-tab flex flex-col items-center justify-center py-1 text-slate-400 hover:text-emerald-400 active:scale-95 transition" data-target="lokasi">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span class="text-[10px] font-semibold tracking-tight">Lokasi</span>
+      </a>
+
+      <!-- Tab 5: Semak / Daftar CTA -->
+      <a href="#semak-kelayakan" class="pwa-nav-tab flex flex-col items-center justify-center py-1.5 px-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-md active:scale-95 transition transform" data-target="semak-kelayakan">
+        <svg class="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-[10px] font-black tracking-tight leading-none">Daftar</span>
+      </a>
+    </div>
+  </aside>
 </body>
 </html>
