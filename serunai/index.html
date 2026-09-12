@@ -2,13 +2,21 @@
 <html lang="ms" class="scroll-smooth">
   <!-- PWA Meta Tags & Mobile Enhancements -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="/serunai/manifest.json">
   <meta name="theme-color" content="#020617">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Serunai Madani">
   <meta name="mobile-web-app-capable" content="yes">
-  <link rel="apple-touch-icon" href="https://residensimadani.jwp.gov.my/images/residensi_madani_h50.png">
+  <link rel="apple-touch-icon" href="/serunai/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/serunai/icon-192.png">
+  <script>
+    window.deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      window.deferredPrompt = e;
+    });
+  </script>
   <title>Residensi MADANI Serunai | Kediaman Mampu Milik Presint 5 Putrajaya</title>
   <meta name="description" content="Peluang keemasan miliki rumah 3 bilik 800 kps di Presint 5 Putrajaya pada harga RM200,000 sahaja. Ansuran serendah RM900 sebulan. Semak kelayakan anda hari ini.">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -1343,15 +1351,52 @@
     }
 
     async function triggerNativeInstall() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
+      const promptEvent = window.deferredPrompt || deferredPrompt;
+      if (promptEvent) {
+        promptEvent.prompt();
+        const { outcome } = await promptEvent.userChoice;
         if (outcome === 'accepted') {
           dismissPwaBanner();
         }
+        window.deferredPrompt = null;
+        deferredPrompt = null;
+        return;
+      }
+
+      // If deferredPrompt is not yet ready, wait briefly
+      const btn = document.querySelector('#pwa-action-android button');
+      const originalText = btn ? btn.innerText : 'Pasang Sekarang';
+      if (btn) btn.innerText = "Memproses Pemasangan...";
+
+      const promptAppeared = await new Promise((resolve) => {
+        const timeout = setTimeout(() => resolve(false), 1200);
+        window.addEventListener('beforeinstallprompt', (e) => {
+          clearTimeout(timeout);
+          e.preventDefault();
+          window.deferredPrompt = e;
+          deferredPrompt = e;
+          resolve(true);
+        }, { once: true });
+      });
+
+      if (btn) btn.innerText = originalText;
+
+      const activePrompt = window.deferredPrompt || deferredPrompt;
+      if (activePrompt) {
+        activePrompt.prompt();
+        const { outcome } = await activePrompt.userChoice;
+        if (outcome === 'accepted') {
+          dismissPwaBanner();
+        }
+        window.deferredPrompt = null;
         deferredPrompt = null;
       } else {
-        showPwaGuide('android');
+        if (btn) {
+          btn.innerText = "Sila tekan menu ⋮ di atas & 'Install app'";
+          setTimeout(() => {
+            btn.innerText = "Pasang Sekarang";
+          }, 4000);
+        }
       }
     }
 

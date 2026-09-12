@@ -1,10 +1,12 @@
 // Service Worker for Residensi MADANI Serunai PWA
-const CACHE_NAME = 'serunai-pwa-v1';
+const CACHE_NAME = 'serunai-pwa-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/serunai/',
   '/serunai/index.html',
-  '/manifest.json'
+  '/serunai/manifest.json',
+  '/serunai/icon-192.png',
+  '/serunai/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
