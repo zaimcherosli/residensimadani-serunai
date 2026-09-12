@@ -225,13 +225,8 @@
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Gaji Bersih Bulanan</label>
-                <select id="quick-income" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
-                  <option value="Bawah RM 2,500">Bawah RM 2,500</option>
-                  <option value="RM 2,500 - RM 4,000" selected>RM 2,500 - RM 4,000</option>
-                  <option value="RM 4,001 - RM 6,000">RM 4,001 - RM 6,000</option>
-                  <option value="Lebih RM 6,000">Lebih RM 6,000</option>
-                </select>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Gaji Bersih Bulanan (RM)</label>
+                <input id="quick-income" type="text" required placeholder="Contoh: RM 3,500" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
               </div>
 
               <button id="quick-submit-btn" type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-md">
@@ -846,12 +841,21 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Pendapatan Bersih Bulanan</label>
-              <select id="main-income" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
-                <option value="Bawah RM 2,500">Bawah RM 2,500</option>
-                <option value="RM 2,500 - RM 4,000" selected>RM 2,500 - RM 4,000</option>
-                <option value="RM 4,001 - RM 6,000">RM 4,001 - RM 6,000</option>
-                <option value="Lebih RM 6,000">Lebih RM 6,000</option>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Pendapatan Bersih Bulanan (RM)</label>
+              <input id="main-income" type="text" required placeholder="Contoh: RM 3,500" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Komitmen Bulanan Semasa (RM)</label>
+              <input id="main-commitment" type="text" placeholder="Contoh: Kereta, ASB, Pinjaman Peribadi, Kad Kredit (cth: RM 800 atau Tiada)" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Pendapatan Kasar Seluruh Isi Rumah Tidak Melebihi RM8,000?</label>
+              <select id="main-household-income" class="w-full text-sm px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                <option value="Ya, Tidak Melebihi RM8,000" selected>Ya, Tidak Melebihi RM8,000</option>
+                <option value="Tidak, Melebihi RM8,000">Tidak, Melebihi RM8,000</option>
               </select>
             </div>
           </div>
@@ -1066,7 +1070,9 @@
       const email = document.getElementById('main-email').value.trim();
       const age = document.getElementById('main-age').value.trim();
       const sector = document.getElementById('main-sector').value;
-      const income = document.getElementById('main-income').value;
+      const income = document.getElementById('main-income').value.trim();
+      const commitment = document.getElementById('main-commitment').value.trim();
+      const householdIncome = document.getElementById('main-household-income').value;
       const wp = document.getElementById('main-wp').value;
       const firstHomeInput = document.querySelector('input[name="first_home"]:checked');
       const firstHome = firstHomeInput ? firstHomeInput.value : "Ya, Rumah Pertama";
@@ -1075,6 +1081,8 @@
       if (age) notesParts.push(`Umur: ${age} tahun`);
       notesParts.push(`Sektor: ${sector}`);
       notesParts.push(`Gaji Bersih: ${income}`);
+      if (commitment) notesParts.push(`Komitmen: ${commitment}`);
+      notesParts.push(`Pendapatan Isi Rumah <= RM8k: ${householdIncome}`);
       notesParts.push(`Kaitan WP: ${wp}`);
       notesParts.push(`Status Rumah: ${firstHome}`);
       const notes = notesParts.join(" | ");
@@ -1097,7 +1105,9 @@
         (email ? `Emel: ${email}\n` : '') +
         (age ? `Umur: ${age} tahun\n` : '') +
         `Sektor: ${sector}\n` +
-        `Gaji Bersih: ${income}\n` +
+        `Pendapatan Bersih: ${income}\n` +
+        (commitment ? `Komitmen Semasa: ${commitment}\n` : '') +
+        `Pendapatan Kasar Isi Rumah <= RM8k: ${householdIncome}\n` +
         `Kaitan WP: ${wp}\n` +
         `Status Rumah: ${firstHome}\n\n` +
         `Mohon panduan pegawai penasihat untuk semakan kelayakan dan langkah seterusnya. Terima kasih!`
