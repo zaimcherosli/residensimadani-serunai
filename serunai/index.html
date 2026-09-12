@@ -189,11 +189,11 @@
               </div>
               <h4 class="text-lg font-extrabold text-slate-900">Maklumat Berjaya Diterima</h4>
               <p class="text-xs text-slate-600 leading-relaxed">
-                Permohonan anda telah direkodkan ke dalam sistem. Pegawai penasihat kami sedia membantu anda sekarang melalui WhatsApp.
+                Maklumat anda telah direkodkan ke dalam CRM dan WhatsApp sedang dibuka secara automatik. Jika WhatsApp tidak dibuka, sila klik butang di bawah.
               </p>
               <div class="pt-2">
                 <a id="quick-wa-btn" href="#" target="_blank" class="inline-block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition shadow">
-                  Hubungi Pegawai via WhatsApp Sekarang
+                  Buka WhatsApp Sekarang
                 </a>
               </div>
             </div>
@@ -839,11 +839,11 @@
           </div>
           <h3 class="text-2xl font-black text-slate-900">Maklumat Berjaya Diterima!</h3>
           <p class="text-slate-600 max-w-md mx-auto text-sm leading-relaxed">
-            Maklumat permohonan semakan anda telah direkodkan ke dalam sistem. Pegawai penasihat perumahan kami akan menghubungi anda melalui WhatsApp dalam tempoh 24 jam untuk memaklumkan keputusan semakan.
+            Maklumat permohonan semakan anda telah direkodkan ke dalam CRM dan WhatsApp sedang dibuka secara automatik. Jika WhatsApp tidak dibuka, sila klik butang di bawah.
           </p>
           <div class="pt-3">
             <a id="main-wa-btn" href="#" target="_blank" class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base py-4 px-8 rounded-xl shadow-lg transition transform hover:-translate-y-0.5">
-              Hubungi Pegawai via WhatsApp Sekarang
+              Buka WhatsApp Sekarang
             </a>
           </div>
         </div>
@@ -942,9 +942,8 @@
     async function handleQuickSubmit(e) {
       e.preventDefault();
       const btn = document.getElementById('quick-submit-btn');
-      const originalText = btn.innerText;
       btn.disabled = true;
-      btn.innerText = "Menghantar Maklumat...";
+      btn.innerText = "Membuka WhatsApp...";
 
       const name = document.getElementById('quick-name').value.trim();
       const phone = document.getElementById('quick-phone').value.trim();
@@ -961,16 +960,6 @@
         notes: `Sektor: ${sector} | Gaji Bersih: ${income}`
       };
 
-      try {
-        await fetch(CRM_API_ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-      } catch (err) {
-        console.warn("CRM connection notice:", err);
-      }
-
       const waMsg = encodeURIComponent(
         `Salam Tuan, saya telah menghantar maklumat semakan pantas bagi Residensi MADANI Serunai di laman web.\n\n` +
         `Nama: ${name}\n` +
@@ -981,19 +970,36 @@
       );
       const waUrl = `https://wa.me/${WA_PHONE}?text=${waMsg}`;
 
+      // Update backup link & show success container
       const waBtn = document.getElementById('quick-wa-btn');
       if (waBtn) waBtn.setAttribute('href', waUrl);
-
       document.getElementById('hero-quick-form').classList.add('hidden');
       document.getElementById('quick-form-success').classList.remove('hidden');
+
+      // 1. Send data to Lead Tracker CRM in background with keepalive
+      try {
+        await Promise.race([
+          fetch(CRM_API_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            keepalive: true
+          }),
+          new Promise(resolve => setTimeout(resolve, 300))
+        ]);
+      } catch (err) {
+        console.warn("CRM connection notice:", err);
+      }
+
+      // 2. Automated redirect to WhatsApp with pretext
+      window.location.href = waUrl;
     }
 
     async function handleMainSubmit(e) {
       e.preventDefault();
       const btn = document.getElementById('main-submit-btn');
-      const originalText = btn.innerText;
       btn.disabled = true;
-      btn.innerText = "Menghantar Permohonan...";
+      btn.innerText = "Membuka WhatsApp...";
 
       const name = document.getElementById('main-name').value.trim();
       const phone = document.getElementById('main-phone').value.trim();
@@ -1024,16 +1030,6 @@
         notes: notes
       };
 
-      try {
-        await fetch(CRM_API_ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-      } catch (err) {
-        console.warn("CRM connection notice:", err);
-      }
-
       const waMsg = encodeURIComponent(
         `Salam Tuan, saya telah mengisi borang permohonan semakan kelayakan penuh bagi projek Residensi MADANI Serunai Presint 5 Putrajaya.\n\n` +
         `Nama: ${name}\n` +
@@ -1048,11 +1044,29 @@
       );
       const waUrl = `https://wa.me/${WA_PHONE}?text=${waMsg}`;
 
+      // Update backup link & show success container
       const waBtn = document.getElementById('main-wa-btn');
       if (waBtn) waBtn.setAttribute('href', waUrl);
-
       document.getElementById('main-lead-form').classList.add('hidden');
       document.getElementById('form-success').classList.remove('hidden');
+
+      // 1. Send data to Lead Tracker CRM in background with keepalive
+      try {
+        await Promise.race([
+          fetch(CRM_API_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            keepalive: true
+          }),
+          new Promise(resolve => setTimeout(resolve, 300))
+        ]);
+      } catch (err) {
+        console.warn("CRM connection notice:", err);
+      }
+
+      // 2. Automated redirect to WhatsApp with pretext
+      window.location.href = waUrl;
     }
 
     // Auto-Scroll Gallery Carousel Logic
