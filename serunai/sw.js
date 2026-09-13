@@ -1,5 +1,5 @@
 // Service Worker for Residensi MADANI Serunai PWA
-const CACHE_NAME = 'serunai-pwa-v2';
+const CACHE_NAME = 'serunai-pwa-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/serunai/',

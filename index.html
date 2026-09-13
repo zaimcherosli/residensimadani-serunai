@@ -1013,14 +1013,17 @@
       const sector = document.getElementById('quick-sector').value;
       const income = document.getElementById('quick-income').value;
 
+      const pwaActive = (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true || new URLSearchParams(window.location.search).get('utm_source') === 'pwa_app');
+      const sourceText = pwaActive ? "Aplikasi PWA - Kad Semakan Pantas (Hero)" : "Landing Page - Kad Semakan Pantas (Hero)";
+
       const payload = {
         userId: CRM_USER_ID,
         name: name,
         phone: phone,
         niche: "Hartanah",
         product: "Residensi MADANI Serunai",
-        source: "Landing Page - Kad Semakan Pantas (Hero)",
-        notes: `Sektor: ${sector} | Gaji Bersih: ${income}`
+        source: sourceText,
+        notes: `Sektor: ${sector} | Gaji Bersih: ${income}` + (pwaActive ? " | Saluran: Aplikasi PWA" : "")
       };
 
       const waMsg = encodeURIComponent(
@@ -1076,6 +1079,9 @@
       const firstHomeInput = document.querySelector('input[name="first_home"]:checked');
       const firstHome = firstHomeInput ? firstHomeInput.value : "Ya, Rumah Pertama";
 
+      const pwaActive = (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true || new URLSearchParams(window.location.search).get('utm_source') === 'pwa_app');
+      const sourceText = pwaActive ? "Aplikasi PWA - Borang Penuh Semakan Kelayakan" : "Landing Page - Borang Penuh Semakan Kelayakan";
+
       const notesParts = [];
       if (age) notesParts.push(`Umur: ${age} tahun`);
       notesParts.push(`Sektor: ${sector}`);
@@ -1084,6 +1090,7 @@
       notesParts.push(`Pendapatan Isi Rumah <= RM8k: ${householdIncome}`);
       notesParts.push(`Kaitan WP: ${wp}`);
       notesParts.push(`Status Rumah: ${firstHome}`);
+      if (pwaActive) notesParts.push("Saluran: Aplikasi PWA");
       const notes = notesParts.join(" | ");
 
       const payload = {
@@ -1093,7 +1100,7 @@
         email: email || null,
         niche: "Hartanah",
         product: "Residensi MADANI Serunai",
-        source: "Landing Page - Borang Penuh Semakan Kelayakan",
+        source: sourceText,
         notes: notes
       };
 
@@ -1287,11 +1294,58 @@
       checkAndShowPwaBanner();
     });
 
+    const isFromPWA = isStandalone || new URLSearchParams(window.location.search).get('utm_source') === 'pwa_app';
+
     window.addEventListener('appinstalled', () => {
       deferredPrompt = null;
       dismissPwaBanner();
       console.log('PWA berjaya dipasang.');
+      localStorage.setItem('pwa_installed', 'true');
+      localStorage.setItem('pwa_installed_at', new Date().toISOString());
+
+      // Hantar rekod pemasangan ke Lead Tracker CRM
+      try {
+        fetch(CRM_API_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: CRM_USER_ID,
+            name: "Pemasangan Aplikasi Baru (PWA Installed)",
+            phone: "N/A",
+            niche: "Hartanah",
+            product: "Residensi MADANI Serunai",
+            source: "PWA App - Pemasangan Baru",
+            notes: `Pengguna berjaya memasang aplikasi Residensi MADANI Serunai ke skrin telefon pada ${new Date().toLocaleString('ms-MY')} | Peranti: ${isAndroid ? 'Android' : 'Desktop/Lain'}`
+          }),
+          keepalive: true
+        });
+      } catch (err) {
+        console.warn('PWA tracking notice:', err);
+      }
     });
+
+    // Kesan bila aplikasi dibuka pertama kali dari skrin telefon (iOS & Android)
+    if (isFromPWA) {
+      if (!localStorage.getItem('pwa_first_opened_tracked')) {
+        localStorage.setItem('pwa_first_opened_tracked', new Date().toISOString());
+        try {
+          fetch(CRM_API_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: CRM_USER_ID,
+              name: "Pelancaran Pertama Aplikasi (PWA First Open)",
+              phone: "N/A",
+              niche: "Hartanah",
+              product: "Residensi MADANI Serunai",
+              source: "PWA App - Pelancaran Pertama",
+              notes: `Aplikasi pertama kali dibuka dari skrin utama telefon pada ${new Date().toLocaleString('ms-MY')} | Peranti: ${isIOS ? 'iPhone (iOS)' : (isAndroid ? 'Android' : 'Lain-lain')}`
+            }),
+            keepalive: true
+          });
+        } catch (err) {}
+      }
+    }
 
     function checkAndShowPwaBanner() {
       if (isStandalone) return;
