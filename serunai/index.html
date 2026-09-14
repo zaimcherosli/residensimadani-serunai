@@ -4330,6 +4330,48 @@
       }
     }
 
+    // ==========================================================
+    // PEMBAIKAN & PENJANAAN KOMEN AI LIVE (GEMINI & AGENT ROUTER)
+    // ==========================================================
+    function parseOrRepairJsonArray(raw) {
+      let cleaned = (raw || '').trim();
+      if (cleaned.startsWith('```')) {
+        cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+      }
+      try {
+        const parsed = JSON.parse(cleaned);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (err) {
+        // 1. Cuba cari penutup array terdekat dari objek terakhir sekiranya teks terpotong
+        const firstBracket = cleaned.indexOf('[');
+        if (firstBracket !== -1) {
+          const lastBrace = cleaned.lastIndexOf('}');
+          if (lastBrace > firstBracket) {
+            const candidate = cleaned.substring(firstBracket, lastBrace + 1) + ']';
+            try {
+              const res = JSON.parse(candidate);
+              if (Array.isArray(res) && res.length > 0) return res;
+            } catch (e2) {}
+          }
+        }
+
+        // 2. Fallback: Ekstrak setiap objek komen individual menggunakan regex
+        const regex = /\{[^{}]*"user"\s*:\s*"[^"]*"[^{}]*"comment"\s*:\s*"[^"]*"[^{}]*\}/g;
+        const matches = cleaned.match(regex);
+        if (matches && matches.length > 0) {
+          const recovered = [];
+          for (const m of matches) {
+            try {
+              recovered.push(JSON.parse(m));
+            } catch (e3) {}
+          }
+          if (recovered.length > 0) return recovered;
+        }
+        throw err;
+      }
+      return [];
+    }
+
     async function handleGenerateAiLiveComments() {
       const countSelect = document.getElementById('ai-count-select');
       const modeSelect = document.getElementById('ai-mode-select');
@@ -4339,43 +4381,39 @@
       const count = countSelect ? parseInt(countSelect.value, 10) : 50;
       const mode = modeSelect ? modeSelect.value : 'replace';
       const currentHost = getLiveAgentName();
+      const providerLabel = activeAiProvider === 'agentrouter' ? 'Agent Router' : 'Gemini';
 
-      const systemPrompt = `Anda adalah simulator sembang TikTok Live bagi projek hartanah di Malaysia.
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = `${providerLabel} Sedang Menjana...`;
+      }
+      if (statusEl) {
+        statusEl.classList.remove('hidden', 'text-rose-600', 'text-emerald-700');
+        statusEl.classList.add('text-purple-700');
+        statusEl.innerText = `Menjana ${count} komen menggunakan ${providerLabel}... Sila tunggu sebentar.`;
+      }
+
+      const buildPrompt = (batchSize) => `Anda adalah simulator sembang TikTok Live bagi projek hartanah di Malaysia.
 Maklumat Projek:
-- Nama Projek: Residensi MADANI Serunai
-- Lokasi: Presint 5, Putrajaya
-- Harga Tetap Jualan: RM 200,000 (Harga Kawalan Kerajaan)
-- Anggaran Ansuran Bulanan: RM 900 sebulan
-- Keluasan: 800 kaki persegi
-- Bilangan Bilik: 3 Bilik Tidur, 2 Bilik Air
-- Kelayakan: Warganegara Malaysia berumur 21 tahun ke atas, menetap atau bekerja di Wilayah Persekutuan (Putrajaya, KL, Labuan), pendapatan kasar isi rumah di bawah RM8,000 sebulan, keutamaan kepada pembeli rumah pertama.
-- Kemudahan: 35 fasiliti gaya resort kondominium (surau, dewan serbaguna, taman permainan, tadika, gimnasium, tempat letak kereta bertingkat, kawalan keselamatan 24 jam).
-- Pembiayaan: 100% pinjaman penuh (LPPSA kerajaan atau bank swasta), percuma duti setem MOT bagi rumah pertama.
-- Kuota: Terhad kepada 587 unit sahaja.
+- Nama Projek: Residensi MADANI Serunai (Presint 5, Putrajaya)
+- Harga Jualan: RM 200,000 (Harga Kawalan Kerajaan, Ansuran ~RM 900/bulan)
+- Unit: 800 kps, 3 Bilik Tidur, 2 Bilik Air, 35 fasiliti gaya resort.
+- Kelayakan: Warganegara 21+, kerja/menetap di Wilayah Persekutuan, gaji bawah RM8,000, kuota terhad 587 unit.
+- Pembiayaan: 100% pinjaman (LPPSA/bank), percuma duti setem MOT.
 
 TUGASAN:
-Jana tepat ${count} soalan atau komen penonton Malaysia yang natural, pelbagai, dan realistik untuk siaran langsung TikTok Live mengenai Residensi MADANI Serunai.
-Pastikan sesetengah soalan dijawab secara berselang oleh hos "${currentHost}" (dengan isHost: true).
-Gunakan bahasa santai Bahasa Melayu harian orang Malaysia (tanpa sebarang ikon atau emoji di hadapan perkataan).
+Jana ${batchSize} komen penonton Malaysia yang natural, bersahaja dan realistik untuk siaran langsung TikTok Live mengenai Residensi MADANI Serunai.
+Pastikan sesetengah soalan dijawab secara berselang oleh hos "${currentHost}" (isHost: true).
+PENTING: Pastikan setiap komen adalah ringkas dan padat (1 ayat sahaja, 5-15 patah perkataan) seperti sembang siaran langsung TikTok yang sebenar.
 
-PENTING: Berikan jawapan HANYA dalam format tatasusunan JSON yang sah (valid JSON array) seperti ini:
+Berikan jawapan HANYA dalam format tatasusunan JSON yang sah (valid JSON array) tanpa perbualan lain:
 [
   {"id": 1, "user": "Ahmad_Putrajaya", "comment": "Gaji bersih RM2,500 lepas ke nak ambil unit 3 bilik ni?", "isHost": false},
   {"id": 2, "user": "${currentHost}", "comment": "Lepas Ahmad, ansuran hanya sekitar RM900 sebulan dan boleh mohon LPPSA atau bank.", "isHost": true}
 ]`;
 
-      if (btn) {
-        btn.disabled = true;
-        btn.innerText = `${activeAiProvider === 'agentrouter' ? 'Agent Router' : 'Gemini'} Sedang Menjana...`;
-      }
-      if (statusEl) {
-        statusEl.classList.remove('hidden', 'text-rose-600', 'text-emerald-700');
-        statusEl.classList.add('text-purple-700');
-        statusEl.innerText = `Membaca konteks Residensi Serunai menggunakan ${activeAiProvider === 'agentrouter' ? 'Agent Router' : 'Gemini'} dan menjana ${count} komen...`;
-      }
-
-      try {
-        let rawJsonText = '';
+      const requestAiBatch = async (batchSize) => {
+        const prompt = buildPrompt(batchSize);
 
         if (activeAiProvider === 'agentrouter') {
           const arKeyInput = document.getElementById('agentrouter-api-key-input');
@@ -4400,10 +4438,11 @@ PENTING: Berikan jawapan HANYA dalam format tatasusunan JSON yang sah (valid JSO
             body: JSON.stringify({
               model: model,
               messages: [
-                { role: 'system', content: 'Anda adalah penjana komen JSON TikTok Live. Balas HANYA dalam format tatasusunan JSON yang sah (valid JSON array) tanpa markdown atau perbualan lain.' },
-                { role: 'user', content: systemPrompt }
+                { role: 'system', content: 'Anda adalah penjana komen JSON TikTok Live. Balas HANYA dalam format tatasusunan JSON yang sah tanpa markdown.' },
+                { role: 'user', content: prompt }
               ],
-              temperature: 0.7
+              temperature: 0.7,
+              max_tokens: 8192
             })
           });
 
@@ -4413,7 +4452,8 @@ PENTING: Berikan jawapan HANYA dalam format tatasusunan JSON yang sah (valid JSO
           }
 
           const data = await res.json();
-          rawJsonText = data?.choices?.[0]?.message?.content || '';
+          const raw = data?.choices?.[0]?.message?.content || '';
+          return parseOrRepairJsonArray(raw);
         } else {
           const keyInput = document.getElementById('gemini-api-key-input');
           const modelSelect = document.getElementById('gemini-model-select');
@@ -4429,10 +4469,10 @@ PENTING: Berikan jawapan HANYA dalam format tatasusunan JSON yang sah (valid JSO
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              contents: [{ parts: [{ text: systemPrompt }] }],
+              contents: [{ parts: [{ text: prompt }] }],
               generationConfig: {
                 temperature: 0.7,
-                maxOutputTokens: 4096,
+                maxOutputTokens: 8192,
                 responseMimeType: "application/json"
               }
             })
@@ -4444,33 +4484,53 @@ PENTING: Berikan jawapan HANYA dalam format tatasusunan JSON yang sah (valid JSO
           }
 
           const data = await res.json();
-          rawJsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          return parseOrRepairJsonArray(raw);
+        }
+      };
+
+      try {
+        let allComments = [];
+
+        if (count > 50) {
+          // Bagi kuantiti 100 komen, bahagikan kepada 2 panggilan selari (2 x 50) untuk kepantasan dan mengelak had transmisi token
+          const batchSize = Math.ceil(count / 2);
+          const [batch1, batch2] = await Promise.all([
+            requestAiBatch(batchSize),
+            requestAiBatch(batchSize)
+          ]);
+          allComments = [...batch1, ...batch2];
+        } else {
+          allComments = await requestAiBatch(count);
         }
 
-        let cleaned = rawJsonText.trim();
-        if (cleaned.startsWith('```')) {
-          cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
-        }
-
-        const parsedComments = JSON.parse(cleaned);
-
-        if (!Array.isArray(parsedComments) || parsedComments.length === 0) {
+        if (!Array.isArray(allComments) || allComments.length === 0) {
           throw new Error("Format komen yang dijana tidak sah.");
         }
 
+        // Susun semula ID komen
+        allComments.forEach((c, idx) => { c.id = idx + 1; });
+
         if (mode === 'replace') {
-          liveCommentsPool = parsedComments;
+          liveCommentsPool = allComments;
         } else {
-          liveCommentsPool = [...parsedComments, ...liveCommentsPool];
+          liveCommentsPool = [...allComments, ...liveCommentsPool];
         }
 
         localStorage.setItem(STORAGE_KEY_COMMENTS, JSON.stringify(liveCommentsPool));
         renderInitialLiveComments();
 
+        // Selaraskan komen baharu ke Cloudflare KV secara automatik
+        fetch('/api/live-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ comments: liveCommentsPool })
+        }).catch(() => {});
+
         if (statusEl) {
           statusEl.classList.remove('text-purple-700');
           statusEl.classList.add('text-emerald-700');
-          statusEl.innerText = `Berjaya! ${parsedComments.length} komen baru dijana dan diaktifkan (${activeAiProvider === 'agentrouter' ? 'Agent Router' : 'Gemini'}).`;
+          statusEl.innerText = `Berjaya! ${allComments.length} komen baru dijana dan diaktifkan (${providerLabel}).`;
         }
       } catch (err) {
         if (statusEl) {
