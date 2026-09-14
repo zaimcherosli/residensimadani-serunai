@@ -70,25 +70,37 @@
     .marquee-track:active {
       animation-play-state: paused;
     }
-    @keyframes floatHeart {
+    @keyframes tapHeartRise {
       0% {
-        transform: translateY(0) scale(0.8);
+        transform: translate(0, 0) scale(0.5) rotate(0deg);
         opacity: 1;
       }
-      50% {
-        transform: translateY(-130px) scale(1.2) rotate(-15deg);
-        opacity: 0.85;
+      20% {
+        transform: translate(calc(var(--tap-drift, 0px) * 0.25), -35px) scale(1.25) rotate(var(--tap-rot, 0deg));
+        opacity: 1;
+      }
+      80% {
+        opacity: 0.9;
       }
       100% {
-        transform: translateY(-260px) scale(0.9) rotate(20deg);
+        transform: translate(var(--tap-drift, 0px), calc(-1 * var(--tap-rise, 160px))) scale(0.9) rotate(calc(var(--tap-rot, 0deg) * 1.6));
         opacity: 0;
       }
     }
-    .heart-bubble {
+    .tap-heart {
       position: absolute;
+      animation: tapHeartRise var(--tap-dur, 1.2s) cubic-bezier(0.16, 1, 0.3, 1) forwards;
       pointer-events: none;
-      animation: floatHeart 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-      z-index: 45;
+      user-select: none;
+      will-change: transform, opacity;
+      z-index: 40;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
     .live-comments-mask {
       mask-image: linear-gradient(to top, black 80%, transparent 100%);
@@ -102,12 +114,15 @@
   <!-- SKRIN PENUH SIARAN LANGSUNG (TIKTOK LIVE SESSION)    -->
   <!-- Dipaparkan serta-merta apabila link laman web dibuka -->
   <!-- ==================================================== -->
-  <div id="live-session-overlay" class="fixed inset-0 z-[100] bg-black overflow-hidden w-screen h-screen select-none flex items-center justify-center">
-    <!-- Player Wrapper: Responsif Penuh di Mobile & Frame Moden di Desktop -->
-    <div class="relative w-full h-full max-w-[480px] max-h-[100vh] bg-neutral-950 overflow-hidden shadow-2xl flex flex-col justify-between">
-      
-      <!-- Video Player (Autoplay Looping Show Unit) -->
-      <div class="absolute inset-0 z-0 cursor-pointer" onclick="handleScreenTap(event)">
+  <div id="live-session-overlay" class="fixed inset-0 z-[100] bg-black flex h-[100dvh] w-[100vw] items-center justify-center select-none overflow-hidden">
+    <!-- Live Screen Container (9:16 Portrait Aspect) -->
+    <div
+      id="live-screen-container"
+      onclick="handleScreenTap(event)"
+      class="relative aspect-[9/16] h-full max-h-[100dvh] w-auto max-w-full overflow-hidden bg-black select-none cursor-pointer mx-auto shadow-2xl"
+    >
+      <!-- Video Stream Background: 9:16 Mobile Portrait -->
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
         <video
           id="live-video-player"
           src="https://assets.mixkit.co/videos/preview/mixkit-modern-interior-of-a-luxurious-apartment-43097-large.mp4"
@@ -118,172 +133,214 @@
           playsinline
           class="w-full h-full object-cover"
         ></video>
-        <!-- Overlay Gradient Atas & Bawah untuk Keterbacaan Teks -->
-        <div class="absolute inset-0 bg-gradient-to-b from-black/75 via-transparent to-black/90 pointer-events-none"></div>
+        <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none"></div>
+        <div class="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black/95 via-black/60 to-transparent pointer-events-none"></div>
       </div>
 
       <!-- Container Animasi Hati Terapung -->
       <div id="hearts-container" class="absolute inset-0 pointer-events-none overflow-hidden z-20"></div>
 
-      <!-- Notifikasi Gesaan Buka Audio (Unmute Prompt) -->
-      <div
-        id="live-unmute-prompt"
-        onclick="toggleLiveAudio()"
-        class="absolute top-20 left-1/2 -translate-x-1/2 bg-slate-900/90 border border-emerald-500/60 text-white text-xs px-4 py-2 rounded-full backdrop-blur-md shadow-2xl flex items-center gap-2 cursor-pointer z-30 animate-pulse hover:bg-slate-800 transition"
-      >
-        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-        <span class="font-bold">Tekan untuk buka audio siaran</span>
-        <svg class="w-4 h-4 ml-1 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
-      </div>
-
-      <!-- HEADER ATAS LIVE (Profil Ejen, Badge Live, Butang CMS & Tutup) -->
-      <div class="relative z-30 p-3.5 pt-3 flex items-center justify-between gap-2">
-        <!-- Profil Ejen & Kaunter Penonton -->
-        <div class="flex items-center gap-2 bg-black/50 backdrop-blur-md rounded-full py-1 px-2.5 border border-white/15">
-          <img
-            src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80"
-            alt="Zaim Rosli"
-            class="w-8 h-8 rounded-full object-cover border border-emerald-400 shrink-0"
-          />
-          <div class="leading-tight pr-1">
-            <div class="flex items-center gap-1.5">
-              <span class="text-xs font-bold text-white tracking-tight">Zaim Rosli</span>
-              <span class="bg-rose-600 text-white text-[9px] font-black px-1.5 py-0.2 rounded uppercase tracking-wider flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
-                LIVE
-              </span>
-            </div>
-            <div class="text-[10px] text-slate-300 flex items-center gap-1">
-              <span id="live-viewer-count" class="font-bold text-emerald-400">1,418</span>
-              <span>penonton</span>
-            </div>
+      <!-- Top Header -->
+      <div class="absolute top-3 inset-x-3 z-30 flex items-center justify-between text-white pointer-events-none">
+        <!-- Agent Host Pill -->
+        <div class="flex items-center gap-2 bg-black/60 backdrop-blur-md rounded-full py-1 pl-1 pr-2.5 border border-white/10 pointer-events-auto">
+          <div class="relative">
+            <img
+              src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80"
+              alt="Zaim Rosli"
+              class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-1 ring-amber-400"
+            />
+            <span class="absolute -bottom-1 -right-1 bg-amber-500 rounded-full p-0.5 text-black flex items-center justify-center">
+              <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </span>
           </div>
+          <div class="flex flex-col">
+            <span class="text-xs font-bold leading-tight truncate max-w-[100px] sm:max-w-[130px]">
+              Zaim Rosli
+            </span>
+            <span id="live-likes-header" class="text-[10px] text-neutral-300 font-medium leading-none tabular-nums">
+              52,843 likes
+            </span>
+          </div>
+          <button
+            id="follow-btn"
+            type="button"
+            onclick="toggleFollowAgent(event)"
+            class="ml-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all active:scale-95 flex items-center gap-1 bg-rose-600 hover:bg-rose-500 text-white"
+          >
+            + FOLLOW
+          </button>
         </div>
 
-        <!-- Butang Kawalan Kanan (Audio, AI CMS, Tutup) -->
-        <div class="flex items-center gap-1.5">
-          <!-- Butang Audio (Mute / Unmute) -->
-          <button
-            id="audio-toggle-btn"
-            type="button"
-            onclick="toggleLiveAudio()"
-            class="w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 border border-white/20 text-white flex items-center justify-center transition backdrop-blur-md"
-            title="Buka / Matikan Audio"
-          >
-            <svg id="audio-icon-muted" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
-            <svg id="audio-icon-unmuted" class="w-4 h-4 hidden text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
-          </button>
+        <!-- Right Controls: Eye 1.7k + Settings (Admin CMS) + Close (X) -->
+        <div class="flex items-center gap-1.5 pointer-events-auto">
+          <div class="flex items-center gap-1 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10 text-xs font-semibold text-neutral-200 shadow-sm">
+            <svg class="w-3.5 h-3.5 text-neutral-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            <span id="live-viewer-count" class="tabular-nums font-bold tracking-tight text-white">
+              1.7k
+            </span>
+          </div>
 
-          <!-- Butang AI CMS (Khusus AI & Video) -->
+          <!-- Admin CMS Button (Gear Icon) -->
           <button
             type="button"
             onclick="openAiCmsModal()"
-            class="px-2.5 py-1.5 rounded-full bg-purple-600/85 hover:bg-purple-600 text-white text-[10px] font-bold transition border border-purple-400/30 backdrop-blur-md shadow"
-            title="Konfigurasi AI Gemini"
+            aria-label="Panel Admin AI CMS"
+            title="Buka Panel Admin AI CMS"
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-black/70 hover:bg-black text-white/80 hover:text-white backdrop-blur-md border border-white/15 transition active:scale-90 shrink-0"
           >
-            <span>AI CMS</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           </button>
 
-          <!-- Butang Tutup / Ke Laman Web Penuh -->
+          <!-- Close Button (X Icon) -->
           <button
             type="button"
             onclick="closeLiveSession()"
-            class="px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white text-[10px] font-bold transition border border-white/25 backdrop-blur-md flex items-center gap-1 shadow"
-            title="Lihat Laman Penuh Serunai"
+            aria-label="Tutup &amp; Ke Laman Web"
+            title="Tutup &amp; Ke Laman Web"
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-black/70 hover:bg-black text-white backdrop-blur-md border border-white/15 transition active:scale-90 shrink-0"
           >
-            <span>Laman Web</span>
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
       </div>
 
-      <!-- NOTIFIKASI SOCIAL PROOF TOAST (BERKALA) -->
-      <div class="relative z-30 px-3.5 -mt-2">
-        <div
-          id="live-social-toast"
-          class="transition-all duration-500 opacity-0 transform -translate-y-2 pointer-events-none inline-flex items-center gap-2 bg-slate-900/85 backdrop-blur-md text-white text-[10.5px] px-3 py-1 rounded-full border border-emerald-500/30 shadow-lg"
+      <!-- Right Side Interactions: Heart Like Button & Count -->
+      <div class="pointer-events-auto absolute right-3 top-[3.8rem] z-20 flex flex-col items-center gap-1">
+        <button
+          type="button"
+          onclick="handleHeartClick(event)"
+          aria-label="Suka"
+          class="flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur transition active:scale-90 hover:bg-black/80 border border-white/10"
         >
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-          <span id="live-social-toast-text" class="truncate font-medium">Ahmad (Putrajaya) baru menyertai live</span>
-        </div>
+          <svg class="w-5 h-5 fill-rose-500 text-rose-500" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </button>
+        <span id="live-sidebar-likes" class="text-[9.5px] font-bold text-white tabular-nums">
+          52,843
+        </span>
       </div>
 
-      <!-- RUANG TENGAH (KOSONG UTK SENTUHAN TIKTOK HEARTS) -->
-      <div class="flex-1" onclick="handleScreenTap(event)"></div>
-
-      <!-- BAHAGIAN BAWAH (KOMEN, KAD PIN PRODUK, DAN KOTAK INPUT) -->
-      <div class="relative z-30 p-3.5 pb-4 space-y-2.5">
-
-        <!-- ALIRAN KOMEN PENONTON TIKTOK LIVE -->
-        <div class="relative h-44 overflow-hidden live-comments-mask">
-          <div id="live-comments-stream" class="absolute inset-x-0 bottom-0 space-y-1.5 overflow-y-auto max-h-44 flex flex-col justify-end no-scrollbar">
-            <!-- Komen dinamik akan dimasukkan di sini secara berterusan -->
+      <!-- Live Activity & Comments & Pinned Card Stack -->
+      <div class="absolute inset-x-2.5 bottom-12 sm:bottom-14 z-20 pointer-events-none flex flex-col justify-end gap-1.5 transition-all duration-300">
+        <!-- Activity notifications (Join / Borang / Viewing) -->
+        <div id="live-activity-box" class="w-full flex items-start pointer-events-none mb-0.5">
+          <div id="live-activity-inner" class="pointer-events-auto cursor-pointer max-w-[92%] transition-all duration-400 ease-out transform opacity-0 -translate-y-1 scale-95" onclick="goToSemakKelayakanFromLive()">
+            <div id="live-activity-pill" class="px-2.5 py-1 rounded-2xl border text-[11px] leading-tight flex items-center gap-1.5 bg-emerald-600/90 text-white border-emerald-400/40 shadow-lg shadow-emerald-600/20 backdrop-blur-md">
+              <span id="live-activity-icon" class="shrink-0 flex items-center"></span>
+              <span id="live-activity-badge" class="text-[8.5px] uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-white/20 text-white font-extrabold">JOIN</span>
+              <span id="live-activity-text" class="truncate max-w-[220px] sm:max-w-[260px] drop-shadow-sm">Danish Iskandar menyertai siaran langsung</span>
+            </div>
           </div>
         </div>
 
-        <!-- KAD PIN PRODUK (PINNED OFFER) -->
-        <div class="bg-slate-900/90 backdrop-blur-xl border border-white/20 rounded-2xl p-2.5 flex items-center justify-between gap-2.5 shadow-2xl">
-          <img
-            src="https://erumawip.jwp.gov.my/images/imageProjek/6a548ab19b501.jpeg"
-            alt="Residensi MADANI Serunai"
-            class="w-11 h-11 rounded-xl object-cover border border-emerald-500/40 shrink-0"
-          />
-          <div class="min-w-0 flex-1 leading-tight">
-            <div class="flex items-center gap-1.5">
-              <span class="bg-amber-500 text-slate-950 font-black text-[9px] px-1.5 py-0.2 rounded uppercase">PIN</span>
-              <span class="text-xs font-extrabold text-white truncate">Residensi MADANI Serunai</span>
-            </div>
-            <div class="text-[11px] text-emerald-400 font-black mt-0.5">
-              RM 200,000 <span class="text-slate-400 text-[10px] font-normal">&bull; Presint 5 (3 Bilik)</span>
-            </div>
+        <!-- Live Comments Stream -->
+        <div class="w-full pointer-events-none flex flex-col justify-end transition-all duration-300">
+          <div id="live-comments-stream" class="max-h-40 sm:max-h-48 overflow-y-auto space-y-1.5 pr-12 no-scrollbar pointer-events-auto flex flex-col justify-end">
+            <!-- Dynamic comments here -->
           </div>
-          <div class="flex items-center gap-1.5 shrink-0">
+        </div>
+
+        <!-- Pinned Offer Card (Residensi MADANI Serunai Flash Sale) -->
+        <div id="live-pinned-card" class="w-full pointer-events-auto transition-all duration-300 ease-out">
+          <div class="relative bg-white text-neutral-900 rounded-xl p-2 shadow-xl flex items-center gap-2 border border-neutral-200">
+            <!-- Close button for card -->
+            <button
+              type="button"
+              onclick="dismissLivePinnedCard(event)"
+              class="absolute -top-1.5 -right-1.5 bg-neutral-900 text-white hover:text-blue-400 rounded-full p-1 shadow-md transition active:scale-90"
+              title="Tutup tawaran"
+            >
+              <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <!-- Thumbnail with countdown badge -->
+            <div class="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 border border-neutral-200">
+              <img
+                src="https://erumawip.jwp.gov.my/images/imageProjek/6a548ab19b501.jpeg"
+                alt="Residensi MADANI Serunai"
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute top-0 inset-x-0 bg-neutral-900/85 text-[7.5px] font-black text-white text-center py-0.2 tracking-tight flex items-center justify-center gap-0.5">
+                <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span id="offer-countdown">19:53</span>
+              </div>
+            </div>
+
+            <!-- Info -->
+            <div class="flex-1 min-w-0" onclick="goToSemakKelayakanFromLive()" role="button" tabindex="0">
+              <div class="flex items-center gap-1">
+                <span class="bg-blue-600 text-white text-[7.5px] font-bold px-1.5 py-0.5 rounded uppercase">
+                  Service+
+                </span>
+                <span class="text-[9.5px] text-neutral-500 font-medium truncate">Konsultasi Percuma</span>
+              </div>
+              <div class="text-[11px] font-bold text-neutral-900 truncate leading-tight mt-0.5">
+                Semakan Kelayakan &amp; Pakej Early Bird
+              </div>
+              <div class="text-[10px] font-semibold text-blue-700 leading-tight">
+                Zero Downpayment &bull; Percuma MOT
+              </div>
+            </div>
+
+            <!-- CTA Button -->
             <button
               type="button"
               onclick="goToSemakKelayakanFromLive()"
-              class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition shadow"
+              class="shrink-0 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[11px] rounded-lg shadow-sm transition active:scale-95"
             >
-              Semak
+              Isi Borang
             </button>
-            <a
-              href="https://wa.me/60108118559?text=Salam%20Tuan%20Zaim%2C%20saya%20sedang%20menonton%20siaran%20langsung%20Residensi%20MADANI%20Serunai%20Presint%205.%20Saya%20ingin%20semak%20kelayakan%20permohonan%20unit%203%20bilik%20RM200k."
-              target="_blank"
-              class="bg-white hover:bg-slate-100 text-slate-900 text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition shadow"
-            >
-              WhatsApp
-            </a>
           </div>
         </div>
+      </div>
 
-        <!-- BAR INPUT KOMEN & BUTANG LOVE -->
-        <div class="flex items-center gap-2 pt-0.5">
-          <div class="flex-1 relative">
-            <input
-              id="live-user-input"
-              type="text"
-              placeholder="Tanya soalan di siaran langsung..."
-              onkeydown="if(event.key==='Enter') sendLiveUserComment()"
-              class="w-full bg-white/15 border border-white/20 rounded-full px-3.5 py-2 text-xs text-white placeholder:text-slate-300 focus:outline-none focus:bg-black/60 focus:border-emerald-500 backdrop-blur-md"
-            />
-          </div>
+      <!-- Bottom Action Bar -->
+      <div class="absolute inset-x-2.5 bottom-2.5 z-30 flex items-center gap-1.5 pointer-events-auto">
+        <!-- Butang Service+ (Ikon Clipboard / Borang) -->
+        <button
+          type="button"
+          onclick="goToSemakKelayakanFromLive()"
+          aria-label="Buka Borang Semakan"
+          title="Borang Semakan Kelayakan"
+          class="shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/30 transition active:scale-90 border border-white/20"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+        </button>
+
+        <form onsubmit="handleUserLiveComment(event)" class="flex-1 flex items-center gap-1 min-w-0">
+          <input
+            id="live-user-name-input"
+            type="text"
+            placeholder="Nama"
+            maxlength="18"
+            class="w-16 sm:w-20 bg-black/60 backdrop-blur-md border border-white/20 rounded-full px-2.5 py-1.5 text-[10.5px] text-white placeholder-white/50 focus:outline-none focus:border-blue-400"
+          />
+          <input
+            id="live-user-input"
+            type="text"
+            placeholder="Tanya soalan..."
+            maxlength="120"
+            class="flex-1 min-w-0 bg-black/60 backdrop-blur-md border border-white/20 rounded-full px-3 py-1.5 text-[10.5px] text-white placeholder-white/50 focus:outline-none focus:border-blue-400"
+          />
           <button
-            type="button"
-            onclick="sendLiveUserComment()"
-            class="w-8 h-8 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center shrink-0 transition shadow"
+            type="submit"
+            class="h-8 w-8 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center transition active:scale-90 shrink-0 shadow"
             title="Hantar Soalan"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
           </button>
-          <button
-            type="button"
-            onclick="handleHeartClick(event)"
-            class="w-8 h-8 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center shrink-0 transition shadow active:scale-125"
-            title="Hantar Love"
-          >
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-          </button>
-        </div>
+        </form>
 
+        <button
+          id="audio-toggle-btn"
+          type="button"
+          onclick="toggleLiveAudio()"
+          aria-label="Hidupkan bunyi"
+          class="shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white backdrop-blur transition hover:bg-black active:scale-90 border border-white/10"
+        >
+          <svg id="audio-icon-muted" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+          <svg id="audio-icon-unmuted" class="w-3.5 h-3.5 hidden text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+        </button>
       </div>
     </div>
   </div>
@@ -2145,10 +2202,30 @@
     let liveCommentsPool = [];
     let liveCommentIndex = 0;
     let commentTickerInterval = null;
-    let socialToastInterval = null;
+    let activityNotificationInterval = null;
     let viewerCounterInterval = null;
-    let currentViewerCount = 1418;
+    let audienceTapInterval = null;
+    let offerCountdownInterval = null;
+    let likesCount = 52843;
+    let viewersCount = 1700;
+    let isFollowing = false;
     let isLiveAudioActive = false;
+    let offerSeconds = 1193; // 19:53
+
+    const HEART_COLORS = ['#ff2d55', '#ff375f', '#fbbf24', '#f43f5e', '#a855f7', '#06b6d4', '#ffffff'];
+
+    const ACTIVITIES = [
+      { id: 1, type: 'borang', text: 'Farhan baru sahaja mengisi borang semakan kelayakan (3 Bilik)', badge: 'Service+' },
+      { id: 2, type: 'join', text: 'Danish Iskandar menyertai siaran langsung', badge: 'JOIN' },
+      { id: 3, type: 'viewing', text: 'Puan Farah & Suami sahkan viewing slot Presint 5 Sabtu 11:00 AM', badge: 'Viewing' },
+      { id: 4, type: 'join', text: 'Nurul Hidayah menyertai siaran langsung', badge: 'JOIN' },
+      { id: 5, type: 'borang', text: 'Siti Noraini selesai semak kelayakan pakej pinjaman 100%', badge: 'Service+' },
+      { id: 6, type: 'join', text: 'Khairul Anwar menyertai siaran langsung', badge: 'JOIN' },
+      { id: 7, type: 'viewing', text: 'Dr. Nizam tempah slot viewing show unit Presint 5', badge: 'Viewing' },
+      { id: 8, type: 'borang', text: 'Amirul hantar borang konsultasi Residensi Serunai RM200k', badge: 'Service+' },
+      { id: 9, type: 'join', text: 'Shahril Nizam menyertai siaran langsung', badge: 'JOIN' },
+      { id: 10, type: 'viewing', text: 'En. Azman lock viewing slot show unit Ahad 2:30 PM', badge: 'Viewing' }
+    ];
 
     // Inisialisasi Data & Live Session
     function initLiveSessionData() {
@@ -2173,7 +2250,41 @@
 
       // 3. Masukkan komen awal
       renderInitialLiveComments();
+      updateLikesDisplay();
+      updateViewersDisplay();
       startLiveTickers();
+      startAudienceTapSimulation();
+      startOfferCountdown();
+      startActivityNotifications();
+    }
+
+    function updateLikesDisplay() {
+      const headerLikes = document.getElementById('live-likes-header');
+      const sidebarLikes = document.getElementById('live-sidebar-likes');
+      const formatted = likesCount.toLocaleString('en-US');
+      if (headerLikes) headerLikes.innerText = `${formatted} likes`;
+      if (sidebarLikes) sidebarLikes.innerText = formatted;
+    }
+
+    function updateViewersDisplay() {
+      const viewerEl = document.getElementById('live-viewer-count');
+      if (viewerEl) {
+        viewerEl.innerText = (viewersCount / 1000).toFixed(1) + 'k';
+      }
+    }
+
+    function toggleFollowAgent(e) {
+      if (e) e.stopPropagation();
+      isFollowing = !isFollowing;
+      const btn = document.getElementById('follow-btn');
+      if (!btn) return;
+      if (isFollowing) {
+        btn.className = 'ml-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all active:scale-95 flex items-center gap-1 bg-neutral-800 text-neutral-300 border border-white/20';
+        btn.innerHTML = '<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Diikuti';
+      } else {
+        btn.className = 'ml-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all active:scale-95 flex items-center gap-1 bg-rose-600 hover:bg-rose-500 text-white';
+        btn.innerText = '+ FOLLOW';
+      }
     }
 
     // Paparkan komen awal
@@ -2186,44 +2297,52 @@
       liveCommentIndex = 4 % liveCommentsPool.length;
     }
 
-    // Masukkan satu komen ke dalam stream
-    function appendCommentToStream(commentObj, animate = true) {
+    // Masukkan komen ke dalam stream mengikut format TikTok Live
+    function appendCommentToStream(item, animate = true) {
       const stream = document.getElementById('live-comments-stream');
       if (!stream) return;
 
       const card = document.createElement('div');
-      card.className = `flex items-start gap-2 text-xs text-white max-w-[92%] transition-all duration-300 ${animate ? 'animate-in fade-in slide-in-from-bottom-2' : ''}`;
+      const isHost = Boolean(item.isHost);
+      const isUserSent = Boolean(item.isUserSent);
 
-      const avatarInitial = (commentObj.user || 'U').charAt(0).toUpperCase();
-      const isHost = Boolean(commentObj.isHost);
+      let bgClass = 'bg-black/60 text-white/95 border border-white/10';
+      let nameClass = 'text-blue-300';
+      let badgeHtml = '';
+
+      if (isHost) {
+        bgClass = 'bg-blue-600/90 text-white font-medium border border-blue-400';
+        nameClass = 'text-white';
+        badgeHtml = '<span class="bg-white text-blue-600 px-1 py-0.1 text-[8px] rounded font-extrabold uppercase ml-1">HOST</span>';
+      } else if (isUserSent) {
+        bgClass = 'bg-emerald-800/80 text-white font-medium border border-emerald-400/80 ring-1 ring-emerald-400/30';
+        nameClass = 'text-emerald-200 font-extrabold';
+        badgeHtml = '<span class="bg-emerald-400 text-neutral-900 px-1 py-0.1 text-[8px] rounded font-extrabold uppercase ml-1">Anda</span>';
+      }
+
+      card.className = `text-xs px-2.5 py-1 rounded-2xl backdrop-blur-md max-w-[90%] inline-flex flex-col gap-0.5 transition-all duration-300 ${bgClass}`;
 
       card.innerHTML = `
-        <div class="w-6 h-6 rounded-full ${isHost ? 'bg-amber-500 text-slate-950 font-black' : 'bg-white/25 text-white font-bold'} text-[10px] flex items-center justify-center shrink-0 border border-white/20">
-          ${avatarInitial}
+        <div class="flex items-center gap-1">
+          <span class="font-bold text-[10.5px] truncate max-w-[130px] ${nameClass}">
+            ${item.user || 'Penonton'}
+          </span>
+          ${badgeHtml}
         </div>
-        <div class="bg-black/45 backdrop-blur-md rounded-2xl px-3 py-1.5 border border-white/10 text-[11px] leading-snug">
-          <div class="flex items-center gap-1.5 mb-0.5">
-            <span class="font-bold ${isHost ? 'text-amber-300' : 'text-slate-300'}">${commentObj.user || 'Penonton'}</span>
-            ${isHost ? '<span class="bg-amber-400 text-slate-950 font-extrabold text-[8px] px-1 py-0.2 rounded uppercase">Hos</span>' : ''}
-          </div>
-          <p class="text-white">${commentObj.comment}</p>
-        </div>
+        <span class="leading-snug text-[11px] break-words text-white">${item.comment}</span>
       `;
 
       stream.appendChild(card);
 
-      // Hadkan jumlah komen pada satu masa supaya ringan
-      while (stream.children.length > 7) {
+      while (stream.children.length > 8) {
         stream.removeChild(stream.firstElementChild);
       }
 
-      // Auto scroll ke bawah
       stream.scrollTop = stream.scrollHeight;
     }
 
-    // Mulakan pemasa kitaran komen & notifikasi
+    // Mulakan pemasa kitaran komen & fluktuasi penonton
     function startLiveTickers() {
-      // 1. Kitaran Komen (setiap 3.5 saat)
       if (commentTickerInterval) clearInterval(commentTickerInterval);
       commentTickerInterval = setInterval(() => {
         if (liveCommentsPool.length > 0) {
@@ -2233,64 +2352,133 @@
         }
       }, 3500);
 
-      // 2. Kitaran Social Proof Toast (setiap 9 saat)
-      if (socialToastInterval) clearInterval(socialToastInterval);
-      let toastIdx = 0;
-      socialToastInterval = setInterval(() => {
-        const toastEl = document.getElementById('live-social-toast');
-        const textEl = document.getElementById('live-social-toast-text');
-        if (toastEl && textEl) {
-          textEl.innerText = SOCIAL_PROOF_TOASTS[toastIdx];
-          toastIdx = (toastIdx + 1) % SOCIAL_PROOF_TOASTS.length;
-
-          // Animasi Masuk
-          toastEl.classList.remove('opacity-0', '-translate-y-2');
-          toastEl.classList.add('opacity-100', 'translate-y-0');
-
-          // Hilang selepas 4.5 saat
-          setTimeout(() => {
-            toastEl.classList.add('opacity-0', '-translate-y-2');
-            toastEl.classList.remove('opacity-100', 'translate-y-0');
-          }, 4500);
-        }
-      }, 9000);
-
-      // 3. Fluktuasi Penonton (+/- 2 setiap 4 saat)
       if (viewerCounterInterval) clearInterval(viewerCounterInterval);
       viewerCounterInterval = setInterval(() => {
-        const delta = Math.floor(Math.random() * 5) - 2; // -2 to +2
-        currentViewerCount = Math.max(1390, Math.min(1450, currentViewerCount + delta));
-        const countEl = document.getElementById('live-viewer-count');
-        if (countEl) {
-          countEl.innerText = currentViewerCount.toLocaleString('ms-MY');
-        }
-      }, 4000);
+        const delta = Math.floor(Math.random() * 7) - 2;
+        viewersCount = Math.min(3200, Math.max(1650, viewersCount + delta));
+        updateViewersDisplay();
+      }, 7000);
     }
 
-    // 2. Kawalan Buka / Tutup Live Session
+    // Simulasi tap-tap audience TikTok secara berterusan
+    function startAudienceTapSimulation() {
+      if (audienceTapInterval) clearInterval(audienceTapInterval);
+      audienceTapInterval = setInterval(() => {
+        const container = document.getElementById('hearts-container');
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        if (rect.width <= 0) return;
+
+        const count = Math.random() < 0.25 ? 3 : Math.random() < 0.65 ? 2 : 1;
+        likesCount += count * (Math.floor(Math.random() * 3) + 1);
+        updateLikesDisplay();
+
+        for (let i = 0; i < count; i++) {
+          const spawnX = rect.left + rect.width - 90 + (Math.random() * 70 - 15);
+          const spawnY = rect.top + rect.height - 170 + (Math.random() * 80 - 40);
+          spawnHeart(spawnX, spawnY);
+        }
+      }, 450);
+    }
+
+    // Notifikasi Aktiviti Berkala (Join / Borang / Viewing)
+    function startActivityNotifications() {
+      if (activityNotificationInterval) clearInterval(activityNotificationInterval);
+      let actIdx = 0;
+      const inner = document.getElementById('live-activity-inner');
+      const pill = document.getElementById('live-activity-pill');
+      const iconEl = document.getElementById('live-activity-icon');
+      const badgeEl = document.getElementById('live-activity-badge');
+      const textEl = document.getElementById('live-activity-text');
+
+      function showNext() {
+        if (!inner || !pill) return;
+        const act = ACTIVITIES[actIdx];
+        actIdx = (actIdx + 1) % ACTIVITIES.length;
+
+        badgeEl.innerText = act.badge;
+        textEl.innerText = act.text;
+
+        if (act.type === 'borang') {
+          pill.className = 'px-2.5 py-1 rounded-2xl border text-[11px] leading-tight flex items-center gap-1.5 bg-blue-600/90 text-white border-blue-400/40 shadow-lg shadow-blue-600/20 backdrop-blur-md';
+          badgeEl.className = 'text-[8.5px] uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-white/20 text-white font-extrabold';
+          iconEl.innerHTML = '<svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>';
+        } else if (act.type === 'viewing') {
+          pill.className = 'px-2.5 py-1 rounded-2xl border text-[11px] leading-tight flex items-center gap-1.5 bg-amber-400 text-neutral-950 font-bold border-amber-300 shadow-lg shadow-amber-400/20';
+          badgeEl.className = 'text-[8.5px] uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-neutral-950/20 text-neutral-950 font-black';
+          iconEl.innerHTML = '<svg class="w-3 h-3 shrink-0 text-neutral-950" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>';
+        } else {
+          pill.className = 'px-2.5 py-1 rounded-2xl border text-[11px] leading-tight flex items-center gap-1.5 bg-emerald-600/90 text-white border-emerald-400/40 shadow-lg shadow-emerald-600/20 backdrop-blur-md';
+          badgeEl.className = 'text-[8.5px] uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-white/20 text-white font-extrabold';
+          iconEl.innerHTML = '<svg class="w-3 h-3 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>';
+        }
+
+        inner.classList.remove('opacity-0', '-translate-y-1', 'scale-95');
+        inner.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+
+        setTimeout(() => {
+          inner.classList.add('opacity-0', '-translate-y-1', 'scale-95');
+          inner.classList.remove('opacity-100', 'translate-y-0', 'scale-100');
+        }, 4200);
+      }
+
+      showNext();
+      activityNotificationInterval = setInterval(showNext, 7500);
+    }
+
+    // Pemasa Undur Tawaran Kad Pin
+    function startOfferCountdown() {
+      if (offerCountdownInterval) clearInterval(offerCountdownInterval);
+      offerCountdownInterval = setInterval(() => {
+        if (offerSeconds > 0) {
+          offerSeconds -= 1;
+        } else {
+          offerSeconds = 1200;
+        }
+        const mins = Math.floor(offerSeconds / 60);
+        const secs = offerSeconds % 60;
+        const el = document.getElementById('offer-countdown');
+        if (el) {
+          el.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+      }, 1000);
+    }
+
+    function dismissLivePinnedCard(e) {
+      if (e) e.stopPropagation();
+      const card = document.getElementById('live-pinned-card');
+      if (card) {
+        card.classList.add('hidden');
+        setTimeout(() => {
+          card.classList.remove('hidden');
+        }, 60000);
+      }
+    }
+
+    // Kawalan Buka / Tutup Live Session
     function openLiveSession() {
       const overlay = document.getElementById('live-session-overlay');
-      const pill = document.getElementById('floating-live-pill');
       const video = document.getElementById('live-video-player');
 
       if (overlay) overlay.classList.remove('hidden');
-      if (pill) pill.classList.add('hidden');
       if (video) {
         video.play().catch(() => {});
       }
       startLiveTickers();
+      startAudienceTapSimulation();
+      startOfferCountdown();
+      startActivityNotifications();
     }
 
     function closeLiveSession() {
       const overlay = document.getElementById('live-session-overlay');
-      const pill = document.getElementById('floating-live-pill');
-
       if (overlay) overlay.classList.add('hidden');
-      if (pill) pill.classList.remove('hidden');
 
       if (commentTickerInterval) clearInterval(commentTickerInterval);
-      if (socialToastInterval) clearInterval(socialToastInterval);
       if (viewerCounterInterval) clearInterval(viewerCounterInterval);
+      if (audienceTapInterval) clearInterval(audienceTapInterval);
+      if (activityNotificationInterval) clearInterval(activityNotificationInterval);
+      if (offerCountdownInterval) clearInterval(offerCountdownInterval);
     }
 
     function goToSemakKelayakanFromLive() {
@@ -2303,10 +2491,9 @@
       }
     }
 
-    // 3. Kawalan Audio
+    // Kawalan Audio
     function toggleLiveAudio() {
       const video = document.getElementById('live-video-player');
-      const prompt = document.getElementById('live-unmute-prompt');
       const iconMuted = document.getElementById('audio-icon-muted');
       const iconUnmuted = document.getElementById('audio-icon-unmuted');
 
@@ -2315,7 +2502,6 @@
       if (video.muted) {
         video.muted = false;
         isLiveAudioActive = true;
-        if (prompt) prompt.classList.add('hidden');
         if (iconMuted) iconMuted.classList.add('hidden');
         if (iconUnmuted) iconUnmuted.classList.remove('hidden');
       } else {
@@ -2326,114 +2512,117 @@
       }
     }
 
-    // 4. Kitaran Pop-up Service+ (1 Minit Ada, 1 Minit Tiada)
-    function initServicePlusCycle() {
-      let isVisible = false;
-      const popup = document.getElementById('service-plus-live-popup');
-
-      // Timbul selepas 15 saat pertama
-      setTimeout(() => {
-        if (popup) {
-          popup.classList.remove('hidden');
-          isVisible = true;
-        }
-      }, 15000);
-
-      // Kitaran 60s
-      servicePlusCycleInterval = setInterval(() => {
-        if (!popup) return;
-        if (isVisible) {
-          popup.classList.add('hidden');
-          isVisible = false;
-        } else {
-          popup.classList.remove('hidden');
-          isVisible = true;
-        }
-      }, 60000);
-    }
-
-    function dismissServicePlusPopup() {
-      const popup = document.getElementById('service-plus-live-popup');
-      if (popup) popup.classList.add('hidden');
-    }
-
-    // 5. Animasi Hati Terapung TikTok (Floating Hearts)
-    function handleScreenTap(e) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX || (rect.left + rect.width / 2);
-      const y = e.clientY || (rect.top + rect.height / 2);
-      spawnHeart(x, y);
-    }
-
-    function handleHeartClick(e) {
-      e.stopPropagation();
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = rect.left + rect.width / 2;
-      const y = rect.top;
-      spawnHeart(x, y);
-    }
-
-    function spawnHeart(x, y) {
+    // Animasi Hati Terapung TikTok (Tap-Heart)
+    function spawnHeart(x, y, color) {
       const container = document.getElementById('hearts-container');
       if (!container) return;
 
+      const rect = container.getBoundingClientRect();
+      const relX = x - rect.left;
+      const relY = y - rect.top;
+
       const heart = document.createElement('div');
-      heart.className = 'heart-bubble';
+      heart.className = 'tap-heart';
 
-      const colors = ['#f43f5e', '#ec4899', '#a855f7', '#10b981', '#f59e0b', '#3b82f6'];
-      const randomColor = colors[Math.floor(Math.random() * colors.length)];
-      const randomSize = Math.floor(Math.random() * 12) + 22; // 22px to 34px
+      const chosenColor = color || HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)];
+      const size = 20 + Math.round(Math.random() * 15);
+      const drift = Math.round(Math.random() * 60 - 30);
+      const rise = 140 + Math.round(Math.random() * 90);
+      const rot = Math.round(Math.random() * 30 - 15);
+      const dur = (1.2 + Math.random() * 0.4).toFixed(2);
 
-      const containerRect = container.getBoundingClientRect();
-      const relX = x - containerRect.left;
-      const relY = y - containerRect.top;
-
-      heart.style.left = `${relX - randomSize / 2}px`;
-      heart.style.top = `${relY - randomSize / 2}px`;
+      heart.style.left = `${relX - size / 2}px`;
+      heart.style.top = `${relY - size / 2}px`;
+      heart.style.width = `${size}px`;
+      heart.style.height = `${size}px`;
+      heart.style.color = chosenColor;
+      heart.style.setProperty('--tap-drift', `${drift}px`);
+      heart.style.setProperty('--tap-rise', `${rise}px`);
+      heart.style.setProperty('--tap-rot', `${rot}deg`);
+      heart.style.setProperty('--tap-dur', `${dur}s`);
+      heart.style.filter = `drop-shadow(0 2px 8px ${chosenColor}aa)`;
 
       heart.innerHTML = `
-        <svg style="width:${randomSize}px;height:${randomSize}px;fill:${randomColor};filter:drop-shadow(0 2px 8px rgba(0,0,0,0.6));" viewBox="0 0 24 24">
+        <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full">
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
       `;
 
       container.appendChild(heart);
-
       setTimeout(() => {
-        if (heart.parentNode) {
-          heart.parentNode.removeChild(heart);
-        }
-      }, 2200);
+        if (heart.parentNode) heart.parentNode.removeChild(heart);
+      }, 1800);
     }
 
-    // 6. Pengguna Menghantar Komen Sendiri di Live
-    function sendLiveUserComment() {
-      const input = document.getElementById('live-user-input');
-      if (!input) return;
-      const text = input.value.trim();
-      if (!text) return;
+    function handleScreenTap(e) {
+      if (e.target.closest('button, a, input, form, #live-pinned-card, #live-comments-stream')) return;
+      const x = e.clientX;
+      const y = e.clientY;
+      spawnHeart(x, y);
+      likesCount += 1;
+      updateLikesDisplay();
+    }
 
-      const newComment = {
+    function handleHeartClick(e) {
+      if (e) e.stopPropagation();
+      const container = document.getElementById('hearts-container');
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const x = rect.right - 40;
+      const y = rect.bottom - 160;
+      spawnHeart(x, y, '#ff2d55');
+      likesCount += 5;
+      updateLikesDisplay();
+    }
+
+    // Pengguna Menghantar Komen Sendiri di Live
+    async function handleUserLiveComment(e) {
+      if (e) e.preventDefault();
+      const nameInput = document.getElementById('live-user-name-input');
+      const textInput = document.getElementById('live-user-input');
+      if (!textInput) return;
+
+      const text = textInput.value.trim();
+      if (!text) return;
+      const userName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : 'Pelawat';
+
+      const userComment = {
         id: Date.now(),
-        user: "Anda",
+        user: userName,
         comment: text,
-        isHost: false
+        isHost: false,
+        isUserSent: true
       };
 
-      appendCommentToStream(newComment, true);
-      liveCommentsPool.unshift(newComment);
-      input.value = '';
+      appendCommentToStream(userComment, true);
+      textInput.value = '';
 
-      // Simulasi jawapan balas automatik dari hos selepas 4 saat
+      // Balasan Hos Automatik Pintar
       setTimeout(() => {
-        const hostReply = {
+        let reply = `Terima kasih ${userName}. Anda boleh terus klik butang 'Isi Borang' atau hubungi WhatsApp kami untuk semakan kelayakan segera ya!`;
+        const lower = text.toLowerCase();
+        if (lower.includes('mana') || lower.includes('lokasi') || lower.includes('where')) {
+          reply = `Hai ${userName}, Residensi MADANI Serunai terletak di Presint 5 Putrajaya, hanya beberapa minit dari PICC dan kompleks kementerian!`;
+        } else if (lower.includes('1st') || lower.includes('pertama') || lower.includes('first')) {
+          reply = `Hai ${userName}, pembeli rumah pertama layak dapat pinjaman penuh 100% serta pengecualian duti setem MOT percuma!`;
+        } else if (lower.includes('parking') || lower.includes('kereta')) {
+          reply = `Hai ${userName}, setiap unit 3 bilik lengkap disediakan dengan tempat letak kereta bertingkat khas.`;
+        } else if (lower.includes('harga') || lower.includes('berapa') || lower.includes('price')) {
+          reply = `Harga tetap bersubsidi kerajaan hanya RM 200,000 sahaja dengan anggaran ansuran bulanan RM 900 sebulan ${userName}.`;
+        } else if (lower.includes('gaji') || lower.includes('loan') || lower.includes('kelayakan')) {
+          reply = `Gaji bersih serendah RM 2,200 dah layak mohon loan LPPSA kerajaan mahupun pinjaman bank swasta ya ${userName}.`;
+        } else if (lower.includes('bilik') || lower.includes('saiz') || lower.includes('layout')) {
+          reply = `Keluasan 800 kps dengan 3 bilik tidur, 2 bilik air, lengkap ruang tamu, dapur, balkoni dan yard ya ${userName}.`;
+        }
+
+        const hostComment = {
           id: Date.now() + 1,
           user: "Zaim Rosli",
-          comment: `Terima kasih atas soalan anda! Kami akan terangkan sebentar lagi atau anda boleh klik butang WhatsApp di bawah untuk semakan segera.`,
+          comment: reply,
           isHost: true
         };
-        appendCommentToStream(hostReply, true);
-      }, 4000);
+        appendCommentToStream(hostComment, true);
+      }, 1600);
     }
 
     // ==========================================================
