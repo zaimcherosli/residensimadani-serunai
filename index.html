@@ -102,9 +102,9 @@
   <!-- SKRIN PENUH SIARAN LANGSUNG (TIKTOK LIVE SESSION)    -->
   <!-- Dipaparkan serta-merta apabila link laman web dibuka -->
   <!-- ==================================================== -->
-  <div id="live-session-overlay" class="fixed inset-0 z-[100] bg-slate-950 overflow-hidden w-full h-full select-none flex items-center justify-center">
-    <!-- Player Wrapper: Responsif Penuh di Mobile & Frame Telefon Moden di Desktop -->
-    <div class="relative w-full h-full sm:max-w-[430px] sm:max-h-[92vh] sm:rounded-3xl bg-black overflow-hidden shadow-2xl flex flex-col justify-between border-0 sm:border sm:border-slate-800">
+  <div id="live-session-overlay" class="fixed inset-0 z-[100] bg-black overflow-hidden w-screen h-screen select-none flex items-center justify-center">
+    <!-- Player Wrapper: Responsif Penuh di Mobile & Frame Moden di Desktop -->
+    <div class="relative w-full h-full max-w-[480px] max-h-[100vh] bg-neutral-950 overflow-hidden shadow-2xl flex flex-col justify-between">
       
       <!-- Video Player (Autoplay Looping Show Unit) -->
       <div class="absolute inset-0 z-0 cursor-pointer" onclick="handleScreenTap(event)">
@@ -119,7 +119,7 @@
           class="w-full h-full object-cover"
         ></video>
         <!-- Overlay Gradient Atas & Bawah untuk Keterbacaan Teks -->
-        <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/90 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-black/75 via-transparent to-black/90 pointer-events-none"></div>
       </div>
 
       <!-- Container Animasi Hati Terapung -->
@@ -129,26 +129,26 @@
       <div
         id="live-unmute-prompt"
         onclick="toggleLiveAudio()"
-        class="absolute top-16 left-1/2 -translate-x-1/2 bg-slate-900/90 border border-emerald-500/60 text-white text-[11px] px-3.5 py-1.5 rounded-full backdrop-blur-md shadow-2xl flex items-center gap-2 cursor-pointer z-30 animate-pulse hover:bg-slate-800 transition whitespace-nowrap"
+        class="absolute top-20 left-1/2 -translate-x-1/2 bg-slate-900/90 border border-emerald-500/60 text-white text-xs px-4 py-2 rounded-full backdrop-blur-md shadow-2xl flex items-center gap-2 cursor-pointer z-30 animate-pulse hover:bg-slate-800 transition"
       >
         <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
         <span class="font-bold">Tekan untuk buka audio siaran</span>
-        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+        <svg class="w-4 h-4 ml-1 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
       </div>
 
       <!-- HEADER ATAS LIVE (Profil Ejen, Badge Live, Butang CMS & Tutup) -->
-      <div class="relative z-30 p-3 pt-3 flex items-center justify-between gap-2">
+      <div class="relative z-30 p-3.5 pt-3 flex items-center justify-between gap-2">
         <!-- Profil Ejen & Kaunter Penonton -->
-        <div class="flex items-center gap-2 bg-black/60 backdrop-blur-md rounded-full py-1 px-2.5 border border-white/15 min-w-0">
+        <div class="flex items-center gap-2 bg-black/50 backdrop-blur-md rounded-full py-1 px-2.5 border border-white/15">
           <img
             src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80"
             alt="Zaim Rosli"
-            class="w-7 h-7 rounded-full object-cover border border-emerald-400 shrink-0"
+            class="w-8 h-8 rounded-full object-cover border border-emerald-400 shrink-0"
           />
-          <div class="leading-tight pr-1 min-w-0">
+          <div class="leading-tight pr-1">
             <div class="flex items-center gap-1.5">
-              <span class="text-xs font-bold text-white tracking-tight truncate">Zaim Rosli</span>
-              <span class="bg-rose-600 text-white text-[8px] font-black px-1.5 py-0.2 rounded uppercase tracking-wider flex items-center gap-1 shrink-0">
+              <span class="text-xs font-bold text-white tracking-tight">Zaim Rosli</span>
+              <span class="bg-rose-600 text-white text-[9px] font-black px-1.5 py-0.2 rounded uppercase tracking-wider flex items-center gap-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
                 LIVE
               </span>
@@ -161,24 +161,24 @@
         </div>
 
         <!-- Butang Kawalan Kanan (Audio, AI CMS, Tutup) -->
-        <div class="flex items-center gap-1.5 shrink-0">
+        <div class="flex items-center gap-1.5">
           <!-- Butang Audio (Mute / Unmute) -->
           <button
             id="audio-toggle-btn"
             type="button"
             onclick="toggleLiveAudio()"
-            class="w-7 h-7 rounded-full bg-black/60 hover:bg-black/80 border border-white/20 text-white flex items-center justify-center transition backdrop-blur-md shrink-0"
+            class="w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 border border-white/20 text-white flex items-center justify-center transition backdrop-blur-md"
             title="Buka / Matikan Audio"
           >
-            <svg id="audio-icon-muted" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
-            <svg id="audio-icon-unmuted" class="w-3.5 h-3.5 hidden text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+            <svg id="audio-icon-muted" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+            <svg id="audio-icon-unmuted" class="w-4 h-4 hidden text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
           </button>
 
           <!-- Butang AI CMS (Khusus AI & Video) -->
           <button
             type="button"
             onclick="openAiCmsModal()"
-            class="h-7 px-2.5 rounded-full bg-purple-600/90 hover:bg-purple-600 text-white text-[10px] font-bold transition border border-purple-400/30 backdrop-blur-md shadow shrink-0 flex items-center justify-center"
+            class="px-2.5 py-1.5 rounded-full bg-purple-600/85 hover:bg-purple-600 text-white text-[10px] font-bold transition border border-purple-400/30 backdrop-blur-md shadow"
             title="Konfigurasi AI Gemini"
           >
             <span>AI CMS</span>
@@ -188,20 +188,20 @@
           <button
             type="button"
             onclick="closeLiveSession()"
-            class="h-7 px-2.5 rounded-full bg-white/20 hover:bg-white/30 text-white text-[10px] font-bold transition border border-white/30 backdrop-blur-md flex items-center gap-1 shadow shrink-0"
-            title="Tutup & Lihat Laman Web"
+            class="px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white text-[10px] font-bold transition border border-white/25 backdrop-blur-md flex items-center gap-1 shadow"
+            title="Lihat Laman Penuh Serunai"
           >
-            <span>Tutup</span>
+            <span>Laman Web</span>
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
       </div>
 
       <!-- NOTIFIKASI SOCIAL PROOF TOAST (BERKALA) -->
-      <div class="relative z-30 px-3 -mt-1">
+      <div class="relative z-30 px-3.5 -mt-2">
         <div
           id="live-social-toast"
-          class="transition-all duration-500 opacity-0 transform -translate-y-2 pointer-events-none inline-flex items-center gap-1.5 bg-slate-900/90 backdrop-blur-md text-white text-[10px] px-3 py-1 rounded-full border border-emerald-500/30 shadow-lg max-w-full"
+          class="transition-all duration-500 opacity-0 transform -translate-y-2 pointer-events-none inline-flex items-center gap-2 bg-slate-900/85 backdrop-blur-md text-white text-[10.5px] px-3 py-1 rounded-full border border-emerald-500/30 shadow-lg"
         >
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
           <span id="live-social-toast-text" class="truncate font-medium">Ahmad (Putrajaya) baru menyertai live</span>
@@ -212,81 +212,43 @@
       <div class="flex-1" onclick="handleScreenTap(event)"></div>
 
       <!-- BAHAGIAN BAWAH (KOMEN, KAD PIN PRODUK, DAN KOTAK INPUT) -->
-      <div class="relative z-30 p-3 pb-3.5 space-y-2.5">
-
-        <!-- POPUP SERVICE+ (INTERVAL 1 MINIT ADA, 1 MINIT TIADA) -->
-        <div
-          id="service-plus-live-popup"
-          class="hidden bg-slate-900/95 backdrop-blur-xl border border-emerald-500/50 rounded-2xl p-3 text-white shadow-2xl transition-all duration-500"
-        >
-          <div class="flex items-start justify-between gap-2">
-            <div>
-              <div class="inline-block bg-emerald-500 text-slate-950 text-[9px] font-black px-1.5 py-0.2 rounded uppercase tracking-wider mb-1">
-                Bimbingan Khas Pembeli
-              </div>
-              <h4 class="text-xs font-black text-white">Semakan Kelayakan Pinjaman Percuma</h4>
-              <p class="text-[10.5px] text-slate-300 mt-0.5 leading-snug">
-                Bantuan permohonan pinjaman LPPSA kerajaan & bank swasta. Percuma semakan CTOS / CCRIS dan kiraan kelayakan gaji.
-              </p>
-            </div>
-            <button onclick="dismissServicePlusPopup()" class="text-slate-400 hover:text-white p-1" title="Tutup">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-          <div class="mt-2 flex items-center gap-2">
-            <a
-              id="service-plus-wa-btn"
-              href="https://wa.me/60108118559?text=Salam%20Tuan%20Zaim%2C%20saya%20berminat%20dengan%20bimbingan%20pinjaman%20Residensi%20MADANI%20Serunai."
-              target="_blank"
-              class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold py-1.5 px-3 rounded-xl text-center transition shadow"
-            >
-              Dapatkan Bimbingan di WhatsApp
-            </a>
-            <button
-              type="button"
-              onclick="dismissServicePlusPopup()"
-              class="px-2.5 py-1.5 rounded-xl bg-slate-800 text-slate-300 text-[11px] font-semibold hover:bg-slate-700 transition"
-            >
-              Nanti Dulu
-            </button>
-          </div>
-        </div>
+      <div class="relative z-30 p-3.5 pb-4 space-y-2.5">
 
         <!-- ALIRAN KOMEN PENONTON TIKTOK LIVE -->
-        <div class="relative h-40 overflow-hidden live-comments-mask">
-          <div id="live-comments-stream" class="absolute inset-x-0 bottom-0 space-y-1.5 overflow-y-auto max-h-40 flex flex-col justify-end no-scrollbar">
+        <div class="relative h-44 overflow-hidden live-comments-mask">
+          <div id="live-comments-stream" class="absolute inset-x-0 bottom-0 space-y-1.5 overflow-y-auto max-h-44 flex flex-col justify-end no-scrollbar">
             <!-- Komen dinamik akan dimasukkan di sini secara berterusan -->
           </div>
         </div>
 
         <!-- KAD PIN PRODUK (PINNED OFFER) -->
-        <div class="bg-slate-900/90 backdrop-blur-xl border border-white/20 rounded-2xl p-2.5 flex items-center justify-between gap-2 shadow-2xl">
+        <div class="bg-slate-900/90 backdrop-blur-xl border border-white/20 rounded-2xl p-2.5 flex items-center justify-between gap-2.5 shadow-2xl">
           <img
             src="https://erumawip.jwp.gov.my/images/imageProjek/6a548ab19b501.jpeg"
             alt="Residensi MADANI Serunai"
-            class="w-10 h-10 rounded-xl object-cover border border-emerald-500/40 shrink-0"
+            class="w-11 h-11 rounded-xl object-cover border border-emerald-500/40 shrink-0"
           />
           <div class="min-w-0 flex-1 leading-tight">
-            <div class="flex items-center gap-1">
-              <span class="bg-amber-500 text-slate-950 font-black text-[8px] px-1.5 py-0.2 rounded uppercase">PIN</span>
+            <div class="flex items-center gap-1.5">
+              <span class="bg-amber-500 text-slate-950 font-black text-[9px] px-1.5 py-0.2 rounded uppercase">PIN</span>
               <span class="text-xs font-extrabold text-white truncate">Residensi MADANI Serunai</span>
             </div>
-            <div class="text-[11px] text-emerald-400 font-black mt-0.5 truncate">
-              RM 200,000 <span class="text-slate-300 text-[10px] font-normal">| Presint 5 (3 Bilik)</span>
+            <div class="text-[11px] text-emerald-400 font-black mt-0.5">
+              RM 200,000 <span class="text-slate-400 text-[10px] font-normal">&bull; Presint 5 (3 Bilik)</span>
             </div>
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
               onclick="goToSemakKelayakanFromLive()"
-              class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl transition shadow"
+              class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition shadow"
             >
               Semak
             </button>
             <a
               href="https://wa.me/60108118559?text=Salam%20Tuan%20Zaim%2C%20saya%20sedang%20menonton%20siaran%20langsung%20Residensi%20MADANI%20Serunai%20Presint%205.%20Saya%20ingin%20semak%20kelayakan%20permohonan%20unit%203%20bilik%20RM200k."
               target="_blank"
-              class="bg-white hover:bg-slate-100 text-slate-900 text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition shadow flex items-center gap-1"
+              class="bg-white hover:bg-slate-100 text-slate-900 text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition shadow"
             >
               WhatsApp
             </a>
@@ -301,13 +263,13 @@
               type="text"
               placeholder="Tanya soalan di siaran langsung..."
               onkeydown="if(event.key==='Enter') sendLiveUserComment()"
-              class="w-full bg-black/60 border border-white/20 rounded-full px-3.5 py-2 text-xs text-white placeholder:text-slate-300 focus:outline-none focus:bg-black/90 focus:border-emerald-500 backdrop-blur-md"
+              class="w-full bg-white/15 border border-white/20 rounded-full px-3.5 py-2 text-xs text-white placeholder:text-slate-300 focus:outline-none focus:bg-black/60 focus:border-emerald-500 backdrop-blur-md"
             />
           </div>
           <button
             type="button"
             onclick="sendLiveUserComment()"
-            class="w-8 h-8 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center shrink-0 transition shadow active:scale-95"
+            class="w-8 h-8 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center shrink-0 transition shadow"
             title="Hantar Soalan"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
@@ -323,7 +285,6 @@
         </div>
 
       </div>
-
     </div>
   </div>
 
@@ -2186,7 +2147,6 @@
     let commentTickerInterval = null;
     let socialToastInterval = null;
     let viewerCounterInterval = null;
-    let servicePlusCycleInterval = null;
     let currentViewerCount = 1418;
     let isLiveAudioActive = false;
 
@@ -2199,7 +2159,7 @@
         videoEl.src = savedVideo;
       }
 
-      // 2. Muat turun Komen
+      // 2. Muat turun Komen Live dari LocalStorage (jika pernah dijana AI)
       try {
         const savedComments = localStorage.getItem(STORAGE_KEY_COMMENTS);
         if (savedComments) {
@@ -2214,7 +2174,6 @@
       // 3. Masukkan komen awal
       renderInitialLiveComments();
       startLiveTickers();
-      initServicePlusCycle();
     }
 
     // Paparkan komen awal
