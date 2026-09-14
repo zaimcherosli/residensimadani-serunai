@@ -146,6 +146,7 @@
         <div class="flex items-center gap-2 bg-black/60 backdrop-blur-md rounded-full py-1 pl-1 pr-2.5 border border-white/10 pointer-events-auto">
           <div class="relative">
             <img
+              id="live-host-avatar"
               src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80"
               alt="Zaim Rosli"
               class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-1 ring-amber-400"
@@ -155,7 +156,7 @@
             </span>
           </div>
           <div class="flex flex-col">
-            <span class="text-xs font-bold leading-tight truncate max-w-[100px] sm:max-w-[130px]">
+            <span id="live-host-name" class="text-xs font-bold leading-tight truncate max-w-[100px] sm:max-w-[130px]">
               Zaim Rosli
             </span>
             <span id="live-likes-header" class="text-[10px] text-neutral-300 font-medium leading-none tabular-nums">
@@ -494,7 +495,72 @@
           </div>
         </div>
 
-        <!-- 5. Butang Reset & Simpan -->
+        <!-- 5. Profil & Maklumat Hos Live (Ejen) -->
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-900">Profil &amp; Maklumat Hos (Ejen)</span>
+            <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded">Paparan Live</span>
+          </div>
+
+          <!-- Preview & Nama Ejen -->
+          <div class="flex items-center gap-3">
+            <div class="relative shrink-0">
+              <img
+                id="cms-agent-avatar-preview"
+                src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80"
+                alt="Preview Ejen"
+                class="w-12 h-12 rounded-full object-cover border-2 border-purple-500 shadow-sm"
+              />
+              <span class="absolute -bottom-1 -right-1 bg-amber-500 rounded-full p-0.5 text-black flex items-center justify-center">
+                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              </span>
+            </div>
+            <div class="flex-1 space-y-1">
+              <label class="block text-[11px] font-bold text-slate-700">Nama Hos / Ejen</label>
+              <input
+                id="cms-agent-name-input"
+                type="text"
+                placeholder="Contoh: Zaim Rosli"
+                class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none font-semibold"
+              />
+            </div>
+          </div>
+
+          <!-- Pilihan URL Gambar & Muat Naik Fail -->
+          <div class="space-y-1.5">
+            <label class="block text-[11px] font-bold text-slate-700">URL Gambar Profil Ejen</label>
+            <input
+              id="cms-agent-avatar-input"
+              type="text"
+              placeholder="https://..."
+              oninput="handleAvatarUrlInput(this.value)"
+              class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            />
+            
+            <div class="flex items-center justify-between gap-2 pt-1">
+              <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-xl text-[11px] font-bold transition">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Pilih Dari Peranti
+                <input
+                  id="cms-agent-avatar-file"
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  onchange="handleAvatarFileUpload(event)"
+                />
+              </label>
+              <button
+                type="button"
+                onclick="resetAgentProfileToDefault()"
+                class="text-[10.5px] text-slate-500 hover:text-slate-800 underline font-medium"
+              >
+                Guna Gambar Asal
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Butang Reset & Simpan -->
         <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
           <button
             type="button"
@@ -2197,6 +2263,10 @@
     const STORAGE_KEY_COMMENTS = 'serunai_live_comments';
     const STORAGE_KEY_VIDEO = 'serunai_live_video_url';
     const STORAGE_KEY_GEMINI = 'hartanah_gemini_config';
+    const STORAGE_KEY_AGENT_NAME = 'serunai_live_agent_name';
+    const STORAGE_KEY_AGENT_AVATAR = 'serunai_live_agent_avatar';
+    const DEFAULT_AGENT_NAME = 'Zaim Rosli';
+    const DEFAULT_AGENT_AVATAR = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80';
 
     // State Variables
     let liveCommentsPool = [];
@@ -2211,6 +2281,63 @@
     let isFollowing = false;
     let isLiveAudioActive = false;
     let offerSeconds = 1193; // 19:53
+
+    // Fungsi Pengurusan Maklumat Hos Live (Ejen)
+    function getLiveAgentName() {
+      return localStorage.getItem(STORAGE_KEY_AGENT_NAME) || DEFAULT_AGENT_NAME;
+    }
+
+    function getLiveAgentAvatar() {
+      return localStorage.getItem(STORAGE_KEY_AGENT_AVATAR) || DEFAULT_AGENT_AVATAR;
+    }
+
+    function updateLiveAgentDisplay() {
+      const name = getLiveAgentName();
+      const avatar = getLiveAgentAvatar();
+
+      const nameEl = document.getElementById('live-host-name');
+      if (nameEl) nameEl.innerText = name;
+
+      const avatarEl = document.getElementById('live-host-avatar');
+      if (avatarEl) {
+        avatarEl.src = avatar;
+        avatarEl.alt = name;
+      }
+    }
+
+    function handleAvatarUrlInput(val) {
+      const preview = document.getElementById('cms-agent-avatar-preview');
+      if (preview && val && val.trim().length > 0) {
+        preview.src = val.trim();
+      }
+    }
+
+    function handleAvatarFileUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Sila pilih gambar bersaiz di bawah 2MB untuk kelancaran simpanan.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const dataUrl = evt.target.result;
+        const preview = document.getElementById('cms-agent-avatar-preview');
+        const input = document.getElementById('cms-agent-avatar-input');
+        if (preview) preview.src = dataUrl;
+        if (input) input.value = dataUrl;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetAgentProfileToDefault() {
+      const nameInput = document.getElementById('cms-agent-name-input');
+      const avatarInput = document.getElementById('cms-agent-avatar-input');
+      const preview = document.getElementById('cms-agent-avatar-preview');
+      if (nameInput) nameInput.value = DEFAULT_AGENT_NAME;
+      if (avatarInput) avatarInput.value = DEFAULT_AGENT_AVATAR;
+      if (preview) preview.src = DEFAULT_AGENT_AVATAR;
+    }
 
     const HEART_COLORS = ['#ff2d55', '#ff375f', '#fbbf24', '#f43f5e', '#a855f7', '#06b6d4', '#ffffff'];
 
@@ -2229,6 +2356,9 @@
 
     // Inisialisasi Data & Live Session
     function initLiveSessionData() {
+      // 0. Kemas kini profil & gambar ejen
+      updateLiveAgentDisplay();
+
       // 1. Muat turun video URL
       const savedVideo = localStorage.getItem(STORAGE_KEY_VIDEO);
       const videoEl = document.getElementById('live-video-player');
@@ -2325,7 +2455,7 @@
       card.innerHTML = `
         <div class="flex items-center gap-1">
           <span class="font-bold text-[10.5px] truncate max-w-[130px] ${nameClass}">
-            ${item.user || 'Penonton'}
+            ${isHost ? getLiveAgentName() : (item.user || 'Penonton')}
           </span>
           ${badgeHtml}
         </div>
@@ -2617,7 +2747,7 @@
 
         const hostComment = {
           id: Date.now() + 1,
-          user: "Zaim Rosli",
+          user: getLiveAgentName(),
           comment: reply,
           isHost: true
         };
@@ -2674,12 +2804,18 @@
         const keyInput = document.getElementById('gemini-api-key-input');
         const modelSelect = document.getElementById('gemini-model-select');
         const videoInput = document.getElementById('live-video-url-input');
+        const agentNameInput = document.getElementById('cms-agent-name-input');
+        const agentAvatarInput = document.getElementById('cms-agent-avatar-input');
+        const agentPreview = document.getElementById('cms-agent-avatar-preview');
 
         if (keyInput && cfg.apiKey) keyInput.value = cfg.apiKey;
         if (modelSelect && cfg.model) modelSelect.value = cfg.model;
         if (videoInput) {
           videoInput.value = localStorage.getItem(STORAGE_KEY_VIDEO) || SAMPLE_PRESET_VIDEOS[0];
         }
+        if (agentNameInput) agentNameInput.value = getLiveAgentName();
+        if (agentAvatarInput) agentAvatarInput.value = getLiveAgentAvatar();
+        if (agentPreview) agentPreview.src = getLiveAgentAvatar();
       } catch (e) {}
     }
 
@@ -2701,10 +2837,14 @@
       const keyInput = document.getElementById('gemini-api-key-input');
       const modelSelect = document.getElementById('gemini-model-select');
       const videoInput = document.getElementById('live-video-url-input');
+      const agentNameInput = document.getElementById('cms-agent-name-input');
+      const agentAvatarInput = document.getElementById('cms-agent-avatar-input');
 
       const apiKey = keyInput ? keyInput.value.trim() : '';
       const model = modelSelect ? modelSelect.value : 'gemini-flash-latest';
       const videoUrl = videoInput ? videoInput.value.trim() : '';
+      const agentName = agentNameInput ? agentNameInput.value.trim() : '';
+      const agentAvatar = agentAvatarInput ? agentAvatarInput.value.trim() : '';
 
       localStorage.setItem(STORAGE_KEY_GEMINI, JSON.stringify({ apiKey, model, isEnabled: Boolean(apiKey) }));
       if (videoUrl) {
@@ -2715,8 +2855,15 @@
           videoEl.play().catch(() => {});
         }
       }
+      if (agentName) {
+        localStorage.setItem(STORAGE_KEY_AGENT_NAME, agentName);
+      }
+      if (agentAvatar) {
+        localStorage.setItem(STORAGE_KEY_AGENT_AVATAR, agentAvatar);
+      }
+      updateLiveAgentDisplay();
 
-      alert('Tetapan berjaya disimpan!');
+      alert('Tetapan dan profil ejen berjaya disimpan!');
       closeAiCmsModal();
     }
 
@@ -2800,6 +2947,7 @@
         statusEl.innerText = `Membaca konteks Residensi Serunai dan menjana ${count} komen penonton...`;
       }
 
+      const currentHost = getLiveAgentName();
       const systemPrompt = `Anda adalah simulator sembang TikTok Live bagi projek hartanah di Malaysia.
 Maklumat Projek:
 - Nama Projek: Residensi MADANI Serunai
@@ -2815,13 +2963,13 @@ Maklumat Projek:
 
 TUGASAN:
 Jana tepat ${count} soalan atau komen penonton Malaysia yang natural, pelbagai, dan realistik untuk siaran langsung TikTok Live mengenai Residensi MADANI Serunai.
-Pastikan sesetengah soalan dijawab secara berselang oleh hos "Zaim Rosli" (dengan isHost: true).
+Pastikan sesetengah soalan dijawab secara berselang oleh hos "${currentHost}" (dengan isHost: true).
 Gunakan bahasa santai Bahasa Melayu harian orang Malaysia (tanpa sebarang ikon atau emoji di hadapan perkataan).
 
 PENTING: Berikan jawapan HANYA dalam format tatasusunan JSON yang sah (valid JSON array) seperti ini:
 [
   {"id": 1, "user": "Ahmad_Putrajaya", "comment": "Gaji bersih RM2,500 lepas ke nak ambil unit 3 bilik ni?", "isHost": false},
-  {"id": 2, "user": "Zaim Rosli", "comment": "Lepas Ahmad, ansuran hanya sekitar RM900 sebulan dan boleh mohon LPPSA atau bank.", "isHost": true}
+  {"id": 2, "user": "${currentHost}", "comment": "Lepas Ahmad, ansuran hanya sekitar RM900 sebulan dan boleh mohon LPPSA atau bank.", "isHost": true}
 ]`;
 
       try {
