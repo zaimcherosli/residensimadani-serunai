@@ -591,44 +591,99 @@
           <div id="agentrouter-test-status" class="text-[11px] font-medium hidden p-2 rounded-lg"></div>
         </div>
 
-        <!-- 3. Penjana Komen Live Automatik (AI) -->
-        <div class="p-3.5 bg-purple-50/70 border border-purple-200 rounded-2xl space-y-2.5">
+        <!-- 3. Pengurusan Komen Siaran Langsung (Brosur Rasmi KPKT & Penjana AI) -->
+        <div class="p-3.5 bg-purple-50/70 border border-purple-200 rounded-2xl space-y-3">
           <div class="flex items-center justify-between">
-            <span class="font-bold text-purple-950">Jana Komen Live Automatik (AI)</span>
-            <div class="flex items-center gap-1">
-              <span id="ai-active-provider-badge" class="text-[10px] bg-purple-200 text-purple-800 font-bold px-1.5 py-0.5 rounded">Google Gemini</span>
-              <span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-1.5 py-0.5 rounded">Residensi Serunai</span>
-            </div>
+            <span class="font-bold text-purple-950">Komen Siaran Langsung (Brosur Rasmi)</span>
+            <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded border border-emerald-200">100% Tepat Brosur KPKT</span>
           </div>
-          <p class="text-[11px] text-purple-800 leading-relaxed">
-            AI akan membaca maklumat tepat Residensi MADANI Serunai (Presint 5 Putrajaya, RM200,000, 3 bilik, syarat Wilayah Persekutuan, kuota 587 unit) untuk mencipta soalan dan komen penonton yang natural dalam Bahasa Melayu.
+
+          <p class="text-[11px] text-purple-900 leading-relaxed">
+            Koleksi 150 soalan dan jawapan hos yang disahkan 100% tepat mengikut dokumen brosur rasmi KPKT Residensi MADANI Serunai (Pegangan Kekal Freehold, RM200k, 800 kps, siap Q3 2030, 16 fasiliti lengkap, SK/SMK 50m).
           </p>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-[10px] font-bold text-purple-900 mb-0.5">Jumlah Komen</label>
-              <select id="ai-count-select" class="w-full px-2.5 py-1.5 border border-purple-300 rounded-lg text-xs bg-white">
-                <option value="25">25 Komen</option>
-                <option value="50" selected>50 Komen</option>
-                <option value="100">100 Komen</option>
-              </select>
+
+          <!-- Pilihan Kuantiti Komen Brosur -->
+          <div class="p-3 bg-white rounded-xl border border-purple-200 space-y-2.5 shadow-sm">
+            <label class="block text-[10.5px] font-bold text-slate-800">Pilih Bilangan Soalan &amp; Komen Brosur</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                id="btn-brochure-count-50"
+                onclick="selectBrochureCount(50)"
+                class="py-2 px-1 text-center rounded-lg border text-xs font-bold transition border-slate-300 bg-slate-50 text-slate-700 hover:bg-purple-50"
+              >
+                50 Soalan
+              </button>
+              <button
+                type="button"
+                id="btn-brochure-count-100"
+                onclick="selectBrochureCount(100)"
+                class="py-2 px-1 text-center rounded-lg border text-xs font-bold transition border-slate-300 bg-slate-50 text-slate-700 hover:bg-purple-50"
+              >
+                100 Soalan
+              </button>
+              <button
+                type="button"
+                id="btn-brochure-count-150"
+                onclick="selectBrochureCount(150)"
+                class="py-2 px-1 text-center rounded-lg border text-xs font-bold transition border-purple-600 bg-purple-600 text-white shadow-sm"
+              >
+                150 Soalan (Penuh)
+              </button>
             </div>
-            <div>
-              <label class="block text-[10px] font-bold text-purple-900 mb-0.5">Pilihan Mod</label>
-              <select id="ai-mode-select" class="w-full px-2.5 py-1.5 border border-purple-300 rounded-lg text-xs bg-white">
-                <option value="replace">Ganti Semua Komen</option>
-                <option value="append">Tambah ke Sedia Ada</option>
-              </select>
+
+            <button
+              id="apply-brochure-comments-btn"
+              type="button"
+              onclick="applyBrochureCommentsAction()"
+              class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-3 rounded-xl transition shadow text-center text-xs flex items-center justify-center gap-1.5"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>Guna <span id="brochure-count-label">150</span> Komen Brosur Rasmi (Tepat 100%)</span>
+            </button>
+            <div id="brochure-comments-status" class="text-[11px] font-medium hidden"></div>
+          </div>
+
+          <!-- Pilihan Tambahan: Penjana Komen AI (Boleh Dibuka Jika Perlu) -->
+          <div class="pt-1.5 border-t border-purple-200">
+            <button
+              type="button"
+              onclick="toggleAiGeneratorAccordion()"
+              class="text-[10.5px] text-purple-700 hover:text-purple-900 font-semibold flex items-center justify-between w-full"
+            >
+              <span>Pilihan Tambahan: Jana Komen Baharu Guna AI (Gemini / Agent Router)</span>
+              <svg id="ai-generator-accordion-icon" class="w-3.5 h-3.5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+
+            <div id="ai-generator-accordion-content" class="hidden mt-2.5 space-y-2.5 pt-2 border-t border-purple-100">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-purple-900 mb-0.5">Jumlah Komen AI</label>
+                  <select id="ai-count-select" class="w-full px-2.5 py-1.5 border border-purple-300 rounded-lg text-xs bg-white">
+                    <option value="25">25 Komen</option>
+                    <option value="50" selected>50 Komen</option>
+                    <option value="100">100 Komen</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-purple-900 mb-0.5">Pilihan Mod</label>
+                  <select id="ai-mode-select" class="w-full px-2.5 py-1.5 border border-purple-300 rounded-lg text-xs bg-white">
+                    <option value="replace">Ganti Semua Komen</option>
+                    <option value="append">Tambah ke Sedia Ada</option>
+                  </select>
+                </div>
+              </div>
+              <button
+                id="generate-ai-comments-btn"
+                type="button"
+                onclick="handleGenerateAiLiveComments()"
+                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-xl transition shadow text-center text-xs"
+              >
+                Jana Komen Live Menggunakan AI
+              </button>
+              <div id="ai-generate-status" class="text-[11px] font-medium hidden"></div>
             </div>
           </div>
-          <button
-            id="generate-ai-comments-btn"
-            type="button"
-            onclick="handleGenerateAiLiveComments()"
-            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-3 rounded-xl transition shadow text-center text-xs"
-          >
-            Jana Komen Live Sekarang
-          </button>
-          <div id="ai-generate-status" class="text-[11px] font-medium hidden"></div>
         </div>
 
         <!-- 4. Pilihan Mod Media & Paparan (Video vs Slideshow Gambar) -->
@@ -998,7 +1053,7 @@
           <span class="text-emerald-400 font-black">&bull;</span>
           <span class="text-amber-300 font-semibold">Tindakan Segera: Permohonan semakin meningkat, semak kelayakan sebelum kuota penuh</span>
           <span class="text-emerald-400 font-black">&bull;</span>
-          <span class="text-slate-200">Kediaman 3 Bilik 800 kps Presint 5 Putrajaya pada harga RM200,000 sahaja</span>
+          <span class="text-slate-200 font-medium">Pegangan Kekal (Freehold) &bull; Zero Downpayment &amp; Free SPA Legal Fee &bull; 16 Fasiliti Komuniti &bull; SK &amp; SMK 50m</span>
           <span class="text-emerald-400 font-black">&bull;</span>
           <span class="text-emerald-400 font-extrabold underline underline-offset-4">Klik Di Sini Untuk Semak Kelayakan Percuma</span>
           <span class="text-emerald-400 font-black">&bull;</span>
@@ -1014,7 +1069,7 @@
           <span class="text-emerald-400 font-black">&bull;</span>
           <span class="text-amber-300 font-semibold">Tindakan Segera: Permohonan semakin meningkat, semak kelayakan sebelum kuota penuh</span>
           <span class="text-emerald-400 font-black">&bull;</span>
-          <span class="text-slate-200">Kediaman 3 Bilik 800 kps Presint 5 Putrajaya pada harga RM200,000 sahaja</span>
+          <span class="text-slate-200 font-medium">Pegangan Kekal (Freehold) &bull; Zero Downpayment &amp; Free SPA Legal Fee &bull; 16 Fasiliti Komuniti &bull; SK &amp; SMK 50m</span>
           <span class="text-emerald-400 font-black">&bull;</span>
           <span class="text-emerald-400 font-extrabold underline underline-offset-4">Klik Di Sini Untuk Semak Kelayakan Percuma</span>
           <span class="text-emerald-400 font-black">&bull;</span>
@@ -1085,8 +1140,12 @@
     <div class="relative z-10 max-w-6xl mx-auto text-center sm:text-left">
       <div class="grid lg:grid-cols-12 gap-8 lg:gap-10 items-center">
         <div class="lg:col-span-7 space-y-5">
-          <div class="inline-flex items-center gap-2 bg-emerald-900/70 border border-emerald-500/40 px-3 py-1 rounded-full text-xs sm:text-sm text-emerald-300 font-semibold">
-            Peluang Pemilikan Rumah Pertama di Putrajaya
+          <div class="inline-flex flex-wrap items-center gap-2 bg-emerald-900/80 border border-emerald-500/40 px-3.5 py-1 rounded-full text-xs sm:text-sm text-emerald-300 font-semibold">
+            <span>Pegangan Kekal (Freehold)</span>
+            <span class="text-emerald-500">&bull;</span>
+            <span>Harga Kawalan Kerajaan RM200,000</span>
+            <span class="text-emerald-500">&bull;</span>
+            <span>Zero Downpayment</span>
           </div>
 
           <h1 class="text-2xl sm:text-5xl font-black tracking-tight leading-tight text-white">
@@ -1107,19 +1166,27 @@
             </a>
           </div>
 
-          <!-- Ringkasan Spesifikasi (Disusun Kemas Ke Bawah) -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 pt-2">
-            <div class="flex sm:flex-col justify-between sm:justify-center items-center sm:items-start bg-slate-900/90 border border-slate-800 px-4 py-2.5 sm:p-3.5 rounded-xl">
-              <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Harga Jualan</span>
-              <span class="text-base sm:text-xl font-black text-emerald-400">RM 200,000</span>
+          <!-- Ringkasan Spesifikasi Brosur Rasmi -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-2">
+            <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl">
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Harga Jualan</span>
+              <span class="text-base sm:text-lg font-black text-emerald-400">RM 200,000</span>
+              <span class="text-[10px] text-slate-400 block mt-0.5">Ansuran ~RM900/bln</span>
             </div>
-            <div class="flex sm:flex-col justify-between sm:justify-center items-center sm:items-start bg-slate-900/90 border border-slate-800 px-4 py-2.5 sm:p-3.5 rounded-xl">
-              <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Keluasan</span>
-              <span class="text-base sm:text-xl font-black text-white">800 KPS</span>
+            <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl">
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Pegangan Tanah</span>
+              <span class="text-base sm:text-lg font-black text-white">FREEHOLD</span>
+              <span class="text-[10px] text-emerald-400 block mt-0.5">Pegangan Kekal</span>
             </div>
-            <div class="flex sm:flex-col justify-between sm:justify-center items-center sm:items-start bg-slate-900/90 border border-slate-800 px-4 py-2.5 sm:p-3.5 rounded-xl">
-              <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Susun Atur</span>
-              <span class="text-base sm:text-xl font-black text-white">3 Bilik, 2 Bilik Air</span>
+            <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl">
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Keluasan &amp; Bilik</span>
+              <span class="text-base sm:text-lg font-black text-white">800 KPS</span>
+              <span class="text-[10px] text-slate-400 block mt-0.5">3 Bilik, 2 Bilik Air</span>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl">
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block">Pakej &amp; Parkir</span>
+              <span class="text-base sm:text-lg font-black text-emerald-400">Zero Down</span>
+              <span class="text-[10px] text-slate-400 block mt-0.5">Free SPA + 1 Parkir</span>
             </div>
           </div>
 
@@ -1459,112 +1526,183 @@
           </div>
         </div>
 
-        <!-- Jadual Perincian (Tiada Ikon) -->
-        <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <div class="border-b border-slate-100 pb-3">
+        <!-- Jadual Perincian Lengkap Brosur Rasmi KPKT -->
+        <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-3.5">
+          <div class="border-b border-slate-100 pb-2.5">
             <span class="text-xs uppercase font-bold text-slate-500">Nama Hartanah</span>
-            <p class="text-lg font-bold text-slate-900">Residensi MADANI Serunai</p>
+            <p class="text-lg font-extrabold text-slate-900">Residensi MADANI Serunai</p>
           </div>
 
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500">Lokasi & Alamat</span>
-            <p class="text-base font-bold text-slate-900">Presint 5, 60200 Putrajaya</p>
+          <div class="border-b border-slate-100 pb-2.5">
+            <span class="text-xs uppercase font-bold text-slate-500">Kategori &amp; Skim Perumahan</span>
+            <p class="text-base font-bold text-slate-900">Residensi MADANI Putrajaya (Harga Kawalan Kerajaan)</p>
           </div>
 
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500">Kategori Projek</span>
-            <p class="text-base font-bold text-slate-900">Residensi Pertiwi / Residensi MADANI</p>
+          <div class="border-b border-slate-100 pb-2.5">
+            <span class="text-xs uppercase font-bold text-slate-500">Lokasi &amp; Tapak Projek</span>
+            <p class="text-sm font-bold text-slate-900">Lot PT 14595, Presint 5, 62000 Wilayah Persekutuan Putrajaya</p>
           </div>
 
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500">Jenis Kediaman</span>
-            <p class="text-base font-bold text-slate-900">Pangsapuri Kediaman Moden</p>
+          <div class="grid grid-cols-2 gap-3 border-b border-slate-100 pb-2.5">
+            <div>
+              <span class="text-xs uppercase font-bold text-slate-500">Pegangan Tanah</span>
+              <p class="text-base font-extrabold text-emerald-700">PEGANGAN KEKAL (FREEHOLD)</p>
+            </div>
+            <div>
+              <span class="text-xs uppercase font-bold text-slate-500">Bebanan Tanah</span>
+              <p class="text-base font-bold text-slate-900">Tiada Bebanan</p>
+            </div>
           </div>
 
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500">Keluasan Binaan</span>
-            <p class="text-lg font-bold text-emerald-700">800 Kaki Persegi (kps)</p>
+          <div class="grid grid-cols-2 gap-3 border-b border-slate-100 pb-2.5">
+            <div>
+              <span class="text-xs uppercase font-bold text-slate-500">Keluasan Binaan</span>
+              <p class="text-base font-bold text-emerald-700">800 Kaki Persegi (kps)</p>
+              <span class="text-[11px] text-slate-500">8,500 mm &times; 10,510 mm</span>
+            </div>
+            <div>
+              <span class="text-xs uppercase font-bold text-slate-500">Susun Atur Kediaman</span>
+              <p class="text-base font-bold text-slate-900">3 Bilik Tidur &amp; 2 Bilik Air</p>
+              <span class="text-[11px] text-slate-500">Ruang Tamu, Dapur &amp; Halaman</span>
+            </div>
           </div>
 
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500">Susun Atur Bilik</span>
-            <p class="text-base font-bold text-slate-900">3 Bilik Tidur & 2 Bilik Air</p>
+          <div class="grid grid-cols-2 gap-3 border-b border-slate-100 pb-2.5">
+            <div>
+              <span class="text-xs uppercase font-bold text-slate-500">Petak Letak Kereta</span>
+              <p class="text-sm font-bold text-slate-900">1 Petak Parkir Bertingkat</p>
+            </div>
+            <div>
+              <span class="text-xs uppercase font-bold text-slate-500">Kepadatan &amp; Lif</span>
+              <p class="text-sm font-bold text-slate-900">587 Unit (Blok A) &bull; 3 Lif</p>
+            </div>
           </div>
 
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500">Harga Kawalan Jualan</span>
-            <p class="text-2xl font-black text-emerald-600">RM 200,000</p>
+          <div class="grid grid-cols-2 gap-3 border-b border-slate-100 pb-2.5">
+            <div>
+              <span class="text-xs uppercase font-bold text-slate-500">Harga Kawalan Jualan</span>
+              <p class="text-2xl font-black text-emerald-600 leading-none">RM 200,000</p>
+              <span class="text-[11px] text-slate-500 mt-1 block">Ansuran dari ~RM900/bulan</span>
+            </div>
+            <div>
+              <span class="text-xs uppercase font-bold text-slate-500">Pakej Istimewa</span>
+              <p class="text-sm font-bold text-slate-900">Zero Downpayment</p>
+              <span class="text-[11px] text-emerald-700 font-bold block">Free SPA Legal Fee</span>
+            </div>
           </div>
 
-          <div>
-            <span class="text-xs uppercase font-bold text-slate-500">Status Permohonan</span>
-            <p class="text-base font-bold text-emerald-700">Permohonan Terbuka (587 Unit Dibuka)</p>
+          <div class="border-b border-slate-100 pb-2.5">
+            <span class="text-xs uppercase font-bold text-slate-500">Jangkaan Siap Sepenuhnya</span>
+            <p class="text-sm font-bold text-slate-900">Suku Ketiga 2030 (Q3 2030)</p>
+          </div>
+
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-[11px] space-y-1 text-slate-600">
+            <p><span class="font-bold text-slate-800">No. Lesen Pemaju:</span> 30730/04-2029/0072(A)</p>
+            <p><span class="font-bold text-slate-800">No. Permit Iklan &amp; Jualan:</span> 30730-2/05-2029/0350(N)-(S)</p>
+            <p><span class="font-bold text-slate-800">Pelan Bangunan:</span> PPj/PR/B/45/2023 (Diluluskan oleh Perbadanan Putrajaya)</p>
+            <p><span class="font-bold text-slate-800">Pendaftaran Rasmi:</span> Disahkan di Portal TEDUH KPKT (teduh.kpkt.gov.my)</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FASILITI LENGKAP KEDIAMAN -->
+  <!-- FASILITI LENGKAP KEDIAMAN (16 FASILITI RASMI BROSUR KPKT) -->
   <section class="py-16 bg-white px-4">
     <div class="max-w-5xl mx-auto">
       <div class="text-center max-w-3xl mx-auto mb-12">
-        <span class="badge-clean text-xs font-bold text-emerald-700 tracking-wider">Gaya Hidup Kondominium</span>
+        <span class="badge-clean text-xs font-bold text-emerald-700 tracking-wider">Kemudahan Menyeluruh</span>
         <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mt-2">
-          Kemudahan Lengkap Untuk Kesejahteraan Seisi Keluarga
+          16 Fasiliti Komuniti Lengkap Untuk Kesejahteraan Seisi Keluarga
         </h2>
         <p class="text-slate-600 mt-3 text-sm sm:text-base">
-          Semua kemudahan rekreasi, sukan, dan pendidikan awal kanak-kanak disediakan di dalam kawasan perumahan anda sendiri.
+          Direka khas bagi memenuhi keperluan ibadah, riadah, sukan, pendidikan awal kanak-kanak, serta kemudahan harian di dalam kawasan berpagar sendiri.
         </p>
       </div>
 
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
-          <span class="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">Pendidikan & Jagaan</span>
-          <h3 class="text-base font-bold text-slate-900 mb-1">Taska & Tadika</h3>
-          <p class="text-xs text-slate-600">Mudah untuk menghantar anak-anak sebelum ke tempat kerja tanpa perlu meredah jalan sesak.</p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Fasiliti 1 -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Kemudahan Ibadah</span>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Surau Komuniti</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Ruang solat berjemaah yang selesa, bersih, dan menenangkan untuk para penghuni Muslim.</p>
         </div>
 
-        <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
-          <span class="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">Keriangan Anak-Anak</span>
-          <h3 class="text-base font-bold text-slate-900 mb-1">Taman Permainan Kanak-Kanak</h3>
-          <p class="text-xs text-slate-600">Ruang bermain moden, ceria, dan selamat untuk aktiviti riadah anak-anak setiap petang.</p>
+        <!-- Fasiliti 2 -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Pendidikan &amp; Jagaan</span>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Taska &amp; Tadika</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Pusat asuhan dan didikan awal kanak-kanak di dalam kawasan residensi tanpa perlu meredah kesesakan lalu lintas.</p>
         </div>
 
-        <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
-          <span class="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">Kesihatan & Gaya Hidup</span>
-          <h3 class="text-base font-bold text-slate-900 mb-1">Kecergasan Luar & Refleksologi</h3>
-          <p class="text-xs text-slate-600">Laluan refleksologi batu semula jadi dan peralatan outdoor gym untuk mengekalkan stamina.</p>
+        <!-- Fasiliti 3 -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Acara Komuniti</span>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Dewan Serbaguna</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Ruang dewan luas yang selesa untuk penganjuran majlis kenduri keluarga dan perjumpaan komuniti.</p>
         </div>
 
-        <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
-          <span class="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">Aktiviti Sukan</span>
-          <h3 class="text-base font-bold text-slate-900 mb-1">Gelanggang Serbaguna</h3>
-          <p class="text-xs text-slate-600">Gelanggang terbuka untuk permainan futsal, badminton, dan aktiviti riadah komuniti.</p>
+        <!-- Fasiliti 4 -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Aktiviti Sukan</span>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Gelanggang Serbaguna</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Gelanggang sukan terbuka untuk futsal, badminton, dan aktiviti riadah aktif penghuni.</p>
         </div>
 
-        <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
-          <span class="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">Majlis & Sambutan</span>
-          <h3 class="text-base font-bold text-slate-900 mb-1">Dewan Serbaguna</h3>
-          <p class="text-xs text-slate-600">Ruang acara yang luas dan selesa untuk majlis perkahwinan, kenduri, mahupun perjumpaan kejiranan.</p>
+        <!-- Fasiliti 5 -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Ruang Mesyuarat</span>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Bilik Serbaguna</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Bilik aktiviti tertutup untuk mesyuarat jawatankuasa penduduk mahupun kelas bimbingan.</p>
         </div>
 
-        <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
-          <span class="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">Kemudahan Komuniti</span>
-          <h3 class="text-base font-bold text-slate-900 mb-1">Bilik Serbaguna</h3>
-          <p class="text-xs text-slate-600">Bilik tertutup yang sesuai digunakan untuk kelas bimbingan, mesyuarat, atau program penduduk.</p>
+        <!-- Fasiliti 6 -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Keriangan Si Cilik</span>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Taman Permainan 1 &amp; 2</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Dua kawasan taman permainan kanak-kanak moden dan ceria dengan ciri keselamatan terbaik.</p>
         </div>
 
-        <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
-          <span class="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">Ketenangan & Santai</span>
-          <h3 class="text-base font-bold text-slate-900 mb-1">Gazebo & Landskap Hijau</h3>
-          <p class="text-xs text-slate-600">Kawasan teduh dikelilingi kehijauan semula jadi untuk berehat dan meluangkan masa berkualiti.</p>
+        <!-- Fasiliti 7 -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Kemudahan Kenderaan</span>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Tempat Cuci Kereta</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Kawasan khas mencuci kenderaan (car wash bay) berdedikasi untuk kemudahan para penghuni.</p>
         </div>
 
-        <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
-          <span class="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">Kawalan Keselamatan</span>
-          <h3 class="text-base font-bold text-slate-900 mb-1">Sistem Keselamatan Terkawal</h3>
-          <p class="text-xs text-slate-600">Kawasan komuniti berpagar bagi menjamin privasi dan keselamatan setiap penghuni.</p>
+        <!-- Fasiliti 8 -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Kesihatan &amp; Stamina</span>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Kecergasan Luar &amp; Refleksologi</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Outdoor gym berhawa lapang dan laluan urutan refleksologi batu semula jadi untuk kesihatan keluarga.</p>
+        </div>
+
+        <!-- Fasiliti 9 -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Kemudahan Komersial</span>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Ruang Niaga Komuniti</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Lot kedai runcit dan perniagaan asas untuk keperluan dapur harian tanpa perlu keluar jauh.</p>
+        </div>
+
+        <!-- Fasiliti 10 -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Santai &amp; Landskap</span>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Gazebo &amp; Taman Teduh</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Ruang santai beratap di kelilingi kehijauan landskap untuk berehat bersama keluarga di waktu petang.</p>
+        </div>
+
+        <!-- Fasiliti 11 -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Pengurusan &amp; Pos</span>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Pejabat &amp; Bilik Peti Surat</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Pejabat pengurusan residensi, bilik peti surat berpusat yang teratur, dan kebuk sampah yang bersih.</p>
+        </div>
+
+        <!-- Fasiliti 12 -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-emerald-700 mb-1">Kawalan Keselamatan</span>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Keselamatan Berpagar 24 Jam</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Komuniti berpagar (gated) dengan pondok kawalan berpengawal, kamera litar tertutup (CCTV), dan lif selamat.</p>
         </div>
       </div>
     </div>
@@ -1583,25 +1721,28 @@
             Kedudukan Presint 5 memberikan akses yang amat mudah ke pelbagai kementerian, institusi pendidikan, pusat membeli-belah, dan hub komersial Cyberjaya.
           </p>
 
-          <div class="space-y-4 pt-2">
-            <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
-              <span class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Akses Lebuhraya Utama</span>
+          <div class="space-y-3.5 pt-2">
+            <div class="bg-slate-800/90 p-4 rounded-xl border border-emerald-500/30">
+              <span class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Pendidikan Bersebelahan (Jalan Kaki)</span>
               <p class="text-sm text-slate-200 leading-relaxed">
-                Dihubungkan terus melalui Lebuhraya Maju (MEX), Lebuhraya Putrajaya-Cyberjaya (PCE), Lebuhraya ELITE, dan Lebuhraya SKVE.
+                <span class="font-bold text-white">SK &amp; SMK Putrajaya Presint 5(2):</span> Hanya <span class="text-emerald-400 font-bold">50 meter</span> (bersebelahan tapak, dalam pembinaan). Anak-anak boleh jalan kaki ke sekolah tanpa perlu menempuh kesesakan jalan raya.
+              </p>
+              <p class="text-xs text-slate-400 mt-1">
+                Turut berdekatan SK &amp; SMK Presint 5(1) (650m) dan Kampus Heriot-Watt University Malaysia (1.6 km).
               </p>
             </div>
 
-            <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
-              <span class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Mercu Tanda & Kemudahan Sekitar</span>
+            <div class="bg-slate-800/90 p-4 rounded-xl border border-slate-700">
+              <span class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Pengangkutan Awam &amp; Lebuhraya</span>
               <p class="text-sm text-slate-200 leading-relaxed">
-                PICC (Pusat Konvensyen Antarabangsa Putrajaya), Marina Putrajaya, Pusat Rekreasi Air, Hospital Putrajaya, Pusat Membeli-belah IOI City Mall, dan Alamanda.
+                Stesen Bas PPJ26 5R6 (400 meter), MRT Putrajaya Sentral PY41 (5.5 km), serta akses terus ke Lebuhraya MEX, ELITE, SKVE, dan Putrajaya-Cyberjaya Expressway (PCE).
               </p>
             </div>
 
-            <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700">
-              <span class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Pengangkutan Awam</span>
+            <div class="bg-slate-800/90 p-4 rounded-xl border border-slate-700">
+              <span class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Kesihatan, Rekreasi &amp; Membeli-Belah</span>
               <p class="text-sm text-slate-200 leading-relaxed">
-                Stesen ERL Putrajaya Sentral, MRT Laluan Putrajaya, serta perkhidmatan bas awam Nadi Putra.
+                Taman Ekuestrian Putrajaya (300m), Tasik Putrajaya (1.5 km), Putrajaya Challenge Park (2.2 km), HeroMarket (4 km), Hospital Putrajaya (5.5 km), Klinik Kesihatan Presint 5 (6.9 km), dan Alamanda Shopping Centre (8.7 km).
               </p>
             </div>
           </div>
@@ -1619,7 +1760,7 @@
     </div>
   </section>
 
-  <!-- SYARAT KELAYAKAN RASMI -->
+  <!-- SYARAT KELAYAKAN RASMI (BROSUR RASMI KPKT) -->
   <section id="kelayakan" class="py-16 bg-white px-4 border-b border-slate-200">
     <div class="max-w-5xl mx-auto">
       <div class="text-center max-w-3xl mx-auto mb-12">
@@ -1628,40 +1769,40 @@
           Adakah Anda Layak Memohon Kediaman Ini?
         </h2>
         <p class="text-slate-600 mt-3 text-sm sm:text-base">
-          Sila semak 4 kriteria utama kelayakan permohonan Residensi MADANI Serunai di bawah:
+          Sila semak garis panduan kelayakan rasmi KPKT bagi pemilikan Residensi MADANI Serunai di bawah:
         </p>
       </div>
 
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
-          <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block mb-2">Kriteria 1</span>
-          <h3 class="text-base font-bold text-slate-900 mb-2">Warganegara Malaysia</h3>
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+          <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block mb-1">Kriteria 1</span>
+          <h3 class="text-base font-bold text-slate-900 mb-1">Warganegara Malaysia</h3>
           <p class="text-xs text-slate-600 leading-relaxed">
-            Terbuka kepada semua warganegara Malaysia yang berumur 21 tahun ke atas pada tarikh pendaftaran permohonan.
+            Terbuka kepada semua warganegara Malaysia yang berumur 21 tahun ke atas pada tarikh pendaftaran permohonan dibuat.
           </p>
         </div>
 
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
-          <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block mb-2">Kriteria 2</span>
-          <h3 class="text-base font-bold text-slate-900 mb-2">Hubungan Wilayah Persekutuan</h3>
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+          <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block mb-1">Kriteria 2</span>
+          <h3 class="text-base font-bold text-slate-900 mb-1">Wilayah Persekutuan</h3>
           <p class="text-xs text-slate-600 leading-relaxed">
-            Pemohon dilahirkan, menetap, atau sedang bekerja di Wilayah Persekutuan Kuala Lumpur, Putrajaya, atau Labuan.
+            Pemohon dilahirkan, menetap, atau sedang bekerja di Wilayah Persekutuan (Putrajaya, Kuala Lumpur, atau Labuan).
           </p>
         </div>
 
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
-          <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block mb-2">Kriteria 3</span>
-          <h3 class="text-base font-bold text-slate-900 mb-2">Kategori Pendapatan</h3>
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+          <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block mb-1">Kriteria 3</span>
+          <h3 class="text-base font-bold text-slate-900 mb-1">Pendapatan Isi Rumah</h3>
           <p class="text-xs text-slate-600 leading-relaxed">
-            Pendapatan isi rumah kasar bulanan menepati garis panduan skim perumahan bersasar Wilayah Persekutuan.
+            Pendapatan kasar bulanan isi rumah tidak melebihi <span class="font-bold text-slate-900">RM8,000 sebulan</span> (individu bujang atau gabungan suami isteri).
           </p>
         </div>
 
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
-          <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block mb-2">Kriteria 4</span>
-          <h3 class="text-base font-bold text-slate-900 mb-2">Rumah Pertama</h3>
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+          <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block mb-1">Kriteria 4</span>
+          <h3 class="text-base font-bold text-slate-900 mb-1">Rumah Pertama &amp; Moratorium</h3>
           <p class="text-xs text-slate-600 leading-relaxed">
-            Keutamaan diberikan kepada pemohon yang belum memiliki sebarang rumah kediaman di Wilayah Persekutuan.
+            Keutamaan rumah pertama. Tertakluk kepada moratorium sekatan jualan 10 tahun (hanya boleh dipindah milik kepada waris terdekat).
           </p>
         </div>
       </div>
@@ -1848,7 +1989,7 @@
     </div>
   </section>
 
-  <!-- SOALAN LAZIM (FAQ) SECTION -->
+  <!-- SOALAN LAZIM (FAQ) SECTION (BERDASARKAN BROSUR KPKT) -->
   <section class="py-16 bg-white px-4 border-b border-slate-200">
     <div class="max-w-4xl mx-auto">
       <div class="text-center max-w-2xl mx-auto mb-12">
@@ -1857,43 +1998,57 @@
           Kemusykilan Yang Kerap Ditanya
         </h2>
         <p class="text-slate-600 mt-2 text-sm sm:text-base">
-          Jawapan ringkas dan jelas bagi memudahkan keputusan anda.
+          Maklumat sahih yang disahkan berdasarkan dokumen rasmi brosur KPKT Residensi MADANI Serunai.
         </p>
       </div>
 
-      <div class="space-y-4">
-        <div class="border border-slate-200 rounded-xl p-5 bg-slate-50">
-          <h3 class="text-base font-bold text-slate-900 mb-2">Bolehkah kakitangan sektor swasta memohon projek ini?</h3>
-          <p class="text-sm text-slate-600 leading-relaxed">
-            Ya, boleh. Projek ini terbuka kepada pekerja sektor swasta dan kakitangan kerajaan selagi memenuhi syarat asas kewarganegaraan serta bekerja atau menetap di Wilayah Persekutuan.
+      <div class="space-y-3.5">
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 bg-slate-50">
+          <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-1.5">Apakah status pegangan tanah Residensi MADANI Serunai ini?</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Residensi MADANI Serunai berstatus <span class="font-bold text-emerald-800">PEGANGAN KEKAL (FREEHOLD)</span> dengan hak milik strata dan bebas daripada sebarang bebanan tanah. Ini merupakan peluang amat berharga untuk memiliki hartanah pegangan kekal di Putrajaya pada harga RM200,000.
           </p>
         </div>
 
-        <div class="border border-slate-200 rounded-xl p-5 bg-slate-50">
-          <h3 class="text-base font-bold text-slate-900 mb-2">Berapakah anggaran bayaran bulanan pinjaman?</h3>
-          <p class="text-sm text-slate-600 leading-relaxed">
-            Berdasarkan harga tetap RM200,000 dengan tempoh pinjaman 30 hingga 35 tahun pada kadar faedah purata 4%, bayaran bulanan dianggarkan sekitar RM900 hingga RM950 sebulan sahaja.
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 bg-slate-50">
+          <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-1.5">Adakah projek ini berdaftar rasmi dan mempunyai permit yang sah?</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Ya, projek Residensi MADANI Serunai adalah inisiatif berdaftar dengan No. Lesen: 30730/04-2029/0072(A) serta No. Permit Iklan &amp; Jualan: 30730-2/05-2029/0350(N)-(S) di bawah kelulusan Perbadanan Putrajaya dan disahkan di portal TEDUH KPKT.
           </p>
         </div>
 
-        <div class="border border-slate-200 rounded-xl p-5 bg-slate-50">
-          <h3 class="text-base font-bold text-slate-900 mb-2">Bolehkah saya membuat permohonan bersama pasangan (Joint Loan)?</h3>
-          <p class="text-sm text-slate-600 leading-relaxed">
-            Boleh. Gabungan pendapatan suami isteri dibenarkan bagi meningkatkan peluang kelulusan pembiayaan bank mahupun LPPSA mengikut garis panduan skim perumahan.
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 bg-slate-50">
+          <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-1.5">Apakah keistimewaan pakej pembelian rumah ini?</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Pembeli menikmati pakej <span class="font-bold text-emerald-800">Zero Downpayment</span> serta <span class="font-bold text-emerald-800">Free SPA Legal Fee</span> (yuran guaman perjanjian jual beli ditanggung percuma). Pinjaman sehingga 100% disediakan melalui LPPSA bagi sektor kerajaan atau bank panel bagi pekerja swasta.
           </p>
         </div>
 
-        <div class="border border-slate-200 rounded-xl p-5 bg-slate-50">
-          <h3 class="text-base font-bold text-slate-900 mb-2">Berapakah jumlah unit yang disediakan dan bilakah jangkaan siap?</h3>
-          <p class="text-sm text-slate-600 leading-relaxed">
-            Sebanyak 587 unit kediaman dibuka untuk permohonan. Projek ini dijangka siap sepenuhnya sekitar tahun 2030.
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 bg-slate-50">
+          <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-1.5">Berapakah anggaran bayaran bulanan pinjaman?</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Berdasarkan harga tetap RM200,000 dengan tempoh pinjaman 30 hingga 35 tahun, anggaran bayaran bulanan hanya sekitar <span class="font-bold text-emerald-800">RM900 hingga RM950 sebulan</span> sahaja, jauh lebih jimat daripada menyewa rumah di Putrajaya.
           </p>
         </div>
 
-        <div class="border border-slate-200 rounded-xl p-5 bg-slate-50">
-          <h3 class="text-base font-bold text-slate-900 mb-2">Adakah sebarang caj dikenakan untuk semakan kelayakan ini?</h3>
-          <p class="text-sm text-slate-600 leading-relaxed">
-            Tiada sebarang caj dikenakan. Bimbingan dan semakan kelayakan pinjaman adalah 100% percuma.
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 bg-slate-50">
+          <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-1.5">Adakah sekolah disediakan berdekatan untuk kemudahan anak-anak?</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Ya! Sekolah Kebangsaan &amp; Sekolah Menengah Kebangsaan Putrajaya Presint 5(2) terletak hanya <span class="font-bold text-emerald-800">50 meter</span> bersebelahan tapak projek (sedang dalam pembinaan). Anak-anak boleh berjalan kaki ke sekolah dengan selamat.
+          </p>
+        </div>
+
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 bg-slate-50">
+          <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-1.5">Berapakah jumlah unit yang disediakan dan bilakah tarikh jangkaan siap?</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Blok A menawarkan kepadatan rendah dengan 587 unit kediaman sahaja (22 unit setiap tingkat dengan 3 lif penumpang lobi). Projek ini dijangka siap sepenuhnya pada <span class="font-bold text-slate-900">Suku Ketiga 2030 (Q3 2030)</span>.
+          </p>
+        </div>
+
+        <div class="border border-slate-200 rounded-xl p-4 sm:p-5 bg-slate-50">
+          <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-1.5">Adakah sebarang caj dikenakan untuk semakan kelayakan ini?</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Tiada sebarang caj dikenakan. Bimbingan dan semakan kelayakan pinjaman bersama perunding perumahan adalah 100% percuma.
           </p>
         </div>
       </div>
@@ -1917,16 +2072,38 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
-  <footer class="bg-slate-950 text-slate-400 py-8 px-4 border-t border-slate-800 text-xs">
-    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div>
-        <p class="font-bold text-slate-200">Residensi MADANI Serunai - Presint 5, Putrajaya</p>
-        <p class="text-slate-500 mt-0.5">Inisiatif Kediaman Mampu Milik Wilayah Persekutuan.</p>
+  <!-- FOOTER DENGAN NOTIS PERLESENAN RASMI KPKT -->
+  <footer class="bg-slate-950 text-slate-400 py-10 px-4 border-t border-slate-800 text-xs">
+    <div class="max-w-5xl mx-auto space-y-6">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 pb-6 border-b border-slate-800/80 text-[11.5px] leading-relaxed">
+        <div>
+          <span class="text-slate-200 font-bold uppercase tracking-wider block mb-1">Maklumat Projek</span>
+          <p class="text-slate-300 font-semibold">Residensi MADANI Serunai</p>
+          <p class="text-slate-400">Lot PT 14595, Presint 5, Putrajaya</p>
+          <p class="text-emerald-400 font-medium mt-0.5">Pegangan Kekal (Freehold)</p>
+        </div>
+        <div>
+          <span class="text-slate-200 font-bold uppercase tracking-wider block mb-1">Status Pemilikan</span>
+          <p class="text-emerald-400 font-semibold">Pegangan Kekal (Freehold)</p>
+          <p class="text-slate-400">Bebanan Tanah: Tiada Bebanan</p>
+        </div>
+        <div>
+          <span class="text-slate-200 font-bold uppercase tracking-wider block mb-1">Lesen &amp; Kelulusan KPKT</span>
+          <p class="text-slate-400">No Lesen: 30730/04-2029/0072(A)</p>
+          <p class="text-slate-400">Permit: 30730-2/05-2029/0350(N)-(S)</p>
+          <p class="text-slate-400">Tempoh Sah: 25/04/2024 - 24/04/2029</p>
+        </div>
+        <div>
+          <span class="text-slate-200 font-bold uppercase tracking-wider block mb-1">Pihak Berkuasa</span>
+          <p class="text-slate-400">Pelan: PPj/PR/B/45/2023</p>
+          <p class="text-slate-400">Perbadanan Putrajaya</p>
+          <p class="text-slate-400">Jangkaan Siap: Q3 2030</p>
+        </div>
       </div>
-      <div class="text-center sm:text-right text-slate-500">
-        <p>Hak Cipta Terpelihara &copy; 2026. Laman Informasi Permohonan Residensi.</p>
-        <p class="mt-0.5">Penafian: Maklumat tertakluk kepada syarat dan kelulusan pihak berkuasa.</p>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-500 text-[11px]">
+        <p>Hak Cipta Terpelihara &copy; 2026 Residensi MADANI Serunai. Maklumat rasmi disahkan di TEDUH KPKT.</p>
+        <p>Penafian: Ilustrasi artis hanyalah gambaran visual dan tertakluk kepada kelulusan pihak berkuasa.</p>
       </div>
     </div>
   </footer>
@@ -2618,26 +2795,910 @@
   <!-- ========================================================== -->
   <script>
     // 1. Data Lalai Komen & Notifikasi Residensi MADANI Serunai
-    const DEFAULT_SERUNAI_COMMENTS = [
-      { id: 1, user: "Farhan_Putrajaya", comment: "Rumah 3 bilik harga RM200k ni memang Presint 5 ke tuan?", isHost: false },
-      { id: 2, user: "Zaim Rosli", comment: "Ya betul Farhan, lokasi di Presint 5 Putrajaya. Harga tetap bersubsidi kerajaan RM200,000.", isHost: true },
-      { id: 3, user: "Siti_KakitanganAwam", comment: "Gaji pokok saya RM2,600 lepas ke nak mohon loan LPPSA?", isHost: false },
-      { id: 4, user: "Zaim Rosli", comment: "Sangat lepas Puan Siti! Gaji bersih RM2,200 ke atas dah layak untuk ansuran RM900 sebulan.", isHost: true },
-      { id: 5, user: "Calvin_KL", comment: "Kerja swasta di KL boleh apply tak? Atau untuk orang Putrajaya je?", isHost: false },
-      { id: 6, user: "Zaim Rosli", comment: "Boleh Calvin, asalkan menetap atau bekerja di mana-mana Wilayah Persekutuan (KL, Putrajaya, Labuan) layak mohon.", isHost: true },
-      { id: 7, user: "Puan_Noraini", comment: "Ada dapat tempat letak kereta khas tak? Berapa lot parking?", isHost: false },
-      { id: 8, user: "Hafiz_Cyberjaya", comment: "Berapa jarak dari Presint 5 ke PICC dan Alamanda?", isHost: false },
-      { id: 9, user: "Zaim Rosli", comment: "Unit lengkap dengan parking kereta bertingkat dan hanya sekitar 5-8 minit ke kompleks kementerian dan PICC.", isHost: true },
-      { id: 10, user: "Ahmad_Bangi", comment: "Pakej ni ada yuran guaman percuma ke? Deposit berapa kena bayar?", isHost: false },
-      { id: 11, user: "Zaim Rosli", comment: "Pakej 100% pinjaman penuh dengan duti setem MOT percuma untuk rumah pertama Ahmad.", isHost: true },
-      { id: 12, user: "Dr_Azizah", comment: "Bila jangkaan siap serah kunci untuk Residensi Serunai ni?", isHost: false },
-      { id: 13, user: "Fikri_BekerjaSendiri", comment: "Kalau bisnes SSM sendiri macam mana dokumen permohonan?", isHost: false },
-      { id: 14, user: "Zaim Rosli", comment: "Bekerja sendiri boleh guna penyata bank 6 bulan, kami boleh bantu semak kelayakan di WhatsApp.", isHost: true },
-      { id: 15, user: "Puan_Mariam", comment: "Unit ni Freehold ke Leasehold ya tuan?", isHost: false },
-      { id: 16, user: "Zaim Rosli", comment: "Pegangan Pajakan 99 tahun (Leasehold) tanah rizab kediaman Wilayah Persekutuan Puan Mariam.", isHost: true },
-      { id: 17, user: "Nazmi_Kastam", comment: "Ada balkoni tak untuk unit 800 kps ni?", isHost: false },
-      { id: 18, user: "Zaim Rosli", comment: "Ada balkoni dan ruang cucian yard berasingan ya Nazmi.", isHost: true }
-    ];
+    const OFFICIAL_SERUNAI_COMMENTS_150 = [
+  {
+    "id": 1,
+    "user": "Ahmad_Presint9",
+    "comment": "Harga jualan RM200k ni memang harga tetap ke ada caj lain terselindung?",
+    "isHost": false
+  },
+  {
+    "id": 2,
+    "user": "Zaim Rosli",
+    "comment": "Harga tetap kawalan kerajaan RM200,000 sahaja Ahmad, tiada sebarang caj tersembunyi.",
+    "isHost": true
+  },
+  {
+    "id": 3,
+    "user": "Mira_Kastam",
+    "comment": "Berapa anggaran bayaran ansuran bulanan untuk rumah ni?",
+    "isHost": false
+  },
+  {
+    "id": 4,
+    "user": "Zaim Rosli",
+    "comment": "Anggaran ansuran hanya sekitar RM900 sebulan Mira, sangat berbaloi untuk kediaman 3 bilik di Putrajaya.",
+    "isHost": true
+  },
+  {
+    "id": 5,
+    "user": "Hafiz_LPPSA",
+    "comment": "Kalau pinjaman kerajaan LPPSA boleh lepas 100% ke?",
+    "isHost": false
+  },
+  {
+    "id": 6,
+    "user": "Zaim Rosli",
+    "comment": "Ya betul Hafiz, pembeli layak peroleh 100% pinjaman penuh LPPSA mahupun pinjaman bank.",
+    "isHost": true
+  },
+  {
+    "id": 7,
+    "user": "Nurul_Bangi",
+    "comment": "Deposit permulaan kena bayar berapa ribu ya tuan?",
+    "isHost": false
+  },
+  {
+    "id": 8,
+    "user": "Zaim Rosli",
+    "comment": "Kami sediakan pakej Zero Downpayment Nurul, tak perlu sediakan wang pendahuluan besar.",
+    "isHost": true
+  },
+  {
+    "id": 9,
+    "user": "Amirul_Puchong",
+    "comment": "Kos guaman perjanjian jual beli pembeli kena tanggung ke?",
+    "isHost": false
+  },
+  {
+    "id": 10,
+    "user": "Zaim Rosli",
+    "comment": "Untuk pakej promosi ini kami berikan Free SPA Legal Fee percuma untuk pembeli.",
+    "isHost": true
+  },
+  {
+    "id": 11,
+    "user": "Puan_Zaleha",
+    "comment": "Betul ke ada kuota khas untuk rumah ni?",
+    "isHost": false
+  },
+  {
+    "id": 12,
+    "user": "Zaim Rosli",
+    "comment": "Ya Puan Zaleha, projek Residensi Serunai ini terhad kepada 587 unit sahaja di Blok A.",
+    "isHost": true
+  },
+  {
+    "id": 13,
+    "user": "Danial_Sepang",
+    "comment": "Booking unit kena bayar berapa sekarang?",
+    "isHost": false
+  },
+  {
+    "id": 14,
+    "user": "Zaim Rosli",
+    "comment": "Boleh isi borang semakan kelayakan secara percuma dahulu Danial di butang bawah skrin.",
+    "isHost": true
+  },
+  {
+    "id": 15,
+    "user": "Shahril_Dengkil",
+    "comment": "Projek ni bawah inisiatif apa sebenarnya?",
+    "isHost": false
+  },
+  {
+    "id": 16,
+    "user": "Zaim Rosli",
+    "comment": "Ini adalah inisiatif rasmi Residensi MADANI untuk kediaman mampu milik berkualiti di Wilayah Persekutuan.",
+    "isHost": true
+  },
+  {
+    "id": 17,
+    "user": "Khairul_Anwar",
+    "comment": "Unit ni tanah Leasehold ke Freehold tuan? Ramai tanya pasal ni.",
+    "isHost": false
+  },
+  {
+    "id": 18,
+    "user": "Zaim Rosli",
+    "comment": "Berita baik Khairul, status tanah Residensi Serunai adalah Pegangan Kekal atau Freehold!",
+    "isHost": true
+  },
+  {
+    "id": 19,
+    "user": "Puan_Mariam",
+    "comment": "Wah betul ke Freehold? Ingatkan Putrajaya semua pajakan 99 tahun.",
+    "isHost": false
+  },
+  {
+    "id": 20,
+    "user": "Zaim Rosli",
+    "comment": "Betul Puan Mariam, mengikut permit jualan rasmi jenis pegangan tanah adalah KEKAL.",
+    "isHost": true
+  },
+  {
+    "id": 21,
+    "user": "Faizal_KL",
+    "comment": "Status geran tanah macam mana tuan?",
+    "isHost": false
+  },
+  {
+    "id": 22,
+    "user": "Zaim Rosli",
+    "comment": "Tanah tiada sebarang bebanan dan telah diluluskan oleh Jabatan Perumahan Negara serta Perbadanan Putrajaya.",
+    "isHost": true
+  },
+  {
+    "id": 23,
+    "user": "Azman_Cyber",
+    "comment": "Bebanan tanah ada tak pemaju gadaikan ke mana-mana bank?",
+    "isHost": false
+  },
+  {
+    "id": 24,
+    "user": "Zaim Rosli",
+    "comment": "Mengikut kelulusan permit KPKT, bebanan tanah adalah tiada sama sekali Azman.",
+    "isHost": true
+  },
+  {
+    "id": 25,
+    "user": "Dr_Razak",
+    "comment": "Boleh semak status permit iklan projek ni di portal kerajaan tak?",
+    "isHost": false
+  },
+  {
+    "id": 26,
+    "user": "Zaim Rosli",
+    "comment": "Boleh Dr Razak, maklumat pemajuan dan iklan boleh disemak di portal TEDUH.KPKT.GOV.MY.",
+    "isHost": true
+  },
+  {
+    "id": 27,
+    "user": "Siti_GuruP5",
+    "comment": "Berapa keluasan sebenar lantai rumah 3 bilik ni?",
+    "isHost": false
+  },
+  {
+    "id": 28,
+    "user": "Zaim Rosli",
+    "comment": "Keluasan standard Jenis A adalah 800 kaki persegi (800 kps) Siti.",
+    "isHost": true
+  },
+  {
+    "id": 29,
+    "user": "Cikgu_Hafiz",
+    "comment": "Ada berapa bilik tidur dan bilik air ya?",
+    "isHost": false
+  },
+  {
+    "id": 30,
+    "user": "Zaim Rosli",
+    "comment": "Ada 3 bilik tidur dan 2 bilik air Cikgu Hafiz, susun atur sangat praktikal untuk keluarga.",
+    "isHost": true
+  },
+  {
+    "id": 31,
+    "user": "KakLina_Katering",
+    "comment": "Dapur dia luas tak? Boleh muat peti ais dan kabinet dapur?",
+    "isHost": false
+  },
+  {
+    "id": 32,
+    "user": "Zaim Rosli",
+    "comment": "Dapur bersambung dengan ruang makan dan ada ruang khas untuk kelengkapan memasak Kak Lina.",
+    "isHost": true
+  },
+  {
+    "id": 33,
+    "user": "Nazmi_Kastam",
+    "comment": "Ada ruang legar dan halaman luar tak?",
+    "isHost": false
+  },
+  {
+    "id": 34,
+    "user": "Zaim Rosli",
+    "comment": "Ya Nazmi, ada ruang legar dan bahagian halaman sebelum masuk ke dapur dan bilik tidur.",
+    "isHost": true
+  },
+  {
+    "id": 35,
+    "user": "Puan_Rosnah",
+    "comment": "Bilik tidur utama ada bilik air sendiri ke en-suite?",
+    "isHost": false
+  },
+  {
+    "id": 36,
+    "user": "Zaim Rosli",
+    "comment": "Ya Puan Rosnah, Bilik Tidur Utama bersambung terus dengan Bilik Air 1 peribadi.",
+    "isHost": true
+  },
+  {
+    "id": 37,
+    "user": "Wan_Dengkil",
+    "comment": "Bilik tidur 1 dan 2 boleh muat katil saiz apa?",
+    "isHost": false
+  },
+  {
+    "id": 38,
+    "user": "Zaim Rosli",
+    "comment": "Boleh muat katil bujang atau katil queen dengan almari pakaian Wan.",
+    "isHost": true
+  },
+  {
+    "id": 39,
+    "user": "Fatin_Cheras",
+    "comment": "Dimensi rumah berapa meter kali berapa meter?",
+    "isHost": false
+  },
+  {
+    "id": 40,
+    "user": "Zaim Rosli",
+    "comment": "Mengikut pelan arkitek dimensi unit adalah 8500 mm lebar kali 10510 mm panjang Fatin.",
+    "isHost": true
+  },
+  {
+    "id": 41,
+    "user": "Razif_Putrajaya",
+    "comment": "Dapat berapa petak letak kereta untuk setiap rumah?",
+    "isHost": false
+  },
+  {
+    "id": 42,
+    "user": "Zaim Rosli",
+    "comment": "Setiap unit diperuntukkan 1 ruang parkir kereta khas bertingkat Razif.",
+    "isHost": true
+  },
+  {
+    "id": 43,
+    "user": "Puan_Salmah",
+    "comment": "Parkir kereta terbuka ke dalam bangunan bertingkat berbumbung?",
+    "isHost": false
+  },
+  {
+    "id": 44,
+    "user": "Zaim Rosli",
+    "comment": "Parkir adalah di dalam podium bertingkat berbumbung dan ada kawalan keselamatan Puan Salmah.",
+    "isHost": true
+  },
+  {
+    "id": 45,
+    "user": "Syazwan_Cyberjaya",
+    "comment": "Berapa unit rumah semuanya dalam satu blok ni?",
+    "isHost": false
+  },
+  {
+    "id": 46,
+    "user": "Zaim Rosli",
+    "comment": "Keseluruhan Blok A hanya mempunyai 587 unit sahaja, kategori kepadatan rendah (low density).",
+    "isHost": true
+  },
+  {
+    "id": 47,
+    "user": "Harris_KL",
+    "comment": "Satu tingkat ada berapa buah rumah?",
+    "isHost": false
+  },
+  {
+    "id": 48,
+    "user": "Zaim Rosli",
+    "comment": "Satu aras hanya ada 22 buah unit rumah sahaja Harris.",
+    "isHost": true
+  },
+  {
+    "id": 49,
+    "user": "Nabila_Puchong",
+    "comment": "Lif ada berapa biji untuk naik ke tingkat atas?",
+    "isHost": false
+  },
+  {
+    "id": 50,
+    "user": "Zaim Rosli",
+    "comment": "Ada 3 buah lif lobi disediakan untuk kemudahan turun naik penduduk Nabila.",
+    "isHost": true
+  },
+  {
+    "id": 51,
+    "user": "En_Baharum",
+    "comment": "Lif sentiasa beroperasi ke kalau waktu puncak pagi?",
+    "isHost": false
+  },
+  {
+    "id": 52,
+    "user": "Zaim Rosli",
+    "comment": "Ya En Baharum, 3 lif lobi mencukupi untuk menampung kepadatan 22 unit per tingkat.",
+    "isHost": true
+  },
+  {
+    "id": 53,
+    "user": "Faiz_Subang",
+    "comment": "Kawasan perumahan ni berpagar ke?",
+    "isHost": false
+  },
+  {
+    "id": 54,
+    "user": "Zaim Rosli",
+    "comment": "Ya Faiz, Residensi Serunai dilengkapi kawalan berpagar (gated) dengan pondok keselamatan.",
+    "isHost": true
+  },
+  {
+    "id": 55,
+    "user": "Mira_WP",
+    "comment": "Tempat basuh kereta ada disediakan tak dalam kondo?",
+    "isHost": false
+  },
+  {
+    "id": 56,
+    "user": "Zaim Rosli",
+    "comment": "Ada Mira! Antara fasiliti menarik ialah tempat cuci kereta khas untuk penduduk.",
+    "isHost": true
+  },
+  {
+    "id": 57,
+    "user": "Cikgu_Zainal",
+    "comment": "Surau ada tak dalam kawasan perumahan ni?",
+    "isHost": false
+  },
+  {
+    "id": 58,
+    "user": "Zaim Rosli",
+    "comment": "Ada surau yang selesa untuk solat berjemaah dan aktiviti keagamaan Cikgu Zainal.",
+    "isHost": true
+  },
+  {
+    "id": 59,
+    "user": "Puan_Hidayah",
+    "comment": "Mak ayah yang bekerja ada tempat asuhan anak taska ke?",
+    "isHost": false
+  },
+  {
+    "id": 60,
+    "user": "Zaim Rosli",
+    "comment": "Disediakan taska dan tadika terus di dalam bangunan untuk kemudahan anak-anak Puan Hidayah.",
+    "isHost": true
+  },
+  {
+    "id": 61,
+    "user": "Haziq_Dengkil",
+    "comment": "Gelanggang sukan ada tak nak main futsal atau badminton?",
+    "isHost": false
+  },
+  {
+    "id": 62,
+    "user": "Zaim Rosli",
+    "comment": "Ada gelanggang serbaguna dan dewan serbaguna yang luas untuk aktiviti riadah Haziq.",
+    "isHost": true
+  },
+  {
+    "id": 63,
+    "user": "KakTon_Katering",
+    "comment": "Kalau nak buat majlis kenduri kahwin boleh sewa dewan ke?",
+    "isHost": false
+  },
+  {
+    "id": 64,
+    "user": "Zaim Rosli",
+    "comment": "Boleh Kak Ton, dewan serbaguna dan bilik serbaguna sedia ada untuk kegunaan penduduk.",
+    "isHost": true
+  },
+  {
+    "id": 65,
+    "user": "Rizal_Bangi",
+    "comment": "Tempat riadah orang tua macam laluan refleksologi ada?",
+    "isHost": false
+  },
+  {
+    "id": 66,
+    "user": "Zaim Rosli",
+    "comment": "Ada laluan refleksologi khas dan taman kecergasan luar (outdoor gym) Rizal.",
+    "isHost": true
+  },
+  {
+    "id": 67,
+    "user": "Puan_Halimah",
+    "comment": "Anak-anak kecil ada tempat main taman permainan tak?",
+    "isHost": false
+  },
+  {
+    "id": 68,
+    "user": "Zaim Rosli",
+    "comment": "Kami sediakan dua taman permainan iaitu Taman Permainan 1 dan Taman Permainan 2 Puan Halimah.",
+    "isHost": true
+  },
+  {
+    "id": 69,
+    "user": "Kamarul_Cyber",
+    "comment": "Tempat lepak petang-petang ambil angin ada gazebo tak?",
+    "isHost": false
+  },
+  {
+    "id": 70,
+    "user": "Zaim Rosli",
+    "comment": "Ada gazebo santai dikelilingi lanskap hijau untuk penduduk berehat Kamarul.",
+    "isHost": true
+  },
+  {
+    "id": 71,
+    "user": "MeiLing_KL",
+    "comment": "Kedai runcit atau ruang niaga mini mart ada tak kat bawah?",
+    "isHost": false
+  },
+  {
+    "id": 72,
+    "user": "Zaim Rosli",
+    "comment": "Ya Mei Ling, terdapat ruang niaga khas di aras kemudahan untuk peruncitan harian.",
+    "isHost": true
+  },
+  {
+    "id": 73,
+    "user": "Pak_Rahim",
+    "comment": "Pejabat pengurusan JMB ada dalam bangunan ke?",
+    "isHost": false
+  },
+  {
+    "id": 74,
+    "user": "Zaim Rosli",
+    "comment": "Ya Pak Rahim, pejabat pengurusan bangunan dan bilik peti surat setempat turut disediakan.",
+    "isHost": true
+  },
+  {
+    "id": 75,
+    "user": "Syafiq_P5",
+    "comment": "Tempat pembuangan sampah bersih tak sistem dia?",
+    "isHost": false
+  },
+  {
+    "id": 76,
+    "user": "Zaim Rosli",
+    "comment": "Kebuk sampah berpusat yang sistematik disediakan di setiap aras untuk kebersihan Syafiq.",
+    "isHost": true
+  },
+  {
+    "id": 77,
+    "user": "Cikgu_Faridah",
+    "comment": "Dekat tak dengan sekolah rendah dan menengah kebangsaan?",
+    "isHost": false
+  },
+  {
+    "id": 78,
+    "user": "Zaim Rosli",
+    "comment": "Sangat dekat Cikgu Faridah! SK dan SMK Putrajaya Presint 5(2) hanya 50 meter sahaja dari pagar projek.",
+    "isHost": true
+  },
+  {
+    "id": 79,
+    "user": "Azri_KakitanganAwam",
+    "comment": "Betul ke sekolah baru Presint 5(2) tu 50 meter je? Boleh jalan kaki?",
+    "isHost": false
+  },
+  {
+    "id": 80,
+    "user": "Zaim Rosli",
+    "comment": "Betul Azri, hanya 50 meter dan sedang dalam pembinaan, anak-anak boleh jalan kaki ke sekolah.",
+    "isHost": true
+  },
+  {
+    "id": 81,
+    "user": "Puan_Latifah",
+    "comment": "Sekolah yang sedia ada beroperasi berapa jarak dia?",
+    "isHost": false
+  },
+  {
+    "id": 82,
+    "user": "Zaim Rosli",
+    "comment": "SK dan SMK Putrajaya Presint 5(1) yang sedia ada pula hanya berjarak 650 meter Puan Latifah.",
+    "isHost": true
+  },
+  {
+    "id": 83,
+    "user": "Nadia_HeriotWatt",
+    "comment": "Kampus Heriot-Watt University jauh tak dari sini?",
+    "isHost": false
+  },
+  {
+    "id": 84,
+    "user": "Zaim Rosli",
+    "comment": "Kampus Heriot-Watt University Malaysia hanya 1.6 km sahaja Nadia, sekitar 3 minit memandu.",
+    "isHost": true
+  },
+  {
+    "id": 85,
+    "user": "En_Ghafar",
+    "comment": "Sesuai sangatlah untuk staf universiti dan cikgu-cikgu sekolah beli kan.",
+    "isHost": false
+  },
+  {
+    "id": 86,
+    "user": "Zaim Rosli",
+    "comment": "Tepat sekali En Ghafar, lokasi ini memang tumpuan tenaga pengajar dan staf kerajaan.",
+    "isHost": true
+  },
+  {
+    "id": 87,
+    "user": "Shahrul_Dengkil",
+    "comment": "Tadika swasta atau tadika kemas ada berdekatan tak?",
+    "isHost": false
+  },
+  {
+    "id": 88,
+    "user": "Zaim Rosli",
+    "comment": "Dalam projek sendiri dah ada ruang tadika dan taska khas Shahrul.",
+    "isHost": true
+  },
+  {
+    "id": 89,
+    "user": "Puan_Ainun",
+    "comment": "Anak saya nak masuk tingkatan 1 tahun depan, senang la kalau dekat sekolah.",
+    "isHost": false
+  },
+  {
+    "id": 90,
+    "user": "Zaim Rosli",
+    "comment": "Ya Puan Ainun, jarak 50m ke sekolah menjimatkan masa dan tambang pengangkutan anak.",
+    "isHost": true
+  },
+  {
+    "id": 91,
+    "user": "Iskandar_Cyber",
+    "comment": "Kalau tak ada kereta ada bas awam NadiPutra lalu tak?",
+    "isHost": false
+  },
+  {
+    "id": 92,
+    "user": "Zaim Rosli",
+    "comment": "Ada stesen bas PPJ26 Apartment 5R6 Presint 5 hanya 400 meter berjalan kaki Iskandar.",
+    "isHost": true
+  },
+  {
+    "id": 93,
+    "user": "Farid_KL",
+    "comment": "Stesen MRT paling dekat stesen apa ya?",
+    "isHost": false
+  },
+  {
+    "id": 94,
+    "user": "Zaim Rosli",
+    "comment": "Stesen MRT Putrajaya Sentral laluan PY41 berjarak 5.5 km sahaja Farid.",
+    "isHost": true
+  },
+  {
+    "id": 95,
+    "user": "Kelvin_Puchong",
+    "comment": "Nak pergi KL ikut highway mana paling laju dari Presint 5?",
+    "isHost": false
+  },
+  {
+    "id": 96,
+    "user": "Zaim Rosli",
+    "comment": "Boleh terus masuk Lebuhraya MEX atau Lebuhraya ELITE, sekitar 30 minit ke pusat bandar KL.",
+    "isHost": true
+  },
+  {
+    "id": 97,
+    "user": "Zul_Kajang",
+    "comment": "Lebuhraya SKVE ada sambungan dekat tak?",
+    "isHost": false
+  },
+  {
+    "id": 98,
+    "user": "Zaim Rosli",
+    "comment": "Ya Zul, Lebuhraya South Klang Valley (SKVE) dan Lebuhraya Putrajaya-Cyberjaya (PCE) sangat dekat.",
+    "isHost": true
+  },
+  {
+    "id": 99,
+    "user": "Puan_Rohani",
+    "comment": "Jalan dalam Putrajaya nak ke kompleks kerajaan jem tak pagi-pagi?",
+    "isHost": false
+  },
+  {
+    "id": 100,
+    "user": "Zaim Rosli",
+    "comment": "Akses melalui Lebuh Wadi Ehsan, Lebuh Sentosa dan Persiaran Perdana sangat lancar Puan Rohani.",
+    "isHost": true
+  },
+  {
+    "id": 101,
+    "user": "Aniq_Dengkil",
+    "comment": "Dekat tak nak ke Dengkil atau Sepang?",
+    "isHost": false
+  },
+  {
+    "id": 102,
+    "user": "Zaim Rosli",
+    "comment": "Presint 5 bersempadan dengan Dengkil dan Persiaran Selatan, akses terus ke Dengkil dan KLIA.",
+    "isHost": true
+  },
+  {
+    "id": 103,
+    "user": "Firdaus_Bangi",
+    "comment": "Dari Bangi nak lalu jalan mana senang sampai sini?",
+    "isHost": false
+  },
+  {
+    "id": 104,
+    "user": "Zaim Rosli",
+    "comment": "Dari Bangi boleh lalu Lebuh Wadi Ehsan atau SKVE, sekitar 15 minit sahaja Firdaus.",
+    "isHost": true
+  },
+  {
+    "id": 105,
+    "user": "Cik_Intan",
+    "comment": "Ada laluan bas pengantara ke stesen MRT Sentral tak?",
+    "isHost": false
+  },
+  {
+    "id": 106,
+    "user": "Zaim Rosli",
+    "comment": "Ya Cik Intan, bas NadiPutra beroperasi menghubungkan Presint 5 terus ke MRT Putrajaya Sentral.",
+    "isHost": true
+  },
+  {
+    "id": 107,
+    "user": "Puan_Zaharah",
+    "comment": "Kalau kecemasan Hospital Putrajaya berapa jauh dari rumah?",
+    "isHost": false
+  },
+  {
+    "id": 108,
+    "user": "Zaim Rosli",
+    "comment": "Hospital Putrajaya berjarak 5.5 km dan Klinik Kesihatan Putrajaya hanya 6.9 km Puan Zaharah.",
+    "isHost": true
+  },
+  {
+    "id": 109,
+    "user": "Dr_Syamim",
+    "comment": "Klinik swasta macam Klinik Maria ada berdekatan tak?",
+    "isHost": false
+  },
+  {
+    "id": 110,
+    "user": "Zaim Rosli",
+    "comment": "Ada Klinik Maria Putrajaya sekitar 9.6 km Dr Syamim.",
+    "isHost": true
+  },
+  {
+    "id": 111,
+    "user": "Hafiz_Equestrian",
+    "comment": "Pusat rekreasi berkuda Taman Ekuestrian dekat mana ya?",
+    "isHost": false
+  },
+  {
+    "id": 112,
+    "user": "Zaim Rosli",
+    "comment": "Taman Ekuestrian Putrajaya hanya 300 meter sahaja dari Residensi Serunai Hafiz!",
+    "isHost": true
+  },
+  {
+    "id": 113,
+    "user": "Puan_Maimunah",
+    "comment": "Tepi tasik Putrajaya boleh berjoging petang-petang ke?",
+    "isHost": false
+  },
+  {
+    "id": 114,
+    "user": "Zaim Rosli",
+    "comment": "Boleh Puan Maimunah, Putrajaya Lakeside hanya 1.5 km untuk riadah tepi tasik bersama keluarga.",
+    "isHost": true
+  },
+  {
+    "id": 115,
+    "user": "Zikri_Extreme",
+    "comment": "Taman Cabaran Putrajaya Challenge Park jauh tak?",
+    "isHost": false
+  },
+  {
+    "id": 116,
+    "user": "Zaim Rosli",
+    "comment": "Taman Cabaran hanya 2.2 km sahaja Zikri, ada sukan panjat dinding dan trek basikal lasak.",
+    "isHost": true
+  },
+  {
+    "id": 117,
+    "user": "Kak_Pah",
+    "comment": "Pasar raya nak beli barang basah dapur kat mana paling dekat?",
+    "isHost": false
+  },
+  {
+    "id": 118,
+    "user": "Zaim Rosli",
+    "comment": "HeroMarket Putrajaya hanya 4.0 km dari sini Kak Pah.",
+    "isHost": true
+  },
+  {
+    "id": 119,
+    "user": "Sarah_Cyber",
+    "comment": "Nak shopping ke Alamanda atau DPULZE berapa minit?",
+    "isHost": false
+  },
+  {
+    "id": 120,
+    "user": "Zaim Rosli",
+    "comment": "Alamanda Shopping Centre 8.7 km dan DPULZE Cyberjaya hanya 9.0 km Sarah.",
+    "isHost": true
+  },
+  {
+    "id": 121,
+    "user": "Taufiq_KL",
+    "comment": "Apa syarat asas untuk saya layak beli rumah Residensi MADANI Serunai ni?",
+    "isHost": false
+  },
+  {
+    "id": 122,
+    "user": "Zaim Rosli",
+    "comment": "Warganegara Malaysia 21 tahun ke atas, bekerja atau menetap di Wilayah Persekutuan Taufiq.",
+    "isHost": true
+  },
+  {
+    "id": 123,
+    "user": "Puan_Lina",
+    "comment": "Syarat gaji maksimum isi rumah berapa ya tuan?",
+    "isHost": false
+  },
+  {
+    "id": 124,
+    "user": "Zaim Rosli",
+    "comment": "Pendapatan kasar isi rumah mestilah di bawah RM8,000 sebulan Puan Lina.",
+    "isHost": true
+  },
+  {
+    "id": 125,
+    "user": "Nizam_BekerjaSendiri",
+    "comment": "Saya tiada slip gaji tetap, meniaga sendiri SSM boleh mohon tak?",
+    "isHost": false
+  },
+  {
+    "id": 126,
+    "user": "Zaim Rosli",
+    "comment": "Boleh Nizam, asalkan ada pendaftaran SSM dan penyata akaun bank 6 bulan kami bantu uruskan.",
+    "isHost": true
+  },
+  {
+    "id": 127,
+    "user": "Puan_Asmah",
+    "comment": "Kalau bujang umur 25 tahun bekerja di Putrajaya layak ke?",
+    "isHost": false
+  },
+  {
+    "id": 128,
+    "user": "Zaim Rosli",
+    "comment": "Layak Puan Asmah, pemohon bujang berumur 21 tahun ke atas yang berpendapatan bawah RM8k layak memohon.",
+    "isHost": true
+  },
+  {
+    "id": 129,
+    "user": "Haris_Selangor",
+    "comment": "Saya tinggal di Selangor tapi kerja di KL, lepas ke syarat?",
+    "isHost": false
+  },
+  {
+    "id": 130,
+    "user": "Zaim Rosli",
+    "comment": "Sangat lepas Haris, syarat menyatakan menetap ATAU bekerja di Wilayah Persekutuan (Putrajaya, KL, Labuan).",
+    "isHost": true
+  },
+  {
+    "id": 131,
+    "user": "Puan_Kalsom",
+    "comment": "Adakah keutamaan diberikan kepada pembeli rumah pertama?",
+    "isHost": false
+  },
+  {
+    "id": 132,
+    "user": "Zaim Rosli",
+    "comment": "Ya Puan Kalsom, keutamaan diberikan kepada warganegara yang belum memiliki kediaman di Wilayah Persekutuan.",
+    "isHost": true
+  },
+  {
+    "id": 133,
+    "user": "Syafiq_Moratorium",
+    "comment": "Betul ke ada sekatan jualan moratorium 10 tahun?",
+    "isHost": false
+  },
+  {
+    "id": 134,
+    "user": "Zaim Rosli",
+    "comment": "Ya Syafiq, moratorium sekatan jualan 10 tahun dari tarikh SPA bagi menjaga objektif rumah mampu milik sebenar.",
+    "isHost": true
+  },
+  {
+    "id": 135,
+    "user": "Puan_Zakiah",
+    "comment": "Boleh tak pindah milik rumah ni kepada anak atau suami dalam tempoh 10 tahun tu?",
+    "isHost": false
+  },
+  {
+    "id": 136,
+    "user": "Zaim Rosli",
+    "comment": "Pindah milik kepada waris terdekat seperti pasangan atau anak dibenarkan dengan kelulusan kerajaan Puan Zakiah.",
+    "isHost": true
+  },
+  {
+    "id": 137,
+    "user": "En_Rashid",
+    "comment": "Ada car wash bay ke untuk basuh kereta sendiri kat sini?",
+    "isHost": false
+  },
+  {
+    "id": 138,
+    "user": "Zaim Rosli",
+    "comment": "Ada En Rashid, tempat cuci kereta berdedikasi disediakan di dalam kawasan kediaman.",
+    "isHost": true
+  },
+  {
+    "id": 139,
+    "user": "Puan_Suraya",
+    "comment": "Projek ni berdaftar dengan KPKT ke tuan?",
+    "isHost": false
+  },
+  {
+    "id": 140,
+    "user": "Zaim Rosli",
+    "comment": "Ya Puan Suraya, No Lesen Pemaju 30730/04-2029/0072(A) dan No Permit Iklan 30730-2/05-2029/0350(N)-(S).",
+    "isHost": true
+  },
+  {
+    "id": 141,
+    "user": "Danial_TargetSiap",
+    "comment": "Bila jangkaan tahun siap sepenuhnya serah kunci rumah ni?",
+    "isHost": false
+  },
+  {
+    "id": 142,
+    "user": "Zaim Rosli",
+    "comment": "Tarikh pemajuan dijangka siap mengikut permit jualan ialah Suku Ketiga 2030 (Q3 2030) Danial.",
+    "isHost": true
+  },
+  {
+    "id": 143,
+    "user": "Cikgu_Nazir",
+    "comment": "PICC Putrajaya Convention Centre tu dekat sangat kan dengan Presint 5?",
+    "isHost": false
+  },
+  {
+    "id": 144,
+    "user": "Zaim Rosli",
+    "comment": "Ya Cikgu Nazir, Presint 5 memang kawasan mercu tanda Putrajaya berhampiran PICC.",
+    "isHost": true
+  },
+  {
+    "id": 145,
+    "user": "Puan_Haryati",
+    "comment": "Kalau nak pergi tengok galeri jualan kat mana alamat dia?",
+    "isHost": false
+  },
+  {
+    "id": 146,
+    "user": "Zaim Rosli",
+    "comment": "Galeri jualan bertempat di Seksyen 51A Petaling Jaya dan kami boleh aturkan sesi konsultasi Puan Haryati.",
+    "isHost": true
+  },
+  {
+    "id": 147,
+    "user": "Shahrul_Borang",
+    "comment": "Macam mana nak tahu kelayakan loan kita lepas ke tak sebelum tempah?",
+    "isHost": false
+  },
+  {
+    "id": 148,
+    "user": "Zaim Rosli",
+    "comment": "Tekan butang 'Isi Borang' warna biru di bawah skrin ini sekarang untuk semakan kelayakan segera secara percuma.",
+    "isHost": true
+  },
+  {
+    "id": 149,
+    "user": "Amirul_Hakim",
+    "comment": "Dokumen apa perlu saya sediakan untuk semakan awal?",
+    "isHost": false
+  },
+  {
+    "id": 150,
+    "user": "Zaim Rosli",
+    "comment": "Hanya perlukan salinan IC dan slip gaji 3 bulan Amirul, pasukan kami akan bantu semak kelayakan hari ini juga!",
+    "isHost": true
+  }
+];
+
+    const DEFAULT_SERUNAI_COMMENTS = OFFICIAL_SERUNAI_COMMENTS_150;
 
     const SOCIAL_PROOF_TOASTS = [
       "Ahmad (Putrajaya) baru menyertai siaran langsung",
@@ -4473,6 +5534,73 @@
     }
 
     // ==========================================================
+    
+    // ==========================================================
+    // PENGURUSAN KOMEN BROSUR RASMI KPKT (50, 100, 150 SOALAN)
+    // ==========================================================
+    let selectedBrochureCount = 150;
+
+    function selectBrochureCount(count) {
+      selectedBrochureCount = count || 150;
+      const b50 = document.getElementById('btn-brochure-count-50');
+      const b100 = document.getElementById('btn-brochure-count-100');
+      const b150 = document.getElementById('btn-brochure-count-150');
+      const label = document.getElementById('brochure-count-label');
+
+      [
+        { btn: b50, c: 50 },
+        { btn: b100, c: 100 },
+        { btn: b150, c: 150 }
+      ].forEach(item => {
+        if (item.btn) {
+          if (item.c === selectedBrochureCount) {
+            item.btn.className = 'py-2 px-1 text-center rounded-lg border text-xs font-bold transition border-purple-600 bg-purple-600 text-white shadow-sm';
+          } else {
+            item.btn.className = 'py-2 px-1 text-center rounded-lg border text-xs font-bold transition border-slate-300 bg-slate-50 text-slate-700 hover:bg-purple-50';
+          }
+        }
+      });
+
+      if (label) label.innerText = selectedBrochureCount;
+    }
+
+    function applyBrochureCommentsAction() {
+      const count = selectedBrochureCount || 150;
+      const statusEl = document.getElementById('brochure-comments-status');
+
+      liveCommentsPool = OFFICIAL_SERUNAI_COMMENTS_150.slice(0, count);
+      localStorage.setItem(STORAGE_KEY_COMMENTS, JSON.stringify(liveCommentsPool));
+      renderInitialLiveComments();
+
+      // Selaraskan ke Cloudflare KV
+      fetch('/api/live-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comments: liveCommentsPool })
+      }).catch(() => {});
+
+      if (statusEl) {
+        statusEl.className = 'text-[11px] font-medium text-emerald-700 bg-emerald-50 p-2 rounded-lg';
+        statusEl.innerText = `Berjaya mengaktifkan ${count} soalan & jawapan rasmi berasaskan brosur KPKT Residensi Serunai!`;
+        statusEl.classList.remove('hidden');
+        setTimeout(() => { if (statusEl) statusEl.classList.add('hidden'); }, 4000);
+      }
+    }
+
+    function toggleAiGeneratorAccordion() {
+      const content = document.getElementById('ai-generator-accordion-content');
+      const icon = document.getElementById('ai-generator-accordion-icon');
+      if (!content) return;
+      const isHidden = content.classList.contains('hidden');
+      if (isHidden) {
+        content.classList.remove('hidden');
+        if (icon) icon.classList.add('rotate-180');
+      } else {
+        content.classList.add('hidden');
+        if (icon) icon.classList.remove('rotate-180');
+      }
+    }
+
     // PEMBAIKAN & PENJANAAN KOMEN AI LIVE (GEMINI & AGENT ROUTER)
     // ==========================================================
     function parseOrRepairJsonArray(raw) {
@@ -4536,12 +5664,21 @@
       }
 
       const buildPrompt = (batchSize) => `Anda adalah simulator sembang TikTok Live bagi projek hartanah di Malaysia.
-Maklumat Projek:
+Maklumat Rasmi Projek (Brosur KPKT Residensi MADANI Serunai):
 - Nama Projek: Residensi MADANI Serunai (Presint 5, Putrajaya)
-- Harga Jualan: RM 200,000 (Harga Kawalan Kerajaan, Ansuran ~RM 900/bulan)
-- Unit: 800 kps, 3 Bilik Tidur, 2 Bilik Air, 35 fasiliti gaya resort.
-- Kelayakan: Warganegara 21+, kerja/menetap di Wilayah Persekutuan, gaji bawah RM8,000, kuota terhad 587 unit.
-- Pembiayaan: 100% pinjaman (LPPSA/bank), percuma duti setem MOT.
+- Pelesenan Rasmi: No Lesen: 30730/04-2029/0072(A), No Permit: 30730-2/05-2029/0350(N)-(S)
+- Harga Jualan: RM 200,000 (Harga Kawalan Kerajaan, Anggaran Ansuran ~RM 900/bulan)
+- Pakej Pembiayaan: Zero Downpayment, Free SPA Legal Fee, 100% pinjaman LPPSA kerajaan atau bank panel swasta
+- Pegangan Tanah: PEGANGAN KEKAL (FREEHOLD), tiada sebarang bebanan tanah
+- Butiran Unit: Jenis A, 800 kps (8500 mm x 10510 mm), 3 Bilik Tidur, 2 Bilik Air, Ruang Tamu, Ruang Makan, Dapur, Halaman
+- Parkir: 1 ruang parkir kereta bertingkat diperuntukkan bagi setiap unit
+- Kepadatan Rendah: Blok A hanya 587 unit, 22 unit setiap tingkat, 3 lif lobi disediakan
+- Tarikh Siap: Suku Ketiga 2030 (Q3 2030)
+- 16 Fasiliti Lengkap: Gelanggang serbaguna, dewan serbaguna, tempat cuci kereta, laluan refleksologi, kecergasan luar, ruang niaga, taska, tadika, surau, gazebo, taman permainan kanak-kanak 1 & 2, kebuk sampah, bilik peti surat, pejabat pengurusan, bilik serbaguna, kawalan berpagar 24 jam
+- Pendidikan: SK & SMK Putrajaya Presint 5(2) (50m, dalam pembinaan), SK & SMK Putrajaya Presint 5(1) (650m), Heriot-Watt University (1.6 km)
+- Pengangkutan: Stesen Bas PPJ26 5R6 (400m), MRT Putrajaya Sentral PY41 (5.5 km), Lebuhraya MEX, ELITE, SKVE, PCE
+- Kesihatan & Rekreasi: Hospital Putrajaya (5.5 km), Klinik Kesihatan P5 (6.9 km), Taman Ekuestrian (300m), Tasik Putrajaya (1.5 km), Taman Cabaran (2.2 km), HeroMarket (4 km), Alamanda (8.7 km), PICC Presint 5
+- Syarat MADANI: Warganegara 21+, kerja atau tinggal di Wilayah Persekutuan (Putrajaya, KL, Labuan), gaji isi rumah bawah RM8,000 sebulan, keutamaan rumah pertama. Moratorium sekatan jualan 10 tahun (hanya pindah milik waris terdekat)
 
 TUGASAN:
 Jana ${batchSize} komen penonton Malaysia yang natural, bersahaja dan realistik untuk siaran langsung TikTok Live mengenai Residensi MADANI Serunai.
@@ -4550,8 +5687,8 @@ PENTING: Pastikan setiap komen adalah ringkas dan padat (1 ayat sahaja, 5-15 pat
 
 Berikan jawapan HANYA dalam format tatasusunan JSON yang sah (valid JSON array) tanpa perbualan lain:
 [
-  {"id": 1, "user": "Ahmad_Putrajaya", "comment": "Gaji bersih RM2,500 lepas ke nak ambil unit 3 bilik ni?", "isHost": false},
-  {"id": 2, "user": "${currentHost}", "comment": "Lepas Ahmad, ansuran hanya sekitar RM900 sebulan dan boleh mohon LPPSA atau bank.", "isHost": true}
+  {"id": 1, "user": "Ahmad_Presint9", "comment": "Harga jualan RM200k ni memang harga tetap ke ada caj lain?", "isHost": false},
+  {"id": 2, "user": "${currentHost}", "comment": "Harga tetap RM200k sahaja Ahmad, Zero Downpayment dan Free SPA Legal Fee.", "isHost": true}
 ]`;
 
       const requestAiBatch = async (batchSize) => {
