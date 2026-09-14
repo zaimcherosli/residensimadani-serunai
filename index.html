@@ -391,16 +391,95 @@
           </button>
         </form>
 
+        <!-- Butang Kongsi Maklumat Siaran Langsung (Ganti Butang Volume) -->
         <button
-          id="audio-toggle-btn"
+          id="live-share-btn"
           type="button"
-          onclick="toggleLiveAudio()"
-          aria-label="Hidupkan bunyi"
-          class="shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white backdrop-blur transition hover:bg-black active:scale-90 border border-white/10"
+          onclick="handleLiveShare(event)"
+          aria-label="Kongsi Maklumat Residensi MADANI Serunai"
+          title="Kongsi Maklumat Residensi MADANI Serunai"
+          class="shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 hover:bg-black text-white hover:text-emerald-400 backdrop-blur transition active:scale-90 border border-white/10 shadow"
         >
-          <svg id="audio-icon-muted" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
-          <svg id="audio-icon-unmuted" class="w-3.5 h-3.5 hidden text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M10 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z"/></svg>
         </button>
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- MODAL KONGSI MAKLUMAT RESIDENSI MADANI SERUNAI -->
+  <div
+    id="live-share-modal"
+    class="hidden fixed inset-0 z-[130] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 select-none"
+    onclick="if(event.target===this) closeLiveShareModal()"
+  >
+    <div class="bg-white text-slate-900 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+      <!-- Header Modal -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M10 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-900 leading-tight">Kongsi Residensi MADANI Serunai</h3>
+            <p class="text-[10px] text-slate-500 font-medium">Presint 5 Putrajaya &bull; RM200,000</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeLiveShareModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Kad Pratonton Maklumat (Preview Card) -->
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2.5">
+        <div class="flex items-start gap-3">
+          <img
+            src="https://erumawip.jwp.gov.my/images/imageProjek/6a548ab19b501.jpeg"
+            alt="Residensi Serunai"
+            class="w-14 h-14 rounded-xl object-cover shrink-0 border border-slate-200 shadow-sm"
+          />
+          <div class="min-w-0 flex-1">
+            <span class="inline-block bg-emerald-600 text-white text-[8.5px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Pegangan Kekal (Freehold)</span>
+            <h4 class="text-xs font-bold text-slate-900 truncate mt-1">Residensi MADANI Serunai</h4>
+            <p class="text-[10.5px] font-extrabold text-emerald-700">Harga Tetap RM200,000 &bull; ~RM900/bln</p>
+          </div>
+        </div>
+        <div class="text-[11px] text-slate-600 space-y-1 pt-1.5 border-t border-slate-200/80">
+          <p class="leading-relaxed">Kediaman mampu milik 3 bilik tidur, 2 bilik air (800 kps) di Presint 5 Putrajaya. Pakej Zero Downpayment &amp; Free SPA Legal Fee. Bersebelahan SK &amp; SMK 50 meter.</p>
+          <div class="bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 text-[10px] text-slate-500 truncate font-mono select-all">
+            https://residensimadani.zaimrosli.my/serunai/
+          </div>
+        </div>
+      </div>
+
+      <!-- Butang Tindakan Pantas Kongsi -->
+      <div class="grid grid-cols-2 gap-2.5 pt-1">
+        <!-- WhatsApp Direct Share -->
+        <a
+          id="share-whatsapp-link"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          onclick="recordShareSuccess()"
+          class="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition active:scale-95 shadow-sm"
+        >
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.541 1.961.82 2.796.82 3.183 0 5.769-2.586 5.77-5.766.001-3.182-2.585-5.77-5.77-5.772zm3.374 8.169c-.14.394-.816.742-1.135.792-.303.048-.687.068-2.222-.569-1.963-.814-3.232-2.825-3.33-2.956-.098-.132-.796-1.06-.796-2.023 0-.962.502-1.436.681-1.631.179-.196.391-.245.521-.245.131 0 .261.002.375.007.12.006.281-.046.438.334.161.391.554 1.353.602 1.452.049.098.082.213.016.344-.065.131-.098.213-.196.327-.098.115-.207.257-.295.344-.099.099-.202.206-.087.403.115.197.511.844 1.096 1.365.753.67 1.388.877 1.585.975.196.098.311.082.426-.049.115-.131.491-.573.622-.769.131-.196.262-.164.442-.098.18.066 1.144.54 1.34.638.196.098.327.147.376.229.049.082.049.475-.091.869z"/></svg>
+          <span>WhatsApp</span>
+        </a>
+
+        <!-- Salin Info & Pautan -->
+        <button
+          type="button"
+          onclick="copyShareInfoToClipboard()"
+          class="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition active:scale-95 shadow-sm"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+          <span id="copy-share-btn-text">Salin Info &amp; Link</span>
+        </button>
+      </div>
+
+      <div id="share-copy-status" class="hidden text-center text-xs font-bold text-emerald-700 bg-emerald-50 py-2 rounded-xl border border-emerald-200">
+        Maklumat dan pautan berjaya disalin! Sedia ditampal di WhatsApp atau media sosial.
       </div>
     </div>
   </div>
@@ -6022,6 +6101,113 @@
         setTimeout(() => {
           el.scrollIntoView({ behavior: 'smooth' });
         }, 100);
+      }
+    }
+
+    
+    // ==========================================================
+    // LOGIK PERKONGSIAN SIARAN LANGSUNG (LIVE SHARE FEATURE)
+    // ==========================================================
+    const LIVE_SHARE_PAYLOAD = {
+      title: 'Residensi MADANI Serunai | Kediaman Presint 5 Putrajaya',
+      text: 'Peluang miliki kediaman Pegangan Kekal (Freehold) di Presint 5 Putrajaya pada harga RM200,000 sahaja! 3 Bilik Tidur, 2 Bilik Air (800 kps) dengan ansuran serendah ~RM900 sebulan. Pakej Zero Downpayment & Percuma SPA Legal Fee. Bersebelahan sekolah SK & SMK 50 meter.',
+      url: 'https://residensimadani.zaimrosli.my/serunai/'
+    };
+
+    function handleLiveShare(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      // 1. Cuba Web Share API asli telefon pintar jika disokong
+      if (navigator.share) {
+        navigator.share({
+          title: LIVE_SHARE_PAYLOAD.title,
+          text: LIVE_SHARE_PAYLOAD.text,
+          url: LIVE_SHARE_PAYLOAD.url
+        }).then(() => {
+          recordShareSuccess();
+        }).catch((err) => {
+          if (err && err.name !== 'AbortError') {
+            openLiveShareModal();
+          }
+        });
+      } else {
+        openLiveShareModal();
+      }
+    }
+
+    function openLiveShareModal() {
+      const modal = document.getElementById('live-share-modal');
+      const waLink = document.getElementById('share-whatsapp-link');
+      if (waLink) {
+        const msg = `${LIVE_SHARE_PAYLOAD.title}\n\n${LIVE_SHARE_PAYLOAD.text}\n\nSemak kelayakan percuma di pautan berikut:\n${LIVE_SHARE_PAYLOAD.url}`;
+        waLink.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      }
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeLiveShareModal() {
+      const modal = document.getElementById('live-share-modal');
+      if (modal) modal.classList.add('hidden');
+      const status = document.getElementById('share-copy-status');
+      if (status) status.classList.add('hidden');
+    }
+
+    function copyShareInfoToClipboard() {
+      const msg = `${LIVE_SHARE_PAYLOAD.title}\n\n${LIVE_SHARE_PAYLOAD.text}\n\nLayari laman rasmi untuk semakan kelayakan permohonan:\n${LIVE_SHARE_PAYLOAD.url}`;
+      const onCopied = () => {
+        const status = document.getElementById('share-copy-status');
+        const btnText = document.getElementById('copy-share-btn-text');
+        if (status) status.classList.remove('hidden');
+        if (btnText) btnText.innerText = 'Telah Disalin!';
+        setTimeout(() => {
+          if (btnText) btnText.innerText = 'Salin Info & Link';
+        }, 3000);
+        recordShareSuccess();
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(msg).then(onCopied).catch(() => {
+          fallbackCopyText(msg, onCopied);
+        });
+      } else {
+        fallbackCopyText(msg, onCopied);
+      }
+    }
+
+    function fallbackCopyText(text, callback) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand('copy');
+        if (callback) callback();
+      } catch (err) {}
+      document.body.removeChild(ta);
+    }
+
+    function recordShareSuccess() {
+      const actText = document.getElementById('live-activity-text');
+      const actBadge = document.getElementById('live-activity-badge');
+      const actPill = document.getElementById('live-activity-pill');
+      const actInner = document.getElementById('live-activity-inner');
+      if (actText && actBadge && actPill && actInner) {
+        actBadge.innerText = 'KONGSI';
+        actBadge.className = 'text-[8.5px] uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-white/20 text-white font-extrabold';
+        actPill.className = 'px-2.5 py-1 rounded-2xl border text-[11px] leading-tight flex items-center gap-1.5 bg-blue-600/90 text-white border-blue-400/40 shadow-lg shadow-blue-600/20 backdrop-blur-md';
+        actText.innerText = 'Anda telah berkongsi maklumat Residensi MADANI Serunai!';
+        actInner.classList.remove('opacity-0', '-translate-y-1', 'scale-95');
+        actInner.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+        setTimeout(() => {
+          actInner.classList.add('opacity-0', '-translate-y-1', 'scale-95');
+          actInner.classList.remove('opacity-100', 'translate-y-0', 'scale-100');
+        }, 4000);
       }
     }
 
