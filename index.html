@@ -476,22 +476,82 @@
           <div id="ai-generate-status" class="text-[11px] font-medium hidden"></div>
         </div>
 
-        <!-- 4. Pilihan URL Video Tour Live -->
-        <div class="space-y-1.5">
-          <label class="font-bold text-slate-800">URL Video Siaran Langsung (MP4 / Web Video)</label>
-          <input
-            id="live-video-url-input"
-            type="text"
-            placeholder="https://..."
-            class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs bg-slate-50 focus:bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
-          />
-          <div class="flex items-center gap-1.5 pt-0.5 text-[10.5px]">
-            <span class="text-slate-500 font-semibold">Preset Cepat:</span>
-            <button type="button" onclick="setSampleVideo(0)" class="text-purple-700 underline font-medium">Interior Mewah</button>
-            <span class="text-slate-300">|</span>
-            <button type="button" onclick="setSampleVideo(1)" class="text-purple-700 underline font-medium">Bilik &amp; Balkoni</button>
-            <span class="text-slate-300">|</span>
-            <button type="button" onclick="setSampleVideo(2)" class="text-purple-700 underline font-medium">Kondominium Moden</button>
+        <!-- 4. Muat Naik Video Siaran Langsung -->
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-900">Video Siaran Langsung (Muat Naik Fail)</span>
+            <span id="cms-video-status-badge" class="text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded">Video Lalai</span>
+          </div>
+
+          <!-- Video Preview Container -->
+          <div id="cms-video-preview-wrapper" class="relative rounded-xl overflow-hidden bg-black aspect-video max-h-36 flex items-center justify-center border border-slate-300">
+            <video
+              id="cms-video-preview-player"
+              muted
+              playsinline
+              loop
+              controls
+              class="w-full h-full object-cover"
+            ></video>
+          </div>
+
+          <!-- File Info & Action Buttons -->
+          <div class="space-y-2">
+            <div id="cms-video-file-info" class="text-[11px] text-slate-600 truncate font-medium">
+              Sila pilih fail video terus dari peranti (MP4, WebM, MOV).
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <label class="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                Pilih Fail Video
+                <input
+                  id="live-video-file-input"
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime,video/*"
+                  class="hidden"
+                  onchange="handleVideoFileUpload(event)"
+                />
+              </label>
+
+              <button
+                id="reset-video-btn"
+                type="button"
+                onclick="resetToDefaultVideoAction()"
+                class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-semibold transition"
+              >
+                Guna Video Asal
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilihan Pautan URL Alternatif (Boleh Dibuka Jika Perlu) -->
+          <div class="pt-1.5 border-t border-slate-200">
+            <button
+              type="button"
+              onclick="toggleVideoUrlAccordion()"
+              class="text-[10.5px] text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1"
+            >
+              <span>Pilihan tambahan: Masukkan pautan URL video</span>
+              <svg id="video-url-accordion-icon" class="w-3 h-3 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div id="video-url-accordion-content" class="hidden mt-2 space-y-1.5">
+              <input
+                id="live-video-url-input"
+                type="text"
+                placeholder="https://... (Pautan video MP4)"
+                oninput="handleVideoUrlInput(this.value)"
+                class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              />
+              <div class="flex items-center gap-1.5 text-[10px]">
+                <span class="text-slate-500 font-semibold">Preset Cepat:</span>
+                <button type="button" onclick="setSampleVideo(0)" class="text-purple-700 underline font-medium">Interior Mewah</button>
+                <span class="text-slate-300">|</span>
+                <button type="button" onclick="setSampleVideo(1)" class="text-purple-700 underline font-medium">Bilik &amp; Balkoni</button>
+                <span class="text-slate-300">|</span>
+                <button type="button" onclick="setSampleVideo(2)" class="text-purple-700 underline font-medium">Kondominium Moden</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -2259,7 +2319,7 @@
       "https://assets.mixkit.co/videos/preview/mixkit-vertical-video-of-a-modern-living-room-48762-large.mp4"
     ];
 
-    // Keys LocalStorage
+    // Keys LocalStorage & Media DB
     const STORAGE_KEY_COMMENTS = 'serunai_live_comments';
     const STORAGE_KEY_VIDEO = 'serunai_live_video_url';
     const STORAGE_KEY_GEMINI = 'hartanah_gemini_config';
@@ -2267,6 +2327,164 @@
     const STORAGE_KEY_AGENT_AVATAR = 'serunai_live_agent_avatar';
     const DEFAULT_AGENT_NAME = 'Zaim Rosli';
     const DEFAULT_AGENT_AVATAR = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80';
+
+    const MEDIA_DB_NAME = 'SerunaiMediaDB';
+    const MEDIA_DB_VERSION = 1;
+    const MEDIA_STORE_NAME = 'videos';
+    let pendingVideoBlob = null;
+    let pendingVideoFileName = '';
+    let currentVideoObjectUrl = null;
+
+    function openMediaDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(MEDIA_DB_NAME, MEDIA_DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(MEDIA_STORE_NAME)) {
+            db.createObjectStore(MEDIA_STORE_NAME);
+          }
+        };
+        req.onsuccess = (e) => resolve(e.target.result);
+        req.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function saveVideoBlobToDB(blob, fileName) {
+      try {
+        const db = await openMediaDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(MEDIA_STORE_NAME, 'readwrite');
+          const store = tx.objectStore(MEDIA_STORE_NAME);
+          store.put({ blob, name: fileName, size: blob.size, updatedAt: Date.now() }, 'custom_live_video');
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = (e) => reject(e.target.error);
+        });
+      } catch (e) {
+        console.error('Ralat simpan ke IndexedDB:', e);
+        return false;
+      }
+    }
+
+    async function getVideoRecordFromDB() {
+      try {
+        const db = await openMediaDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(MEDIA_STORE_NAME, 'readonly');
+          const store = tx.objectStore(MEDIA_STORE_NAME);
+          const req = store.get('custom_live_video');
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = (e) => reject(e.target.error);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function removeVideoFromDB() {
+      try {
+        const db = await openMediaDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(MEDIA_STORE_NAME, 'readwrite');
+          const store = tx.objectStore(MEDIA_STORE_NAME);
+          store.delete('custom_live_video');
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = (e) => reject(e.target.error);
+        });
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function handleVideoFileUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      pendingVideoBlob = file;
+      pendingVideoFileName = file.name;
+
+      if (currentVideoObjectUrl) {
+        URL.revokeObjectURL(currentVideoObjectUrl);
+      }
+      currentVideoObjectUrl = URL.createObjectURL(file);
+
+      const previewPlayer = document.getElementById('cms-video-preview-player');
+      if (previewPlayer) {
+        previewPlayer.src = currentVideoObjectUrl;
+        previewPlayer.play().catch(() => {});
+      }
+
+      const fileInfo = document.getElementById('cms-video-file-info');
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+      if (fileInfo) {
+        fileInfo.innerText = `Fail dipilih: ${file.name} (${sizeMb} MB) - Sedia untuk disimpan`;
+      }
+
+      const badge = document.getElementById('cms-video-status-badge');
+      if (badge) {
+        badge.className = 'text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded';
+        badge.innerText = 'Fail Tempatan Dipilih';
+      }
+    }
+
+    function resetToDefaultVideoAction() {
+      pendingVideoBlob = 'RESET';
+      pendingVideoFileName = '';
+
+      if (currentVideoObjectUrl) {
+        URL.revokeObjectURL(currentVideoObjectUrl);
+        currentVideoObjectUrl = null;
+      }
+
+      const previewPlayer = document.getElementById('cms-video-preview-player');
+      if (previewPlayer) {
+        previewPlayer.src = SAMPLE_PRESET_VIDEOS[0];
+        previewPlayer.play().catch(() => {});
+      }
+
+      const fileInfo = document.getElementById('cms-video-file-info');
+      if (fileInfo) {
+        fileInfo.innerText = 'Kembali kepada video asal.';
+      }
+
+      const badge = document.getElementById('cms-video-status-badge');
+      if (badge) {
+        badge.className = 'text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded';
+        badge.innerText = 'Video Lalai';
+      }
+
+      const urlInput = document.getElementById('live-video-url-input');
+      if (urlInput) urlInput.value = SAMPLE_PRESET_VIDEOS[0];
+    }
+
+    function toggleVideoUrlAccordion() {
+      const content = document.getElementById('video-url-accordion-content');
+      const icon = document.getElementById('video-url-accordion-icon');
+      if (content) {
+        const isHidden = content.classList.contains('hidden');
+        if (isHidden) {
+          content.classList.remove('hidden');
+          if (icon) icon.classList.add('rotate-180');
+        } else {
+          content.classList.add('hidden');
+          if (icon) icon.classList.remove('rotate-180');
+        }
+      }
+    }
+
+    function handleVideoUrlInput(val) {
+      if (!val) return;
+      const previewPlayer = document.getElementById('cms-video-preview-player');
+      if (previewPlayer) {
+        previewPlayer.src = val.trim();
+        previewPlayer.play().catch(() => {});
+      }
+      const badge = document.getElementById('cms-video-status-badge');
+      if (badge) {
+        badge.className = 'text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded';
+        badge.innerText = 'Pautan URL';
+      }
+      pendingVideoBlob = null;
+    }
 
     // State Variables
     let liveCommentsPool = [];
@@ -2355,15 +2573,27 @@
     ];
 
     // Inisialisasi Data & Live Session
-    function initLiveSessionData() {
+    async function initLiveSessionData() {
       // 0. Kemas kini profil & gambar ejen
       updateLiveAgentDisplay();
 
-      // 1. Muat turun video URL
-      const savedVideo = localStorage.getItem(STORAGE_KEY_VIDEO);
+      // 1. Muat turun video (Semak IndexedDB dahulu, jika tiada semak URL atau lalai)
       const videoEl = document.getElementById('live-video-player');
-      if (videoEl && savedVideo) {
-        videoEl.src = savedVideo;
+      try {
+        const record = await getVideoRecordFromDB();
+        if (record && record.blob && videoEl) {
+          if (currentVideoObjectUrl) URL.revokeObjectURL(currentVideoObjectUrl);
+          currentVideoObjectUrl = URL.createObjectURL(record.blob);
+          videoEl.src = currentVideoObjectUrl;
+          videoEl.play().catch(() => {});
+        } else if (videoEl) {
+          const savedVideo = localStorage.getItem(STORAGE_KEY_VIDEO);
+          if (savedVideo) {
+            videoEl.src = savedVideo;
+          }
+        }
+      } catch (err) {
+        console.error('Ralat inisialisasi video:', err);
       }
 
       // 2. Muat turun Komen Live dari LocalStorage (jika pernah dijana AI)
@@ -2798,7 +3028,7 @@
       }
     }
 
-    function loadAiCmsFields() {
+    async function loadAiCmsFields() {
       try {
         const cfg = JSON.parse(localStorage.getItem(STORAGE_KEY_GEMINI) || '{}');
         const keyInput = document.getElementById('gemini-api-key-input');
@@ -2810,13 +3040,39 @@
 
         if (keyInput && cfg.apiKey) keyInput.value = cfg.apiKey;
         if (modelSelect && cfg.model) modelSelect.value = cfg.model;
-        if (videoInput) {
-          videoInput.value = localStorage.getItem(STORAGE_KEY_VIDEO) || SAMPLE_PRESET_VIDEOS[0];
-        }
         if (agentNameInput) agentNameInput.value = getLiveAgentName();
         if (agentAvatarInput) agentAvatarInput.value = getLiveAgentAvatar();
         if (agentPreview) agentPreview.src = getLiveAgentAvatar();
-      } catch (e) {}
+
+        // Semak status video (IndexedDB vs URL)
+        const record = await getVideoRecordFromDB();
+        const previewPlayer = document.getElementById('cms-video-preview-player');
+        const fileInfo = document.getElementById('cms-video-file-info');
+        const badge = document.getElementById('cms-video-status-badge');
+
+        if (record && record.blob) {
+          if (currentVideoObjectUrl) URL.revokeObjectURL(currentVideoObjectUrl);
+          currentVideoObjectUrl = URL.createObjectURL(record.blob);
+          if (previewPlayer) previewPlayer.src = currentVideoObjectUrl;
+          const sizeMb = ((record.size || record.blob.size) / (1024 * 1024)).toFixed(1);
+          if (fileInfo) fileInfo.innerText = `Fail aktif: ${record.name || 'video-live.mp4'} (${sizeMb} MB)`;
+          if (badge) {
+            badge.className = 'text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded';
+            badge.innerText = 'Video Dimuat Naik';
+          }
+        } else {
+          const savedUrl = localStorage.getItem(STORAGE_KEY_VIDEO) || SAMPLE_PRESET_VIDEOS[0];
+          if (videoInput) videoInput.value = savedUrl;
+          if (previewPlayer) previewPlayer.src = savedUrl;
+          if (fileInfo) fileInfo.innerText = 'Menggunakan video lalai asal.';
+          if (badge) {
+            badge.className = 'text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded';
+            badge.innerText = 'Video Lalai';
+          }
+        }
+      } catch (e) {
+        console.error('Ralat muat medan CMS:', e);
+      }
     }
 
     function toggleApiKeyVisibility() {
@@ -2830,10 +3086,11 @@
       const input = document.getElementById('live-video-url-input');
       if (input && SAMPLE_PRESET_VIDEOS[idx]) {
         input.value = SAMPLE_PRESET_VIDEOS[idx];
+        handleVideoUrlInput(SAMPLE_PRESET_VIDEOS[idx]);
       }
     }
 
-    function saveAiConfigAction() {
+    async function saveAiConfigAction() {
       const keyInput = document.getElementById('gemini-api-key-input');
       const modelSelect = document.getElementById('gemini-model-select');
       const videoInput = document.getElementById('live-video-url-input');
@@ -2847,14 +3104,6 @@
       const agentAvatar = agentAvatarInput ? agentAvatarInput.value.trim() : '';
 
       localStorage.setItem(STORAGE_KEY_GEMINI, JSON.stringify({ apiKey, model, isEnabled: Boolean(apiKey) }));
-      if (videoUrl) {
-        localStorage.setItem(STORAGE_KEY_VIDEO, videoUrl);
-        const videoEl = document.getElementById('live-video-player');
-        if (videoEl) {
-          videoEl.src = videoUrl;
-          videoEl.play().catch(() => {});
-        }
-      }
       if (agentName) {
         localStorage.setItem(STORAGE_KEY_AGENT_NAME, agentName);
       }
@@ -2863,7 +3112,32 @@
       }
       updateLiveAgentDisplay();
 
-      alert('Tetapan dan profil ejen berjaya disimpan!');
+      // Urus fail video tempatan (IndexedDB)
+      const videoEl = document.getElementById('live-video-player');
+      if (pendingVideoBlob === 'RESET') {
+        await removeVideoFromDB();
+        localStorage.removeItem(STORAGE_KEY_VIDEO);
+        if (videoEl) {
+          videoEl.src = SAMPLE_PRESET_VIDEOS[0];
+          videoEl.play().catch(() => {});
+        }
+      } else if (pendingVideoBlob && pendingVideoBlob instanceof Blob) {
+        await saveVideoBlobToDB(pendingVideoBlob, pendingVideoFileName);
+        if (videoEl && currentVideoObjectUrl) {
+          videoEl.src = currentVideoObjectUrl;
+          videoEl.play().catch(() => {});
+        }
+      } else if (videoUrl) {
+        await removeVideoFromDB();
+        localStorage.setItem(STORAGE_KEY_VIDEO, videoUrl);
+        if (videoEl) {
+          videoEl.src = videoUrl;
+          videoEl.play().catch(() => {});
+        }
+      }
+
+      pendingVideoBlob = null;
+      alert('Tetapan dan video berjaya disimpan!');
       closeAiCmsModal();
     }
 
