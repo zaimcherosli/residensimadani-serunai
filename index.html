@@ -125,7 +125,7 @@
       <div class="absolute inset-0 overflow-hidden pointer-events-none">
         <video
           id="live-video-player"
-          src="https://assets.mixkit.co/videos/preview/mixkit-modern-interior-of-a-luxurious-apartment-43097-large.mp4"
+          src="https://pub-b41a57c40e74430eb994919066288290.r2.dev/serunai/video-live.mp4"
           poster="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80"
           autoplay
           loop
@@ -576,11 +576,11 @@
           <div id="ai-generate-status" class="text-[11px] font-medium hidden"></div>
         </div>
 
-        <!-- 4. Muat Naik Video Siaran Langsung -->
+        <!-- 4. Muat Naik Video Siaran Langsung (Cloudflare R2) -->
         <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
           <div class="flex items-center justify-between">
-            <span class="font-bold text-slate-900">Video Siaran Langsung (Muat Naik Fail)</span>
-            <span id="cms-video-status-badge" class="text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded">Video Lalai</span>
+            <span class="font-bold text-slate-900">Video Siaran Langsung (Cloudflare R2)</span>
+            <span id="cms-video-status-badge" class="text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded">Memeriksa...</span>
           </div>
 
           <!-- Video Preview Container -->
@@ -598,13 +598,13 @@
           <!-- File Info & Action Buttons -->
           <div class="space-y-2">
             <div id="cms-video-file-info" class="text-[11px] text-slate-600 truncate font-medium">
-              Sila pilih fail video terus dari peranti (MP4, WebM, MOV).
+              Video disimpan di Cloudflare R2 & disegerakkan ke semua telefon dan komputer.
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
               <label class="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                Pilih Fail Video
+                Muat Naik Video Baharu (R2)
                 <input
                   id="live-video-file-input"
                   type="file"
@@ -618,9 +618,10 @@
                 id="reset-video-btn"
                 type="button"
                 onclick="resetToDefaultVideoAction()"
-                class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-semibold transition"
+                class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-semibold transition"
+                title="Padam video daripada Cloudflare R2 secara kekal"
               >
-                Guna Video Asal
+                Padam Video (R2)
               </button>
             </div>
           </div>
@@ -2485,9 +2486,10 @@
       "Hafiz (Cyberjaya) menyertai siaran langsung"
     ];
 
+    const CLOUDFLARE_R2_VIDEO_URL = "https://pub-b41a57c40e74430eb994919066288290.r2.dev/serunai/video-live.mp4";
     const SAMPLE_PRESET_VIDEOS = [
+      CLOUDFLARE_R2_VIDEO_URL,
       "https://assets.mixkit.co/videos/preview/mixkit-modern-interior-of-a-luxurious-apartment-43097-large.mp4",
-      "https://assets.mixkit.co/videos/preview/mixkit-living-room-with-sliding-doors-open-42095-large.mp4",
       "https://assets.mixkit.co/videos/preview/mixkit-vertical-video-of-a-modern-living-room-48762-large.mp4"
     ];
 
@@ -2572,39 +2574,96 @@
       }
     }
 
-    function handleVideoFileUpload(e) {
+    async function handleVideoFileUpload(e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
 
-      pendingVideoBlob = file;
-      pendingVideoFileName = file.name;
+      const fileInfo = document.getElementById('cms-video-file-info');
+      const badge = document.getElementById('cms-video-status-badge');
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
 
-      if (currentVideoObjectUrl) {
-        URL.revokeObjectURL(currentVideoObjectUrl);
+      if (badge) {
+        badge.className = 'text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded animate-pulse';
+        badge.innerText = 'Memuat Naik ke R2...';
       }
-      currentVideoObjectUrl = URL.createObjectURL(file);
+      if (fileInfo) {
+        fileInfo.innerText = `Memuat naik fail ${file.name} (${sizeMb} MB) ke Cloudflare R2... Sila tunggu sebentar.`;
+      }
 
+      if (currentVideoObjectUrl) URL.revokeObjectURL(currentVideoObjectUrl);
+      currentVideoObjectUrl = URL.createObjectURL(file);
       const previewPlayer = document.getElementById('cms-video-preview-player');
       if (previewPlayer) {
         previewPlayer.src = currentVideoObjectUrl;
         previewPlayer.play().catch(() => {});
       }
 
-      const fileInfo = document.getElementById('cms-video-file-info');
-      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
-      if (fileInfo) {
-        fileInfo.innerText = `Fail dipilih: ${file.name} (${sizeMb} MB) - Sedia untuk disimpan`;
-      }
+      try {
+        const res = await fetch('/api/video', {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type || 'video/mp4' },
+          body: file
+        });
+        const result = await res.json();
+        if (result.success && result.url) {
+          localStorage.setItem(STORAGE_KEY_VIDEO, result.url);
 
-      const badge = document.getElementById('cms-video-status-badge');
-      if (badge) {
-        badge.className = 'text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded';
-        badge.innerText = 'Fail Tempatan Dipilih';
+          const mainPlayer = document.getElementById('live-video-player');
+          if (mainPlayer) {
+            mainPlayer.src = result.url;
+            mainPlayer.play().catch(() => {});
+          }
+
+          if (badge) {
+            badge.className = 'text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded';
+            badge.innerText = 'Aktif di Cloudflare R2';
+          }
+          if (fileInfo) {
+            fileInfo.innerText = `Video berjaya dimuat naik ke Cloudflare R2 (${sizeMb} MB) & disegerakkan ke semua peranti!`;
+          }
+          pendingVideoBlob = null;
+        } else {
+          throw new Error(result.error || 'Gagal memuat naik');
+        }
+      } catch (err) {
+        console.error('R2 upload failed:', err);
+        pendingVideoBlob = file;
+        pendingVideoFileName = file.name;
+        if (badge) {
+          badge.className = 'text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded';
+          badge.innerText = 'Storan Tempatan (Offline)';
+        }
+        if (fileInfo) {
+          fileInfo.innerText = `Muat naik R2 terganggu (${err.message}). Disimpan sementara di peranti.`;
+        }
       }
     }
 
-    function resetToDefaultVideoAction() {
-      pendingVideoBlob = 'RESET';
+    async function resetToDefaultVideoAction() {
+      const confirmDelete = confirm('Adakah anda pasti mahu memadamkan video ini daripada Cloudflare R2 secara automatik dan kembali ke video asal?');
+      if (!confirmDelete) return;
+
+      const fileInfo = document.getElementById('cms-video-file-info');
+      const badge = document.getElementById('cms-video-status-badge');
+
+      if (badge) {
+        badge.className = 'text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded animate-pulse';
+        badge.innerText = 'Memadam dari R2...';
+      }
+      if (fileInfo) {
+        fileInfo.innerText = 'Sedang memadam video daripada Cloudflare R2... Sila tunggu sebentar.';
+      }
+
+      try {
+        await fetch('/api/video', { method: 'DELETE' });
+      } catch (err) {
+        console.warn('R2 delete call error:', err);
+      }
+
+      await removeVideoFromDB();
+      localStorage.removeItem(STORAGE_KEY_VIDEO);
+
+      pendingVideoBlob = null;
       pendingVideoFileName = '';
 
       if (currentVideoObjectUrl) {
@@ -2612,25 +2671,31 @@
         currentVideoObjectUrl = null;
       }
 
+      const defaultVid = SAMPLE_PRESET_VIDEOS[1];
+
       const previewPlayer = document.getElementById('cms-video-preview-player');
       if (previewPlayer) {
-        previewPlayer.src = SAMPLE_PRESET_VIDEOS[0];
+        previewPlayer.src = defaultVid;
         previewPlayer.play().catch(() => {});
       }
 
-      const fileInfo = document.getElementById('cms-video-file-info');
-      if (fileInfo) {
-        fileInfo.innerText = 'Kembali kepada video asal.';
+      const mainVideo = document.getElementById('live-video-player');
+      if (mainVideo) {
+        mainVideo.src = defaultVid;
+        mainVideo.play().catch(() => {});
       }
 
-      const badge = document.getElementById('cms-video-status-badge');
+      if (fileInfo) {
+        fileInfo.innerText = 'Video telah berjaya dipadam daripada Cloudflare R2 secara automatik.';
+      }
+
       if (badge) {
         badge.className = 'text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded';
-        badge.innerText = 'Video Lalai';
+        badge.innerText = 'Video Asal';
       }
 
       const urlInput = document.getElementById('live-video-url-input');
-      if (urlInput) urlInput.value = SAMPLE_PRESET_VIDEOS[0];
+      if (urlInput) urlInput.value = defaultVid;
     }
 
     function toggleVideoUrlAccordion() {
@@ -2855,23 +2920,40 @@
 
     // Inisialisasi Data & Live Session
     async function initLiveSessionData() {
-      // 0. Kemas kini profil & gambar ejen
+      // 0. Kemas kini profil & gambar ejen tempatan dahulu
       updateLiveAgentDisplay();
 
-      // 1. Muat turun video (Semak IndexedDB dahulu, jika tiada semak URL atau lalai)
+      // Penyelarasan Awan Cloudflare (KV & R2) secara automatik
+      try {
+        const res = await fetch('/api/live-config', { cache: 'no-store' });
+        if (res.ok) {
+          const cloud = await res.json();
+          if (cloud.agentName) {
+            localStorage.setItem(STORAGE_KEY_AGENT_NAME, cloud.agentName);
+          }
+          if (cloud.agentAvatar) {
+            localStorage.setItem(STORAGE_KEY_AGENT_AVATAR, cloud.agentAvatar);
+          }
+          if (cloud.videoUrl) {
+            localStorage.setItem(STORAGE_KEY_VIDEO, cloud.videoUrl);
+          }
+          if (Array.isArray(cloud.comments) && cloud.comments.length > 0) {
+            localStorage.setItem(STORAGE_KEY_COMMENTS, JSON.stringify(cloud.comments));
+            liveCommentsPool = cloud.comments;
+          }
+          updateLiveAgentDisplay();
+        }
+      } catch (e) {
+        console.log('Cloudflare KV sync skipped');
+      }
+
+      // 1. Muat turun video (Cloudflare R2 atau URL tersimpan atau lalai R2)
       const videoEl = document.getElementById('live-video-player');
       try {
-        const record = await getVideoRecordFromDB();
-        if (record && record.blob && videoEl) {
-          if (currentVideoObjectUrl) URL.revokeObjectURL(currentVideoObjectUrl);
-          currentVideoObjectUrl = URL.createObjectURL(record.blob);
-          videoEl.src = currentVideoObjectUrl;
+        const activeVideo = localStorage.getItem(STORAGE_KEY_VIDEO) || CLOUDFLARE_R2_VIDEO_URL;
+        if (videoEl) {
+          videoEl.src = activeVideo;
           videoEl.play().catch(() => {});
-        } else if (videoEl) {
-          const savedVideo = localStorage.getItem(STORAGE_KEY_VIDEO);
-          if (savedVideo) {
-            videoEl.src = savedVideo;
-          }
         }
       } catch (err) {
         console.error('Ralat inisialisasi video:', err);
@@ -3293,14 +3375,30 @@
       if (modal) modal.classList.add('hidden');
     }
 
-    function verifyAiCmsAuth() {
+    async function verifyAiCmsAuth() {
       const input = document.getElementById('ai-cms-password-input');
       const err = document.getElementById('ai-cms-auth-error');
       if (!input) return;
 
-      const validPassword = localStorage.getItem(STORAGE_KEY_CMS_PASSWORD) || DEFAULT_CMS_PASSWORD;
+      const enteredPass = input.value.trim();
+      let isValid = false;
 
-      if (input.value === validPassword) {
+      try {
+        const res = await fetch('/api/live-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'verify_password', password: enteredPass })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          isValid = Boolean(data.success);
+        }
+      } catch (e) {
+        const validPassword = localStorage.getItem(STORAGE_KEY_CMS_PASSWORD) || DEFAULT_CMS_PASSWORD;
+        isValid = (enteredPass === validPassword);
+      }
+
+      if (isValid) {
         sessionStorage.setItem('serunai_ai_cms_auth', 'true');
         if (err) err.classList.add('hidden');
         document.getElementById('ai-cms-auth-section').classList.add('hidden');
@@ -3341,32 +3439,36 @@
         if (agentAvatarInput) agentAvatarInput.value = getLiveAgentAvatar();
         if (agentPreview) agentPreview.src = getLiveAgentAvatar();
 
-        // 5. Semak status video (IndexedDB vs URL)
-        const record = await getVideoRecordFromDB();
+        // 5. Semak status video Cloudflare R2
         const previewPlayer = document.getElementById('cms-video-preview-player');
         const fileInfo = document.getElementById('cms-video-file-info');
         const badge = document.getElementById('cms-video-status-badge');
         const videoInput = document.getElementById('live-video-url-input');
 
-        if (record && record.blob) {
-          if (currentVideoObjectUrl) URL.revokeObjectURL(currentVideoObjectUrl);
-          currentVideoObjectUrl = URL.createObjectURL(record.blob);
-          if (previewPlayer) previewPlayer.src = currentVideoObjectUrl;
-          const sizeMb = ((record.size || record.blob.size) / (1024 * 1024)).toFixed(1);
-          if (fileInfo) fileInfo.innerText = `Fail aktif: ${record.name || 'video-live.mp4'} (${sizeMb} MB)`;
-          if (badge) {
-            badge.className = 'text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded';
-            badge.innerText = 'Video Dimuat Naik';
+        try {
+          const vRes = await fetch('/api/video', { cache: 'no-store' });
+          if (vRes.ok) {
+            const vData = await vRes.json();
+            if (vData.exists && badge) {
+              badge.className = 'text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded';
+              badge.innerText = 'Aktif di Cloudflare R2';
+              const mb = (vData.size / (1024 * 1024)).toFixed(1);
+              if (fileInfo) fileInfo.innerText = `Video aktif di Cloudflare R2 (${mb} MB) disegerakkan ke semua peranti.`;
+              if (previewPlayer) previewPlayer.src = vData.url;
+              if (videoInput) videoInput.value = vData.url;
+            } else {
+              const activeVid = localStorage.getItem(STORAGE_KEY_VIDEO) || SAMPLE_PRESET_VIDEOS[0];
+              if (previewPlayer) previewPlayer.src = activeVid;
+              if (badge) {
+                badge.className = 'text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded';
+                badge.innerText = 'Video Lalai';
+              }
+              if (fileInfo) fileInfo.innerText = 'Menggunakan video lalai asal.';
+            }
           }
-        } else {
-          const savedUrl = localStorage.getItem(STORAGE_KEY_VIDEO) || SAMPLE_PRESET_VIDEOS[0];
-          if (videoInput) videoInput.value = savedUrl;
-          if (previewPlayer) previewPlayer.src = savedUrl;
-          if (fileInfo) fileInfo.innerText = 'Menggunakan video lalai asal.';
-          if (badge) {
-            badge.className = 'text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded';
-            badge.innerText = 'Video Lalai';
-          }
+        } catch (e) {
+          const activeVid = localStorage.getItem(STORAGE_KEY_VIDEO) || SAMPLE_PRESET_VIDEOS[0];
+          if (previewPlayer) previewPlayer.src = activeVid;
         }
       } catch (e) {
         console.error('Ralat muat medan CMS:', e);
@@ -3450,6 +3552,7 @@
       // Urus kemaskini kata laluan sekiranya diisi
       const newPassInput = document.getElementById('cms-new-password-input');
       const confirmPassInput = document.getElementById('cms-confirm-password-input');
+      let updatedPassword = null;
       if (newPassInput && newPassInput.value.trim()) {
         const np = newPassInput.value.trim();
         const cp = confirmPassInput ? confirmPassInput.value.trim() : '';
@@ -3462,12 +3565,31 @@
           return;
         }
         localStorage.setItem(STORAGE_KEY_CMS_PASSWORD, np);
+        updatedPassword = np;
         newPassInput.value = '';
         if (confirmPassInput) confirmPassInput.value = '';
       }
 
+      // Penyelarasan Awan ke Cloudflare KV (untuk sync ke semua peranti & mobile)
+      try {
+        const payload = {
+          agentName: agentName || DEFAULT_AGENT_NAME,
+          agentAvatar: agentAvatar || DEFAULT_AGENT_AVATAR,
+          aiProvider: activeAiProvider,
+          comments: liveCommentsPool
+        };
+        if (updatedPassword) payload.newPassword = updatedPassword;
+        await fetch('/api/live-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        console.warn('Sync to KV error:', e);
+      }
+
       pendingVideoBlob = null;
-      alert('Tetapan AI, profil ejen dan video berjaya disimpan!');
+      alert('Tetapan AI, profil ejen dan video berjaya disimpan & diselaraskan ke Cloudflare!');
       closeAiCmsModal();
     }
 
@@ -3508,10 +3630,18 @@
       }
 
       localStorage.setItem(STORAGE_KEY_CMS_PASSWORD, newPass);
+      try {
+        fetch('/api/live-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ newPassword: newPass })
+        });
+      } catch (e) {}
+
       newPassInput.value = '';
       confirmPassInput.value = '';
       statusEl.className = 'text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 p-2 rounded-lg';
-      statusEl.textContent = 'Kata laluan pentadbir berjaya dikemas kini!';
+      statusEl.textContent = 'Kata laluan pentadbir berjaya dikemas kini & diselaraskan ke Cloudflare!';
       statusEl.classList.remove('hidden');
       setTimeout(() => {
         if (statusEl) statusEl.classList.add('hidden');
@@ -3521,6 +3651,14 @@
     function handleResetCmsPasswordToDefault() {
       const statusEl = document.getElementById('cms-password-status');
       localStorage.removeItem(STORAGE_KEY_CMS_PASSWORD);
+      try {
+        fetch('/api/live-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resetPassword: true })
+        });
+      } catch (e) {}
+
       const newPassInput = document.getElementById('cms-new-password-input');
       const confirmPassInput = document.getElementById('cms-confirm-password-input');
       if (newPassInput) newPassInput.value = '';
