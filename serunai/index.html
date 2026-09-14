@@ -266,9 +266,23 @@
         </div>
 
         <!-- Live Comments Stream & Swipe Zone -->
-        <div id="live-comments-container" class="w-full pointer-events-none flex flex-col justify-end transition-all duration-300 ease-out">
-          <div id="live-comments-stream" class="max-h-40 sm:max-h-48 overflow-y-auto space-y-1.5 pr-12 no-scrollbar pointer-events-auto flex flex-col justify-end touch-pan-y cursor-grab active:cursor-grabbing">
+        <div id="live-comments-container" class="relative w-full pointer-events-none flex flex-col justify-end transition-all duration-300 ease-out">
+          <div
+            id="live-comments-stream"
+            onscroll="handleCommentsScroll()"
+            class="max-h-40 sm:max-h-48 overflow-y-auto space-y-1.5 pr-12 no-scrollbar pointer-events-auto flex flex-col touch-pan-y overscroll-contain"
+          >
             <!-- Dynamic comments here -->
+          </div>
+
+          <!-- Pill Terapung: Komen Baru di Bawah (TikTok Live Style) -->
+          <div
+            id="live-new-comments-pill"
+            onclick="scrollToLatestComments(event)"
+            class="hidden pointer-events-auto cursor-pointer self-start items-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg shadow-rose-600/40 backdrop-blur-md transition-all active:scale-95 mt-1 animate-bounce"
+          >
+            <svg class="w-3 h-3 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+            <span id="live-new-comments-text">Komen baru</span>
           </div>
         </div>
 
@@ -3608,11 +3622,75 @@
 
       stream.appendChild(card);
 
-      while (stream.children.length > 8) {
+      // Hadkan jumlah elemen dalam DOM kepada 40 komen terkini untuk kelancaran sambil membolehkan skrol ke atas
+      while (stream.children.length > 40) {
         stream.removeChild(stream.firstElementChild);
       }
 
-      stream.scrollTop = stream.scrollHeight;
+      const pill = document.getElementById('live-new-comments-pill');
+      const pillText = document.getElementById('live-new-comments-text');
+
+      if (isUserScrolledUp && animate) {
+        // Pengguna sedang membaca komen terdahulu di atas: JANGAN paksa skrol ke bawah!
+        unreadNewCommentsCount++;
+        if (pill) {
+          pill.classList.remove('hidden');
+          pill.classList.add('inline-flex');
+          if (pillText) {
+            pillText.innerText = unreadNewCommentsCount > 1 
+              ? `${unreadNewCommentsCount} Komen Baru` 
+              : 'Komen Baru';
+          }
+        }
+      } else {
+        // Pengguna berada di bawah: skrol ke bawah secara automatik
+        stream.scrollTop = stream.scrollHeight;
+        if (pill) {
+          pill.classList.add('hidden');
+          pill.classList.remove('inline-flex');
+        }
+      }
+    }
+
+    // ==========================================================
+    // KAWALAN SKROL KOMEN & NOTIFIKASI KOMEN BARU (TIKTOK LIVE)
+    // ==========================================================
+    let isUserScrolledUp = false;
+    let unreadNewCommentsCount = 0;
+
+    function handleCommentsScroll() {
+      const stream = document.getElementById('live-comments-stream');
+      const pill = document.getElementById('live-new-comments-pill');
+      if (!stream) return;
+
+      const distanceFromBottom = stream.scrollHeight - stream.scrollTop - stream.clientHeight;
+
+      if (distanceFromBottom > 45) {
+        isUserScrolledUp = true;
+      } else {
+        isUserScrolledUp = false;
+        unreadNewCommentsCount = 0;
+        if (pill) {
+          pill.classList.add('hidden');
+          pill.classList.remove('inline-flex');
+        }
+      }
+    }
+
+    function scrollToLatestComments(e) {
+      if (e) e.stopPropagation();
+      const stream = document.getElementById('live-comments-stream');
+      const pill = document.getElementById('live-new-comments-pill');
+      if (!stream) return;
+
+      isUserScrolledUp = false;
+      unreadNewCommentsCount = 0;
+      stream.scrollTo({ top: stream.scrollHeight, behavior: 'smooth' });
+
+      if (pill) {
+        pill.classList.add('hidden');
+        pill.classList.remove('inline-flex');
+      }
     }
 
     // ==========================================================
@@ -3966,6 +4044,8 @@
         isUserSent: true
       };
 
+      isUserScrolledUp = false;
+      unreadNewCommentsCount = 0;
       appendCommentToStream(userComment, true);
       textInput.value = '';
 
@@ -3976,7 +4056,7 @@
         if (lower.includes('mana') || lower.includes('lokasi') || lower.includes('where')) {
           reply = `Hai ${userName}, Residensi MADANI Serunai terletak di Presint 5 Putrajaya, hanya beberapa minit dari PICC dan kompleks kementerian!`;
         } else if (lower.includes('1st') || lower.includes('pertama') || lower.includes('first')) {
-          reply = `Hai ${userName}, pembeli rumah pertama layak dapat pinjaman penuh 100% serta pengecualian duti setem MOT percuma!`;
+          reply = `Hai ${userName}, pembeli rumah pertama layak dapat pakej Zero Downpayment serta Free SPA Legal Fee!`;
         } else if (lower.includes('parking') || lower.includes('kereta')) {
           reply = `Hai ${userName}, setiap unit 3 bilik lengkap disediakan dengan tempat letak kereta bertingkat khas.`;
         } else if (lower.includes('harga') || lower.includes('berapa') || lower.includes('price')) {
