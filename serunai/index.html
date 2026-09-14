@@ -1533,70 +1533,77 @@
           </div>
         </div>
 
-        <!-- Jadual Perincian Lengkap Brosur Rasmi KPKT (Susunan Menegak Ke Bawah) -->
-        <div class="bg-white p-5 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-3.5">
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Nama Hartanah</span>
-            <p class="text-lg font-extrabold text-slate-900">Residensi MADANI Serunai</p>
-          </div>
+        <!-- Jadual Perincian Lengkap Brosur Rasmi KPKT (Responsive: 1 Lajur Mobile, 2 Lajur Desktop) -->
+        <div class="bg-white p-5 sm:p-7 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-x-5 sm:gap-y-3.5">
+            <!-- 1. Nama & Kategori (Col-span 2 di Desktop) -->
+            <div class="border-b border-slate-100 pb-2.5 sm:col-span-2">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <div>
+                  <span class="text-xs uppercase font-bold text-slate-500 block mb-0.5">Nama Hartanah</span>
+                  <p class="text-lg font-extrabold text-slate-900">Residensi MADANI Serunai</p>
+                </div>
+                <div>
+                  <span class="text-xs uppercase font-bold text-slate-500 block mb-0.5">Skim Perumahan</span>
+                  <p class="text-xs sm:text-sm font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 inline-block">Harga Kawalan Kerajaan</p>
+                </div>
+              </div>
+            </div>
 
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Kategori &amp; Skim Perumahan</span>
-            <p class="text-base font-bold text-slate-900">Residensi MADANI Putrajaya (Harga Kawalan Kerajaan)</p>
-          </div>
+            <!-- 2. Pegangan Tanah & Bebanan Tanah -->
+            <div class="border-b border-slate-100 pb-2.5">
+              <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Pegangan Tanah</span>
+              <p class="text-base font-extrabold text-emerald-700">PEGANGAN KEKAL (FREEHOLD)</p>
+            </div>
+            <div class="border-b border-slate-100 pb-2.5">
+              <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Bebanan Tanah</span>
+              <p class="text-base font-bold text-slate-900">Tiada Bebanan Tanah (Bebas)</p>
+            </div>
 
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Lokasi &amp; Tapak Projek</span>
-            <p class="text-base font-bold text-slate-900">Lot PT 14595, Presint 5, 62000 Wilayah Persekutuan Putrajaya</p>
-          </div>
+            <!-- 3. Keluasan & Susun Atur -->
+            <div class="border-b border-slate-100 pb-2.5">
+              <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Keluasan Binaan</span>
+              <p class="text-base font-extrabold text-emerald-700">800 Kaki Persegi (kps)</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">8,500 mm &times; 10,510 mm</p>
+            </div>
+            <div class="border-b border-slate-100 pb-2.5">
+              <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Susun Atur Kediaman</span>
+              <p class="text-base font-bold text-slate-900">3 Bilik Tidur &amp; 2 Bilik Air</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Ruang Tamu, Dapur &amp; Halaman</p>
+            </div>
 
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Pegangan Tanah</span>
-            <p class="text-base font-extrabold text-emerald-700">PEGANGAN KEKAL (FREEHOLD)</p>
-          </div>
+            <!-- 4. Harga Jualan & Pakej -->
+            <div class="border-b border-slate-100 pb-2.5">
+              <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Harga Kawalan Jualan</span>
+              <p class="text-xl sm:text-2xl font-black text-emerald-600 leading-none">RM 200,000</p>
+              <p class="text-[11px] text-slate-500 mt-1">Ansuran dari ~RM900/bulan</p>
+            </div>
+            <div class="border-b border-slate-100 pb-2.5">
+              <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Pakej Istimewa</span>
+              <p class="text-sm sm:text-base font-bold text-emerald-700">Zero Downpayment</p>
+              <p class="text-[11px] text-slate-600 mt-0.5 font-medium">Free SPA Legal Fee &bull; 100% Loan</p>
+            </div>
 
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Bebanan Tanah</span>
-            <p class="text-base font-bold text-slate-900">Tiada Bebanan Tanah (Bebas)</p>
-          </div>
+            <!-- 5. Petak Parkir & Kepadatan Lif -->
+            <div class="border-b border-slate-100 pb-2.5">
+              <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Petak Letak Kereta</span>
+              <p class="text-sm font-bold text-slate-900">1 Petak Parkir Bertingkat</p>
+            </div>
+            <div class="border-b border-slate-100 pb-2.5">
+              <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Kepadatan &amp; Kemudahan Lif</span>
+              <p class="text-sm font-bold text-slate-900">587 Unit (Blok A) &bull; 3 Lif Lobi</p>
+            </div>
 
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Keluasan Binaan</span>
-            <p class="text-base sm:text-lg font-extrabold text-emerald-700">800 Kaki Persegi (kps)</p>
-            <p class="text-xs text-slate-500 mt-0.5">Ukuran: 8,500 mm &times; 10,510 mm</p>
-          </div>
+            <!-- 6. Lokasi & Tarikh Siap (Col-span 2 di Desktop) -->
+            <div class="border-b border-slate-100 pb-2.5 sm:col-span-2">
+              <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Lokasi Projek</span>
+              <p class="text-xs sm:text-sm font-bold text-slate-900">Lot PT 14595, Presint 5, 62000 Wilayah Persekutuan Putrajaya</p>
+            </div>
 
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Susun Atur Kediaman</span>
-            <p class="text-base font-bold text-slate-900">3 Bilik Tidur &amp; 2 Bilik Air</p>
-            <p class="text-xs text-slate-500 mt-0.5">Ruang Tamu, Ruang Makan, Dapur &amp; Halaman</p>
-          </div>
-
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Petak Letak Kereta</span>
-            <p class="text-base font-bold text-slate-900">1 Petak Parkir Bertingkat Disediakan</p>
-          </div>
-
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Kepadatan &amp; Kemudahan Lif</span>
-            <p class="text-base font-bold text-slate-900">587 Unit (Blok A) &bull; 22 Unit Setiap Tingkat &bull; 3 Lif Lobi</p>
-          </div>
-
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Harga Kawalan Jualan</span>
-            <p class="text-2xl font-black text-emerald-600 leading-none">RM 200,000</p>
-            <p class="text-xs text-slate-500 mt-1.5">Anggaran bayaran bulanan bermula sekitar ~RM900 sebulan</p>
-          </div>
-
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Pakej Istimewa Pembelian</span>
-            <p class="text-base font-bold text-emerald-700">Zero Downpayment &amp; Free SPA Legal Fee</p>
-            <p class="text-xs text-slate-500 mt-0.5">Kelayakan 100% pinjaman melalui LPPSA kerajaan atau bank panel swasta</p>
-          </div>
-
-          <div>
-            <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Jangkaan Siap Sepenuhnya</span>
-            <p class="text-base font-bold text-slate-900">Suku Ketiga 2030 (Q3 2030)</p>
+            <div class="sm:col-span-2">
+              <span class="text-xs uppercase font-bold text-slate-500 block mb-1">Jangkaan Siap Sepenuhnya</span>
+              <p class="text-sm font-bold text-slate-900">Suku Ketiga 2030 (Q3 2030)</p>
+            </div>
           </div>
         </div>
       </div>
@@ -4509,16 +4516,91 @@
     const HEART_COLORS = ['#ff2d55', '#ff375f', '#fbbf24', '#f43f5e', '#a855f7', '#06b6d4', '#ffffff'];
 
     const ACTIVITIES = [
-      { id: 1, type: 'borang', text: 'Farhan baru sahaja mengisi borang semakan kelayakan (3 Bilik)', badge: 'Service+' },
+      // 1. Borang Semakan Kelayakan & Permohonan (Service+)
+      { id: 1, type: 'borang', text: 'Farhan baru mengisi borang semakan kelayakan (3 Bilik)', badge: 'Service+' },
       { id: 2, type: 'join', text: 'Danish Iskandar menyertai siaran langsung', badge: 'JOIN' },
       { id: 3, type: 'viewing', text: 'Puan Farah & Suami sahkan viewing slot Presint 5 Sabtu 11:00 AM', badge: 'Viewing' },
       { id: 4, type: 'join', text: 'Nurul Hidayah menyertai siaran langsung', badge: 'JOIN' },
       { id: 5, type: 'borang', text: 'Siti Noraini selesai semak kelayakan pakej pinjaman 100%', badge: 'Service+' },
-      { id: 6, type: 'join', text: 'Khairul Anwar menyertai siaran langsung', badge: 'JOIN' },
+      { id: 6, type: 'join', text: 'Khairul Anwar (Presint 9) menyertai siaran langsung', badge: 'JOIN' },
       { id: 7, type: 'viewing', text: 'Dr. Nizam tempah slot viewing show unit Presint 5', badge: 'Viewing' },
       { id: 8, type: 'borang', text: 'Amirul hantar borang konsultasi Residensi Serunai RM200k', badge: 'Service+' },
       { id: 9, type: 'join', text: 'Shahril Nizam menyertai siaran langsung', badge: 'JOIN' },
-      { id: 10, type: 'viewing', text: 'En. Azman lock viewing slot show unit Ahad 2:30 PM', badge: 'Viewing' }
+      { id: 10, type: 'viewing', text: 'En. Azman lock viewing slot show unit Ahad 2:30 PM', badge: 'Viewing' },
+      { id: 11, type: 'borang', text: 'Zulhelmi (Kakitangan JPM) baru mengisi borang semakan LPPSA', badge: 'Service+' },
+      { id: 12, type: 'share', text: 'Afiqah berkongsi siaran langsung ke grup WhatsApp keluarga', badge: 'KONGSI' },
+      { id: 13, type: 'join', text: 'Faiz Subri (Presint 11) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 14, type: 'borang', text: 'Puan Zakiah semak kelayakan pinjaman bersama suami (Joint Loan)', badge: 'Service+' },
+      { id: 15, type: 'viewing', text: 'Hafiz (Cyberjaya) sahkan kehadiran taklimat rumah pertama', badge: 'Viewing' },
+      { id: 16, type: 'like', text: 'Irfan Hakimi menghantar 50 tanda suka', badge: 'SUKA' },
+      { id: 17, type: 'borang', text: 'Muhammad Syafiq hantar permohonan semakan kuota Presint 5', badge: 'Service+' },
+      { id: 18, type: 'join', text: 'Mastura (Presint 15) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 19, type: 'viewing', text: 'Cikgu Rosli lock viewing slot show gallery Sabtu 3:00 PM', badge: 'Viewing' },
+      { id: 20, type: 'borang', text: 'Wan Azlan (Pekerja Swasta KL) selesai isi borang kelayakan', badge: 'Service+' },
+      { id: 21, type: 'join', text: 'Aisyah Humaira menyertai siaran langsung', badge: 'JOIN' },
+      { id: 22, type: 'share', text: 'Kamal Ariff berkongsi siaran langsung ke media sosial', badge: 'KONGSI' },
+      { id: 23, type: 'borang', text: 'Puan Salmah (Presint 8) semak kelayakan pakej Zero Downpayment', badge: 'Service+' },
+      { id: 24, type: 'join', text: 'Tengku Haris (Presint 10) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 25, type: 'viewing', text: 'Dr. Azizah tempah sesi konsultasi pinjaman LPPSA Presint 5', badge: 'Viewing' },
+      { id: 26, type: 'borang', text: 'Fikri Ramli hantar borang semakan pembiayaan bank 100%', badge: 'Service+' },
+      { id: 27, type: 'join', text: 'Nabila Huda (Bangi) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 28, type: 'viewing', text: 'Ahmad Syakir lock viewing slot show unit Sabtu 10:30 AM', badge: 'Viewing' },
+      { id: 29, type: 'borang', text: 'Razif (Kementerian Kewangan) selesai hantar dokumen semakan', badge: 'Service+' },
+      { id: 30, type: 'like', text: 'Siti Aishah menghantar 100 tanda suka', badge: 'SUKA' },
+      { id: 31, type: 'join', text: 'Firdaus (Presint 14) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 32, type: 'borang', text: 'Puan Rohani semak kelayakan skim rumah pertama Freehold', badge: 'Service+' },
+      { id: 33, type: 'viewing', text: 'Helmi & Isteri sahkan slot viewing show unit Ahad 11:30 AM', badge: 'Viewing' },
+      { id: 34, type: 'join', text: 'Danial Asyraf menyertai siaran langsung', badge: 'JOIN' },
+      { id: 35, type: 'borang', text: 'Amran (Kakitangan KKM) selesai semak kelayakan pinjaman penuh', badge: 'Service+' },
+      { id: 36, type: 'share', text: 'Farah Nabilah berkongsi siaran langsung kepada rakan sekerja', badge: 'KONGSI' },
+      { id: 37, type: 'join', text: 'Syed Muzaffar (Presint 16) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 38, type: 'borang', text: 'Puan Norashikin hantar borang semakan pakej Free SPA Legal Fee', badge: 'Service+' },
+      { id: 39, type: 'viewing', text: 'Zulfaqar lock viewing slot Presint 5 Sabtu 4:00 PM', badge: 'Viewing' },
+      { id: 40, type: 'join', text: 'Hakim Luqman menyertai siaran langsung', badge: 'JOIN' },
+      { id: 41, type: 'borang', text: 'Izzat (Pekerja IT Cyberjaya) selesai semak kelayakan gaji bersih', badge: 'Service+' },
+      { id: 42, type: 'viewing', text: 'Puan Marina tempah slot konsultasi pembiayaan perumahan', badge: 'Viewing' },
+      { id: 43, type: 'join', text: 'Nazrin Shah menyertai siaran langsung', badge: 'JOIN' },
+      { id: 44, type: 'borang', text: 'Hasnol (Presint 18) isi borang semakan ansuran RM900 sebulan', badge: 'Service+' },
+      { id: 45, type: 'share', text: 'Suraya berkongsi siaran langsung', badge: 'KONGSI' },
+      { id: 46, type: 'join', text: 'Khairun Nisa menyertai siaran langsung', badge: 'JOIN' },
+      { id: 47, type: 'viewing', text: 'Megat Iskandar sahkan viewing slot show unit Ahad 4:30 PM', badge: 'Viewing' },
+      { id: 48, type: 'borang', text: 'Azizi hantar permohonan semakan kelayakan 3 bilik Presint 5', badge: 'Service+' },
+      { id: 49, type: 'join', text: 'Liyana (Dengkil) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 50, type: 'borang', text: 'Encik Badrul selesai kiraan kelayakan pinjaman perumahan', badge: 'Service+' },
+      { id: 51, type: 'join', text: 'Fatin Amira menyertai siaran langsung', badge: 'JOIN' },
+      { id: 52, type: 'viewing', text: 'Zahidi lock viewing slot sesi petang Sabtu 2:00 PM', badge: 'Viewing' },
+      { id: 53, type: 'borang', text: 'Puan Haryati (Presint 5) semak kelayakan unit berdekatan sekolah', badge: 'Service+' },
+      { id: 54, type: 'join', text: 'Syakir Danial (Presint 4) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 55, type: 'borang', text: 'Haziq (Kakitangan Awam Putrajaya) selesai hantar borang semak', badge: 'Service+' },
+      { id: 56, type: 'share', text: 'Munirah berkongsi siaran langsung ke grup perumahan', badge: 'KONGSI' },
+      { id: 57, type: 'join', text: 'Ashraf (Sepang) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 58, type: 'viewing', text: 'Puan Zaleha sahkan temujanji konsultasi kewangan Ahad 10:00 AM', badge: 'Viewing' },
+      { id: 59, type: 'borang', text: 'Ikhwan hantar borang semakan kuota 587 unit Residensi Serunai', badge: 'Service+' },
+      { id: 60, type: 'join', text: 'Nadiah (Presint 11) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 61, type: 'borang', text: 'Cikgu Shahrul selesai semak kelayakan pinjaman LPPSA kerajaan', badge: 'Service+' },
+      { id: 62, type: 'like', text: 'Fadzil menghantar 50 tanda suka', badge: 'SUKA' },
+      { id: 63, type: 'join', text: 'Puan Intan (Kuala Lumpur) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 64, type: 'viewing', text: 'Rizal & Pasangan lock slot viewing show gallery Sabtu 1:30 PM', badge: 'Viewing' },
+      { id: 65, type: 'borang', text: 'Najib hantar borang semakan pakej pembiayaan 100% RM200k', badge: 'Service+' },
+      { id: 66, type: 'join', text: 'Shafiqah menyertai siaran langsung', badge: 'JOIN' },
+      { id: 67, type: 'borang', text: 'Puan Maznah selesai semak syarat kelayakan rumah pertama MADANI', badge: 'Service+' },
+      { id: 68, type: 'join', text: 'Taufiq (Puchong) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 69, type: 'viewing', text: 'Ustaz Hamdan sahkan slot viewing show unit Ahad 12:00 PM', badge: 'Viewing' },
+      { id: 70, type: 'borang', text: 'Adibah baru mengisi borang semakan kelayakan Presint 5', badge: 'Service+' },
+      { id: 71, type: 'join', text: 'Harith Iskandar menyertai siaran langsung', badge: 'JOIN' },
+      { id: 72, type: 'borang', text: 'Khairul Izzat hantar borang permohonan Residensi MADANI', badge: 'Service+' },
+      { id: 73, type: 'viewing', text: 'Syahrin tempah slot konsultasi rumah pertama Sabtu 5:00 PM', badge: 'Viewing' },
+      { id: 74, type: 'join', text: 'Siti Nurhaliza (Presint 18) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 75, type: 'borang', text: 'Noraisyah (Kakitangan JPA) semak kelayakan pinjaman LPPSA', badge: 'Service+' },
+      { id: 76, type: 'share', text: 'Hanif berkongsi siaran langsung ke kenalan Putrajaya', badge: 'KONGSI' },
+      { id: 77, type: 'join', text: 'Amir Hamzah (Kajang) menyertai siaran langsung', badge: 'JOIN' },
+      { id: 78, type: 'viewing', text: 'Puan Fauziah sahkan slot perjumpaan penasihat hartanah Ahad', badge: 'Viewing' },
+      { id: 79, type: 'like', text: 'Nur Sabrina menghantar 100 tanda suka', badge: 'SUKA' },
+      { id: 80, type: 'borang', text: 'Hafizuddin selesai hantar dokumen permohonan unit 800 kps', badge: 'Service+' },
+      { id: 81, type: 'join', text: 'Syazwani menyertai siaran langsung', badge: 'JOIN' },
+      { id: 82, type: 'viewing', text: 'Cikgu Zulkifli lock viewing slot show unit Presint 5 Sabtu 12:30 PM', badge: 'Viewing' },
+      { id: 83, type: 'borang', text: 'Puan Suhana semak kelayakan skim pembiayaan Zero Downpayment', badge: 'Service+' },
+      { id: 84, type: 'join', text: 'Iskandar Zul (Presint 1) menyertai siaran langsung', badge: 'JOIN' }
     ];
 
     // Inisialisasi Data & Live Session
@@ -4919,6 +5001,14 @@
     // Notifikasi Aktiviti Berkala (Join / Borang / Viewing)
     function startActivityNotifications() {
       if (activityNotificationInterval) clearInterval(activityNotificationInterval);
+      
+      // Salin dan rawakkan senarai notifikasi untuk mengelakkan corak berulang
+      let activeList = [...ACTIVITIES];
+      for (let i = activeList.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [activeList[i], activeList[j]] = [activeList[j], activeList[i]];
+      }
+
       let actIdx = 0;
       const inner = document.getElementById('live-activity-inner');
       const pill = document.getElementById('live-activity-pill');
@@ -4928,8 +5018,16 @@
 
       function showNext() {
         if (!inner || !pill) return;
-        const act = ACTIVITIES[actIdx];
-        actIdx = (actIdx + 1) % ACTIVITIES.length;
+        if (actIdx >= activeList.length) {
+          actIdx = 0;
+          // Rawakkan semula setiap kali kitaran selesai
+          for (let i = activeList.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [activeList[i], activeList[j]] = [activeList[j], activeList[i]];
+          }
+        }
+        const act = activeList[actIdx];
+        actIdx++;
 
         badgeEl.innerText = act.badge;
         textEl.innerText = act.text;
@@ -4942,6 +5040,14 @@
           pill.className = 'px-2.5 py-1 rounded-2xl border text-[11px] leading-tight flex items-center gap-1.5 bg-amber-400 text-neutral-950 font-bold border-amber-300 shadow-lg shadow-amber-400/20';
           badgeEl.className = 'text-[8.5px] uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-neutral-950/20 text-neutral-950 font-black';
           iconEl.innerHTML = '<svg class="w-3 h-3 shrink-0 text-neutral-950" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>';
+        } else if (act.type === 'share') {
+          pill.className = 'px-2.5 py-1 rounded-2xl border text-[11px] leading-tight flex items-center gap-1.5 bg-purple-600/90 text-white border-purple-400/40 shadow-lg shadow-purple-600/20 backdrop-blur-md';
+          badgeEl.className = 'text-[8.5px] uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-white/20 text-white font-extrabold';
+          iconEl.innerHTML = '<svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>';
+        } else if (act.type === 'like') {
+          pill.className = 'px-2.5 py-1 rounded-2xl border text-[11px] leading-tight flex items-center gap-1.5 bg-rose-600/90 text-white border-rose-400/40 shadow-lg shadow-rose-600/20 backdrop-blur-md';
+          badgeEl.className = 'text-[8.5px] uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-white/20 text-white font-extrabold';
+          iconEl.innerHTML = '<svg class="w-3 h-3 shrink-0 fill-current" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
         } else {
           pill.className = 'px-2.5 py-1 rounded-2xl border text-[11px] leading-tight flex items-center gap-1.5 bg-emerald-600/90 text-white border-emerald-400/40 shadow-lg shadow-emerald-600/20 backdrop-blur-md';
           badgeEl.className = 'text-[8.5px] uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-white/20 text-white font-extrabold';
@@ -4958,7 +5064,7 @@
       }
 
       showNext();
-      activityNotificationInterval = setInterval(showNext, 7500);
+      activityNotificationInterval = setInterval(showNext, 6800);
     }
 
     // Pemasa Undur Tawaran Kad Pin
