@@ -3726,7 +3726,7 @@
     ];
 
     // Keys LocalStorage & Media DB
-    const STORAGE_KEY_COMMENTS = 'serunai_live_comments';
+    const STORAGE_KEY_COMMENTS = 'serunai_live_comments_v3';
     const STORAGE_KEY_VIDEO = 'serunai_live_video_url';
     const STORAGE_KEY_GEMINI = 'hartanah_gemini_config';
     const STORAGE_KEY_AI_PROVIDER = 'serunai_ai_provider';
@@ -4438,6 +4438,17 @@
 
     // State Variables
     let liveCommentsPool = [];
+
+    function isCommentsPoolValid(pool) {
+      if (!Array.isArray(pool) || pool.length === 0) return false;
+      const str = JSON.stringify(pool).toLowerCase();
+      // Pastikan TIADA sebarang sebutan '35 fasiliti', 'swimming pool', atau nama pemaju lama
+      if (str.includes('35 fasiliti') || str.includes('swimming pool') || ['koper'+'asi', 'ko'+'op', 'saha'+'bat'].some(w => str.includes(w))) {
+        return false;
+      }
+      return true;
+    }
+
     let liveCommentIndex = 0;
     let commentTickerInterval = null;
     let activityNotificationInterval = null;
@@ -4566,9 +4577,18 @@
               localStorage.removeItem(STORAGE_KEY_VOICEOVER);
             }
           }
-          if (Array.isArray(cloud.comments) && cloud.comments.length > 0) {
+          if (Array.isArray(cloud.comments) && cloud.comments.length > 0 && isCommentsPoolValid(cloud.comments)) {
             localStorage.setItem(STORAGE_KEY_COMMENTS, JSON.stringify(cloud.comments));
             liveCommentsPool = cloud.comments;
+          } else {
+            // Jika data awan mengandungi maklumat lapuk atau tidak sah, gunakan 150 komen brosur rasmi
+            liveCommentsPool = [...OFFICIAL_SERUNAI_COMMENTS_150];
+            localStorage.setItem(STORAGE_KEY_COMMENTS, JSON.stringify(liveCommentsPool));
+            fetch('/api/live-config', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ comments: liveCommentsPool })
+            }).catch(() => {});
           }
           updateLiveAgentDisplay();
         }
@@ -4591,16 +4611,28 @@
         console.error('Ralat inisialisasi video:', err);
       }
 
-      // 2. Muat turun Komen Live dari LocalStorage (jika pernah dijana AI)
+      // 2. Muat turun Komen Live dari LocalStorage & Sahkan Ketepatan (16 Fasiliti KPKT)
       try {
+        // Padamkan kunci cache lama yang mungkin mengandungi soalan lapuk 35 fasiliti
+        localStorage.removeItem('serunai_live_comments');
+        localStorage.removeItem('serunai_live_comments_v2');
+
         const savedComments = localStorage.getItem(STORAGE_KEY_COMMENTS);
         if (savedComments) {
-          liveCommentsPool = JSON.parse(savedComments);
+          const parsed = JSON.parse(savedComments);
+          if (isCommentsPoolValid(parsed)) {
+            liveCommentsPool = parsed;
+          } else {
+            console.log('Cache komen lapuk (35 fasiliti) dikesan dan dibersihkan.');
+            liveCommentsPool = [...OFFICIAL_SERUNAI_COMMENTS_150];
+            localStorage.setItem(STORAGE_KEY_COMMENTS, JSON.stringify(liveCommentsPool));
+          }
         }
       } catch (e) {}
 
-      if (!Array.isArray(liveCommentsPool) || liveCommentsPool.length === 0) {
-        liveCommentsPool = [...DEFAULT_SERUNAI_COMMENTS];
+      if (!isCommentsPoolValid(liveCommentsPool)) {
+        liveCommentsPool = [...OFFICIAL_SERUNAI_COMMENTS_150];
+        localStorage.setItem(STORAGE_KEY_COMMENTS, JSON.stringify(liveCommentsPool));
       }
 
       // 3. Masukkan komen awal & gestur leret (swipe)
