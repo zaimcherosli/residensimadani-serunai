@@ -370,7 +370,7 @@
           <input
             id="ai-cms-password-input"
             type="password"
-            placeholder="Kata laluan (Lalai: admin123)"
+            placeholder="Kata laluan"
             onkeydown="if(event.key==='Enter') verifyAiCmsAuth()"
             class="flex-1 px-3.5 py-2.5 text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none"
           />
@@ -720,7 +720,79 @@
           </div>
         </div>
 
-        <!-- 6. Butang Reset & Simpan -->
+        <!-- 6. Tetapan Kata Laluan Pentadbir (Edit Password) -->
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-900">Kata Laluan Pentadbir (CMS)</span>
+            <span class="text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded">Keselamatan</span>
+          </div>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            Tukar kata laluan untuk mengawal akses ke panel Admin AI CMS ini.
+          </p>
+
+          <div class="space-y-2">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10.5px] font-bold text-slate-700 mb-1">Kata Laluan Baharu</label>
+                <div class="relative">
+                  <input
+                    id="cms-new-password-input"
+                    type="password"
+                    placeholder="Kata laluan baharu"
+                    class="w-full px-3 py-1.5 pr-8 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onclick="togglePasswordInputVisibility('cms-new-password-input')"
+                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[10px]"
+                    title="Papar/Sembunyi"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10.5px] font-bold text-slate-700 mb-1">Sahkan Kata Laluan</label>
+                <div class="relative">
+                  <input
+                    id="cms-confirm-password-input"
+                    type="password"
+                    placeholder="Ulang kata laluan"
+                    class="w-full px-3 py-1.5 pr-8 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onclick="togglePasswordInputVisibility('cms-confirm-password-input')"
+                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[10px]"
+                    title="Papar/Sembunyi"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              <button
+                type="button"
+                onclick="handleUpdateCmsPassword()"
+                class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-3.5 py-1.5 rounded-xl text-xs transition shadow-sm"
+              >
+                Kemas Kini Kata Laluan
+              </button>
+              <button
+                type="button"
+                onclick="handleResetCmsPasswordToDefault()"
+                class="text-[10.5px] text-slate-500 hover:text-slate-800 underline font-medium"
+              >
+                Kembalikan Lalai
+              </button>
+            </div>
+            <div id="cms-password-status" class="text-[11px] font-medium hidden"></div>
+          </div>
+        </div>
+
+        <!-- 7. Butang Reset & Simpan -->
         <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
           <button
             type="button"
@@ -2427,6 +2499,8 @@
     const STORAGE_KEY_AGENTROUTER = 'serunai_agentrouter_config';
     const STORAGE_KEY_AGENT_NAME = 'serunai_live_agent_name';
     const STORAGE_KEY_AGENT_AVATAR = 'serunai_live_agent_avatar';
+    const STORAGE_KEY_CMS_PASSWORD = 'serunai_ai_cms_password';
+    const DEFAULT_CMS_PASSWORD = 'admin123';
     const DEFAULT_AGENT_NAME = 'Zaim Rosli';
     const DEFAULT_AGENT_AVATAR = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80';
     let activeAiProvider = 'gemini';
@@ -3224,7 +3298,9 @@
       const err = document.getElementById('ai-cms-auth-error');
       if (!input) return;
 
-      if (input.value === 'admin123') {
+      const validPassword = localStorage.getItem(STORAGE_KEY_CMS_PASSWORD) || DEFAULT_CMS_PASSWORD;
+
+      if (input.value === validPassword) {
         sessionStorage.setItem('serunai_ai_cms_auth', 'true');
         if (err) err.classList.add('hidden');
         document.getElementById('ai-cms-auth-section').classList.add('hidden');
@@ -3371,9 +3447,92 @@
         }
       }
 
+      // Urus kemaskini kata laluan sekiranya diisi
+      const newPassInput = document.getElementById('cms-new-password-input');
+      const confirmPassInput = document.getElementById('cms-confirm-password-input');
+      if (newPassInput && newPassInput.value.trim()) {
+        const np = newPassInput.value.trim();
+        const cp = confirmPassInput ? confirmPassInput.value.trim() : '';
+        if (np !== cp) {
+          alert('Kata laluan baharu dan pengesahan tidak sepadan.');
+          return;
+        }
+        if (np.length < 4) {
+          alert('Kata laluan baharu mestilah sekurang-kurangnya 4 aksara.');
+          return;
+        }
+        localStorage.setItem(STORAGE_KEY_CMS_PASSWORD, np);
+        newPassInput.value = '';
+        if (confirmPassInput) confirmPassInput.value = '';
+      }
+
       pendingVideoBlob = null;
       alert('Tetapan AI, profil ejen dan video berjaya disimpan!');
       closeAiCmsModal();
+    }
+
+    function togglePasswordInputVisibility(inputId) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function handleUpdateCmsPassword() {
+      const newPassInput = document.getElementById('cms-new-password-input');
+      const confirmPassInput = document.getElementById('cms-confirm-password-input');
+      const statusEl = document.getElementById('cms-password-status');
+      if (!newPassInput || !confirmPassInput || !statusEl) return;
+
+      const newPass = newPassInput.value.trim();
+      const confirmPass = confirmPassInput.value.trim();
+
+      if (!newPass) {
+        statusEl.className = 'text-[11px] font-medium text-rose-600 bg-rose-50 border border-rose-200 p-2 rounded-lg';
+        statusEl.textContent = 'Sila masukkan kata laluan baharu.';
+        statusEl.classList.remove('hidden');
+        return;
+      }
+
+      if (newPass.length < 4) {
+        statusEl.className = 'text-[11px] font-medium text-rose-600 bg-rose-50 border border-rose-200 p-2 rounded-lg';
+        statusEl.textContent = 'Kata laluan baharu mestilah sekurang-kurangnya 4 aksara.';
+        statusEl.classList.remove('hidden');
+        return;
+      }
+
+      if (newPass !== confirmPass) {
+        statusEl.className = 'text-[11px] font-medium text-rose-600 bg-rose-50 border border-rose-200 p-2 rounded-lg';
+        statusEl.textContent = 'Kata laluan baharu dan pengesahan tidak sepadan.';
+        statusEl.classList.remove('hidden');
+        return;
+      }
+
+      localStorage.setItem(STORAGE_KEY_CMS_PASSWORD, newPass);
+      newPassInput.value = '';
+      confirmPassInput.value = '';
+      statusEl.className = 'text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 p-2 rounded-lg';
+      statusEl.textContent = 'Kata laluan pentadbir berjaya dikemas kini!';
+      statusEl.classList.remove('hidden');
+      setTimeout(() => {
+        if (statusEl) statusEl.classList.add('hidden');
+      }, 4000);
+    }
+
+    function handleResetCmsPasswordToDefault() {
+      const statusEl = document.getElementById('cms-password-status');
+      localStorage.removeItem(STORAGE_KEY_CMS_PASSWORD);
+      const newPassInput = document.getElementById('cms-new-password-input');
+      const confirmPassInput = document.getElementById('cms-confirm-password-input');
+      if (newPassInput) newPassInput.value = '';
+      if (confirmPassInput) confirmPassInput.value = '';
+      if (statusEl) {
+        statusEl.className = 'text-[11px] font-medium text-slate-700 bg-slate-100 border border-slate-200 p-2 rounded-lg';
+        statusEl.textContent = 'Kata laluan pentadbir telah dikembalikan ke tetapan lalai.';
+        statusEl.classList.remove('hidden');
+        setTimeout(() => {
+          if (statusEl) statusEl.classList.add('hidden');
+        }, 4000);
+      }
     }
 
     async function handleTestGemini() {
