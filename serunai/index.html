@@ -106,6 +106,21 @@
       mask-image: linear-gradient(to top, black 80%, transparent 100%);
       -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%);
     }
+    .slide-item {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 6s cubic-bezier(0.25, 1, 0.5, 1);
+      transform: scale(1);
+    }
+    .slide-item.active {
+      opacity: 1;
+      transform: scale(1.08);
+      z-index: 1;
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans antialiased pb-20 md:pb-0">
@@ -122,7 +137,7 @@
       class="relative aspect-[9/16] h-full max-h-[100dvh] w-auto max-w-full overflow-hidden bg-black select-none cursor-pointer mx-auto shadow-2xl"
     >
       <!-- Video Stream Background: 9:16 Mobile Portrait -->
-      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div id="live-video-wrapper" class="absolute inset-0 overflow-hidden pointer-events-none">
         <video
           id="live-video-player"
           src="https://pub-b41a57c40e74430eb994919066288290.r2.dev/serunai/video-live.mp4"
@@ -137,14 +152,30 @@
         <div class="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black/95 via-black/60 to-transparent pointer-events-none"></div>
       </div>
 
+      <!-- Slideshow Background (TikTok Photo Mode): 9:16 Mobile Portrait -->
+      <div id="live-slideshow-wrapper" class="hidden absolute inset-0 overflow-hidden pointer-events-none select-none">
+        <div id="live-slides-track" class="relative w-full h-full">
+          <!-- Slaid gambar disuntik secara dinamik -->
+        </div>
+        <!-- Indikator Slaid Minimalis (cth: 1 / 3) -->
+        <div class="absolute top-16 right-3 z-10 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-white/20 tracking-wider">
+          <span id="slideshow-current-index">1</span> / <span id="slideshow-total-count">3</span>
+        </div>
+        <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/80 via-black/30 to-transparent pointer-events-none"></div>
+        <div class="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black/95 via-black/60 to-transparent pointer-events-none"></div>
+      </div>
+
+      <!-- Pemain Audio Voiceover (Latar) -->
+      <audio id="live-voiceover-player" loop playsinline preload="auto" class="hidden"></audio>
+
       <!-- Container Animasi Hati Terapung -->
       <div id="hearts-container" class="absolute inset-0 pointer-events-none overflow-hidden z-20"></div>
 
       <!-- Top Header -->
       <div class="absolute top-3 inset-x-3 z-30 flex items-center justify-between text-white pointer-events-none">
         <!-- Agent Host Pill -->
-        <div class="flex items-center gap-2 bg-black/60 backdrop-blur-md rounded-full py-1 pl-1 pr-2.5 border border-white/10 pointer-events-auto">
-          <div class="relative">
+        <div class="flex items-center gap-1.5 sm:gap-2 bg-black/60 backdrop-blur-md rounded-full py-1 pl-1 pr-2 sm:pr-2.5 border border-white/10 pointer-events-auto min-w-0 shrink max-w-[58%] sm:max-w-none">
+          <div class="relative shrink-0">
             <img
               id="live-host-avatar"
               src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80"
@@ -155,8 +186,8 @@
               <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
             </span>
           </div>
-          <div class="flex flex-col">
-            <span id="live-host-name" class="text-xs font-bold leading-tight truncate max-w-[100px] sm:max-w-[130px]">
+          <div class="flex flex-col min-w-0">
+            <span id="live-host-name" class="text-xs font-bold leading-tight truncate max-w-[70px] sm:max-w-[120px]">
               Zaim Rosli
             </span>
             <span id="live-likes-header" class="text-[10px] text-neutral-300 font-medium leading-none tabular-nums">
@@ -167,9 +198,9 @@
             id="follow-btn"
             type="button"
             onclick="toggleFollowAgent(event)"
-            class="ml-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all active:scale-95 flex items-center gap-1 bg-rose-600 hover:bg-rose-500 text-white"
+            class="ml-0.5 sm:ml-1 px-2 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0 transition-all active:scale-95 flex items-center justify-center bg-rose-600 hover:bg-rose-500 text-white"
           >
-            + FOLLOW
+            FOLLOW
           </button>
         </div>
 
@@ -234,11 +265,21 @@
           </div>
         </div>
 
-        <!-- Live Comments Stream -->
-        <div class="w-full pointer-events-none flex flex-col justify-end transition-all duration-300">
-          <div id="live-comments-stream" class="max-h-40 sm:max-h-48 overflow-y-auto space-y-1.5 pr-12 no-scrollbar pointer-events-auto flex flex-col justify-end">
+        <!-- Live Comments Stream & Swipe Zone -->
+        <div id="live-comments-container" class="w-full pointer-events-none flex flex-col justify-end transition-all duration-300 ease-out">
+          <div id="live-comments-stream" class="max-h-40 sm:max-h-48 overflow-y-auto space-y-1.5 pr-12 no-scrollbar pointer-events-auto flex flex-col justify-end touch-pan-y cursor-grab active:cursor-grabbing">
             <!-- Dynamic comments here -->
           </div>
+        </div>
+
+        <!-- Pill Penunjuk Apabila Komen Disembunyikan (Slide Kanan / Klik untuk Buka Semula) -->
+        <div
+          id="live-comments-restore-tab"
+          onclick="unhideLiveComments(event)"
+          class="hidden pointer-events-auto cursor-pointer self-start items-center gap-1.5 bg-black/75 hover:bg-black backdrop-blur-md px-2.5 py-1 rounded-full text-white text-[10px] font-bold border border-white/20 shadow-lg transition-all active:scale-95 animate-pulse"
+        >
+          <svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+          <span>Komen disembunyikan &bull; Buka komen</span>
         </div>
 
         <!-- Pinned Offer Card (Residensi MADANI Serunai Flash Sale) -->
@@ -576,84 +617,193 @@
           <div id="ai-generate-status" class="text-[11px] font-medium hidden"></div>
         </div>
 
-        <!-- 4. Muat Naik Video Siaran Langsung (Cloudflare R2) -->
+        <!-- 4. Pilihan Mod Media & Paparan (Video vs Slideshow Gambar) -->
         <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
           <div class="flex items-center justify-between">
-            <span class="font-bold text-slate-900">Video Siaran Langsung (Cloudflare R2)</span>
-            <span id="cms-video-status-badge" class="text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded">Memeriksa...</span>
+            <span class="font-bold text-slate-900">Mod Media Siaran Langsung</span>
+            <span id="cms-media-mode-badge" class="text-[10px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.5 rounded">Mod Video</span>
           </div>
 
-          <!-- Video Preview Container -->
-          <div id="cms-video-preview-wrapper" class="relative rounded-xl overflow-hidden bg-black aspect-video max-h-36 flex items-center justify-center border border-slate-300">
-            <video
-              id="cms-video-preview-player"
-              muted
-              playsinline
-              loop
-              controls
-              class="w-full h-full object-cover"
-            ></video>
-          </div>
-
-          <!-- File Info & Action Buttons -->
-          <div class="space-y-2">
-            <div id="cms-video-file-info" class="text-[11px] text-slate-600 truncate font-medium">
-              Video disimpan di Cloudflare R2 & disegerakkan ke semua telefon dan komputer.
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2">
-              <label class="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                Muat Naik Video Baharu (R2)
-                <input
-                  id="live-video-file-input"
-                  type="file"
-                  accept="video/mp4,video/webm,video/quicktime,video/*"
-                  class="hidden"
-                  onchange="handleVideoFileUpload(event)"
-                />
-              </label>
-
-              <button
-                id="reset-video-btn"
-                type="button"
-                onclick="resetToDefaultVideoAction()"
-                class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-semibold transition"
-                title="Padam video daripada Cloudflare R2 secara kekal"
-              >
-                Padam Video (R2)
-              </button>
-            </div>
-          </div>
-
-          <!-- Pilihan Pautan URL Alternatif (Boleh Dibuka Jika Perlu) -->
-          <div class="pt-1.5 border-t border-slate-200">
+          <!-- Tab Pemilih Mod Media -->
+          <div class="grid grid-cols-2 gap-2 p-1 bg-slate-200/70 rounded-xl text-xs">
             <button
               type="button"
-              onclick="toggleVideoUrlAccordion()"
-              class="text-[10.5px] text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1"
+              id="cms-mode-btn-video"
+              onclick="switchLiveMediaMode('video')"
+              class="py-2 px-2 rounded-lg font-bold transition bg-white text-purple-700 shadow-sm border border-purple-200 flex items-center justify-center gap-1"
             >
-              <span>Pilihan tambahan: Masukkan pautan URL video</span>
-              <svg id="video-url-accordion-icon" class="w-3 h-3 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              Mod Video
             </button>
-            <div id="video-url-accordion-content" class="hidden mt-2 space-y-1.5">
-              <input
-                id="live-video-url-input"
-                type="text"
-                placeholder="https://... (Pautan video MP4)"
-                oninput="handleVideoUrlInput(this.value)"
-                class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              />
-              <div class="flex items-center gap-1.5 text-[10px]">
-                <span class="text-slate-500 font-semibold">Preset Cepat:</span>
-                <button type="button" onclick="setSampleVideo(0)" class="text-purple-700 underline font-medium">Interior Mewah</button>
-                <span class="text-slate-300">|</span>
-                <button type="button" onclick="setSampleVideo(1)" class="text-purple-700 underline font-medium">Bilik &amp; Balkoni</button>
-                <span class="text-slate-300">|</span>
-                <button type="button" onclick="setSampleVideo(2)" class="text-purple-700 underline font-medium">Kondominium Moden</button>
+            <button
+              type="button"
+              id="cms-mode-btn-slideshow"
+              onclick="switchLiveMediaMode('slideshow')"
+              class="py-2 px-2 rounded-lg font-bold transition text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              Mod Slideshow
+            </button>
+          </div>
+
+          <!-- Panel 4A: Konfigurasi Video (Aktif Jika Mod Video) -->
+          <div id="cms-video-section-panel" class="space-y-3">
+            <!-- Video Preview Container -->
+            <div id="cms-video-preview-wrapper" class="relative rounded-xl overflow-hidden bg-black aspect-video max-h-36 flex items-center justify-center border border-slate-300">
+              <video
+                id="cms-video-preview-player"
+                muted
+                playsinline
+                loop
+                controls
+                class="w-full h-full object-cover"
+              ></video>
+            </div>
+
+            <!-- File Info & Action Buttons -->
+            <div class="space-y-2">
+              <div id="cms-video-file-info" class="text-[11px] text-slate-600 truncate font-medium">
+                Video disimpan di Cloudflare R2 &amp; disegerakkan ke semua peranti.
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2">
+                <label class="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                  Muat Naik Video (R2)
+                  <input
+                    id="live-video-file-input"
+                    type="file"
+                    accept="video/mp4,video/webm,video/quicktime,video/*"
+                    class="hidden"
+                    onchange="handleVideoFileUpload(event)"
+                  />
+                </label>
+
+                <button
+                  id="reset-video-btn"
+                  type="button"
+                  onclick="resetToDefaultVideoAction()"
+                  class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-semibold transition"
+                  title="Padam video daripada Cloudflare R2 secara kekal"
+                >
+                  Padam Video (R2)
+                </button>
+              </div>
+            </div>
+
+            <!-- Pilihan Pautan URL Alternatif -->
+            <div class="pt-1.5 border-t border-slate-200">
+              <button
+                type="button"
+                onclick="toggleVideoUrlAccordion()"
+                class="text-[10.5px] text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1"
+              >
+                <span>Pilihan tambahan: Masukkan pautan URL video</span>
+                <svg id="video-url-accordion-icon" class="w-3 h-3 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div id="video-url-accordion-content" class="hidden mt-2 space-y-1.5">
+                <input
+                  id="live-video-url-input"
+                  type="text"
+                  placeholder="https://... (Pautan video MP4)"
+                  oninput="handleVideoUrlInput(this.value)"
+                  class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                />
               </div>
             </div>
           </div>
+
+          <!-- Panel 4B: Konfigurasi Slideshow Gambar (Aktif Jika Mod Slideshow) -->
+          <div id="cms-slideshow-section-panel" class="hidden space-y-3">
+            <p class="text-[11px] text-slate-600 leading-relaxed">
+              Mod Slideshow memaparkan koleksi gambar hartanah bertukar secara automatik dengan animasi lembut (*Ken Burns effect*).
+            </p>
+
+            <!-- Slides Thumbnail Grid -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="text-[10.5px] font-bold text-slate-700">Senarai Gambar Slaid (<span id="cms-slides-count">0</span>)</label>
+                <button
+                  type="button"
+                  onclick="resetSlideshowToDefaults()"
+                  class="text-[10px] text-purple-600 hover:underline font-semibold"
+                >
+                  Guna Gambar Contoh
+                </button>
+              </div>
+              <div id="cms-slides-thumbnails-grid" class="grid grid-cols-4 gap-2 min-h-[70px] p-2 bg-slate-100 rounded-xl border border-slate-200">
+                <!-- Thumbnails dimasukkan secara dinamik -->
+              </div>
+            </div>
+
+            <!-- Upload New Slides Button -->
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <label class="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Tambah Gambar Slaid (R2)
+                <input
+                  id="cms-slides-file-input"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  class="hidden"
+                  onchange="handleSlidesUpload(event)"
+                />
+              </label>
+              <button
+                type="button"
+                onclick="clearAllSlides()"
+                class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-semibold transition"
+              >
+                Padam Semua
+              </button>
+            </div>
+            <div id="cms-slides-upload-status" class="text-[11px] font-medium hidden"></div>
+          </div>
+        </div>
+
+        <!-- 5. Voiceover Audio Latar (Cloudflare R2) -->
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-900">Voiceover Audio Latar (R2)</span>
+            <span id="cms-voiceover-badge" class="text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded">Tiada Voiceover</span>
+          </div>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            Muat naik audio penerangan hos/ejen (MP3, WAV, M4A) yang akan dimainkan di latar belakang siaran langsung apabila audio diaktifkan.
+          </p>
+
+          <!-- Audio Preview Player in CMS -->
+          <div class="p-2.5 bg-slate-100 rounded-xl border border-slate-200 space-y-1.5">
+            <div id="cms-voiceover-info" class="text-[11px] text-slate-600 truncate font-medium">
+              Tiada audio voiceover dimuat naik.
+            </div>
+            <audio id="cms-voiceover-preview" controls class="w-full h-8 hidden"></audio>
+          </div>
+
+          <!-- Voiceover Action Buttons -->
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+              Muat Naik Voiceover (R2)
+              <input
+                id="cms-voiceover-file-input"
+                type="file"
+                accept="audio/mp3,audio/wav,audio/m4a,audio/aac,audio/*"
+                class="hidden"
+                onchange="handleVoiceoverUpload(event)"
+              />
+            </label>
+            <button
+              id="delete-voiceover-btn"
+              type="button"
+              onclick="deleteVoiceoverAction()"
+              class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-semibold transition"
+              title="Padam voiceover audio daripada Cloudflare R2 secara kekal"
+            >
+              Padam Voiceover (R2)
+            </button>
+          </div>
+          <div id="cms-voiceover-status" class="text-[11px] font-medium hidden"></div>
         </div>
 
         <!-- 5. Profil & Maklumat Hos Live (Ejen) -->
@@ -2502,9 +2652,22 @@
     const STORAGE_KEY_AGENT_NAME = 'serunai_live_agent_name';
     const STORAGE_KEY_AGENT_AVATAR = 'serunai_live_agent_avatar';
     const STORAGE_KEY_CMS_PASSWORD = 'serunai_ai_cms_password';
+    const STORAGE_KEY_MEDIA_MODE = 'serunai_live_media_mode';
+    const STORAGE_KEY_SLIDES = 'serunai_live_slides';
+    const STORAGE_KEY_VOICEOVER = 'serunai_live_voiceover_url';
     const DEFAULT_CMS_PASSWORD = 'admin123';
     const DEFAULT_AGENT_NAME = 'Zaim Rosli';
     const DEFAULT_AGENT_AVATAR = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80';
+    const DEFAULT_SLIDES = [
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80'
+    ];
+    let liveMediaMode = 'video';
+    let liveSlides = [...DEFAULT_SLIDES];
+    let liveCurrentSlideIndex = 0;
+    let slideshowTimer = null;
+    let liveVoiceoverUrl = '';
     let activeAiProvider = 'gemini';
 
     const MEDIA_DB_NAME = 'SerunaiMediaDB';
@@ -2728,6 +2891,302 @@
       pendingVideoBlob = null;
     }
 
+    // ==========================================================
+    // FUNGSI PENGURUSAN MOD MEDIA & SLIDESHOW GAMBAR (CLOUDFLARE)
+    // ==========================================================
+    function switchLiveMediaMode(mode) {
+      liveMediaMode = mode || 'video';
+      localStorage.setItem(STORAGE_KEY_MEDIA_MODE, liveMediaMode);
+
+      const btnVideo = document.getElementById('cms-mode-btn-video');
+      const btnSlides = document.getElementById('cms-mode-btn-slideshow');
+      const panelVideo = document.getElementById('cms-video-section-panel');
+      const panelSlides = document.getElementById('cms-slideshow-section-panel');
+      const badge = document.getElementById('cms-media-mode-badge');
+      const videoWrapper = document.getElementById('live-video-wrapper');
+      const slidesWrapper = document.getElementById('live-slideshow-wrapper');
+      const mainVideo = document.getElementById('live-video-player');
+
+      if (liveMediaMode === 'slideshow') {
+        if (btnSlides) btnSlides.className = 'py-2 px-2 rounded-lg font-bold transition bg-white text-purple-700 shadow-sm border border-purple-200 flex items-center justify-center gap-1';
+        if (btnVideo) btnVideo.className = 'py-2 px-2 rounded-lg font-bold transition text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1';
+        if (panelVideo) panelVideo.classList.add('hidden');
+        if (panelSlides) panelSlides.classList.remove('hidden');
+        if (badge) {
+          badge.innerText = 'Mod Slideshow';
+          badge.className = 'text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded';
+        }
+        if (videoWrapper) videoWrapper.classList.add('hidden');
+        if (slidesWrapper) slidesWrapper.classList.remove('hidden');
+        if (mainVideo) mainVideo.pause();
+        startLiveSlideshow();
+      } else {
+        if (btnVideo) btnVideo.className = 'py-2 px-2 rounded-lg font-bold transition bg-white text-purple-700 shadow-sm border border-purple-200 flex items-center justify-center gap-1';
+        if (btnSlides) btnSlides.className = 'py-2 px-2 rounded-lg font-bold transition text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1';
+        if (panelVideo) panelVideo.classList.remove('hidden');
+        if (panelSlides) panelSlides.classList.add('hidden');
+        if (badge) {
+          badge.innerText = 'Mod Video';
+          badge.className = 'text-[10px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.5 rounded';
+        }
+        if (videoWrapper) videoWrapper.classList.remove('hidden');
+        if (slidesWrapper) slidesWrapper.classList.add('hidden');
+        if (slideshowTimer) clearInterval(slideshowTimer);
+        if (mainVideo) mainVideo.play().catch(() => {});
+      }
+    }
+
+    function renderLiveSlides() {
+      const track = document.getElementById('live-slides-track');
+      const counterTotal = document.getElementById('slideshow-total-count');
+      if (!track) return;
+
+      track.innerHTML = '';
+      if (!Array.isArray(liveSlides) || liveSlides.length === 0) {
+        liveSlides = [...DEFAULT_SLIDES];
+      }
+
+      if (counterTotal) counterTotal.innerText = liveSlides.length;
+
+      liveSlides.forEach((src, idx) => {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = `Slaid Residensi Serunai ${idx + 1}`;
+        img.className = `slide-item ${idx === liveCurrentSlideIndex ? 'active' : ''}`;
+        track.appendChild(img);
+      });
+    }
+
+    function startLiveSlideshow() {
+      renderLiveSlides();
+      if (slideshowTimer) clearInterval(slideshowTimer);
+
+      slideshowTimer = setInterval(() => {
+        if (!Array.isArray(liveSlides) || liveSlides.length <= 1) return;
+        liveCurrentSlideIndex = (liveCurrentSlideIndex + 1) % liveSlides.length;
+
+        const track = document.getElementById('live-slides-track');
+        const counterCurrent = document.getElementById('slideshow-current-index');
+        if (counterCurrent) counterCurrent.innerText = liveCurrentSlideIndex + 1;
+
+        if (track) {
+          const items = track.querySelectorAll('.slide-item');
+          items.forEach((item, idx) => {
+            if (idx === liveCurrentSlideIndex) {
+              item.classList.add('active');
+            } else {
+              item.classList.remove('active');
+            }
+          });
+        }
+      }, 4000);
+    }
+
+    function renderCmsSlidesThumbnails() {
+      const grid = document.getElementById('cms-slides-thumbnails-grid');
+      const countEl = document.getElementById('cms-slides-count');
+      if (!grid) return;
+
+      grid.innerHTML = '';
+      if (!Array.isArray(liveSlides)) liveSlides = [...DEFAULT_SLIDES];
+      if (countEl) countEl.innerText = liveSlides.length;
+
+      liveSlides.forEach((url, idx) => {
+        const div = document.createElement('div');
+        div.className = 'relative group aspect-square rounded-lg overflow-hidden border border-slate-300 bg-black';
+        div.innerHTML = `
+          <img src="${url}" alt="Slaid ${idx + 1}" class="w-full h-full object-cover">
+          <span class="absolute bottom-1 left-1 bg-black/70 text-white text-[9px] font-bold px-1 rounded">#${idx + 1}</span>
+          <button
+            type="button"
+            onclick="removeSlideAt(${idx})"
+            title="Padam slaid ini"
+            class="absolute top-1 right-1 bg-rose-600 hover:bg-rose-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] shadow"
+          >
+            &times;
+          </button>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    async function handleSlidesUpload(e) {
+      const files = e.target.files;
+      if (!files || files.length === 0) return;
+
+      const statusEl = document.getElementById('cms-slides-upload-status');
+      if (statusEl) {
+        statusEl.className = 'text-[11px] font-medium text-amber-700 bg-amber-50 p-2 rounded-lg';
+        statusEl.innerText = `Memuat naik ${files.length} gambar ke Cloudflare R2... Sila tunggu sebentar.`;
+        statusEl.classList.remove('hidden');
+      }
+
+      let uploadedCount = 0;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        try {
+          const res = await fetch('/api/slides', {
+            method: 'POST',
+            headers: { 'Content-Type': file.type || 'image/jpeg' },
+            body: file
+          });
+          const data = await res.json();
+          if (data.success && data.url) {
+            liveSlides.push(data.url);
+            uploadedCount++;
+          }
+        } catch (err) {
+          console.error('Gagal muat naik slaid:', err);
+        }
+      }
+
+      localStorage.setItem(STORAGE_KEY_SLIDES, JSON.stringify(liveSlides));
+      renderCmsSlidesThumbnails();
+      renderLiveSlides();
+
+      if (statusEl) {
+        statusEl.className = 'text-[11px] font-medium text-emerald-700 bg-emerald-50 p-2 rounded-lg';
+        statusEl.innerText = `Berjaya memuat naik ${uploadedCount} gambar ke Cloudflare R2!`;
+        setTimeout(() => { if (statusEl) statusEl.classList.add('hidden'); }, 4000);
+      }
+      e.target.value = '';
+    }
+
+    function removeSlideAt(idx) {
+      if (!confirm('Padam gambar slaid ini?')) return;
+      const removed = liveSlides.splice(idx, 1);
+      if (removed && removed[0] && removed[0].includes('r2.dev/serunai/slides/')) {
+        const key = 'serunai/slides/' + removed[0].split('serunai/slides/')[1].split('?')[0];
+        fetch(`/api/slides?key=${encodeURIComponent(key)}`, { method: 'DELETE' }).catch(() => {});
+      }
+      localStorage.setItem(STORAGE_KEY_SLIDES, JSON.stringify(liveSlides));
+      renderCmsSlidesThumbnails();
+      renderLiveSlides();
+    }
+
+    function resetSlideshowToDefaults() {
+      liveSlides = [...DEFAULT_SLIDES];
+      localStorage.setItem(STORAGE_KEY_SLIDES, JSON.stringify(liveSlides));
+      renderCmsSlidesThumbnails();
+      renderLiveSlides();
+    }
+
+    function clearAllSlides() {
+      if (!confirm('Adakah anda pasti mahu memadam semua gambar slaid?')) return;
+      liveSlides = [];
+      localStorage.setItem(STORAGE_KEY_SLIDES, JSON.stringify(liveSlides));
+      renderCmsSlidesThumbnails();
+      renderLiveSlides();
+    }
+
+    // ==========================================================
+    // FUNGSI PENGURUSAN VOICEOVER AUDIO (CLOUDFLARE R2)
+    // ==========================================================
+    async function handleVoiceoverUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById('cms-voiceover-status');
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+
+      if (statusEl) {
+        statusEl.className = 'text-[11px] font-medium text-amber-700 bg-amber-50 p-2 rounded-lg';
+        statusEl.innerText = `Memuat naik audio voiceover (${sizeMb} MB) ke Cloudflare R2... Sila tunggu sebentar.`;
+        statusEl.classList.remove('hidden');
+      }
+
+      try {
+        const res = await fetch('/api/voiceover', {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type || 'audio/mpeg' },
+          body: file
+        });
+        const data = await res.json();
+        if (data.success && data.url) {
+          liveVoiceoverUrl = data.url;
+          localStorage.setItem(STORAGE_KEY_VOICEOVER, liveVoiceoverUrl);
+          updateVoiceoverDisplay();
+
+          if (statusEl) {
+            statusEl.className = 'text-[11px] font-medium text-emerald-700 bg-emerald-50 p-2 rounded-lg';
+            statusEl.innerText = 'Audio voiceover berjaya dimuat naik ke Cloudflare R2 & disegerakkan!';
+            setTimeout(() => { if (statusEl) statusEl.classList.add('hidden'); }, 4000);
+          }
+        } else {
+          throw new Error(data.error || 'Gagal memuat naik');
+        }
+      } catch (err) {
+        if (statusEl) {
+          statusEl.className = 'text-[11px] font-medium text-rose-600 bg-rose-50 p-2 rounded-lg';
+          statusEl.innerText = `Ralat muat naik voiceover: ${err.message}`;
+        }
+      }
+      e.target.value = '';
+    }
+
+    async function deleteVoiceoverAction() {
+      const confirmDel = confirm('Adakah anda pasti mahu memadam fail voiceover audio daripada Cloudflare R2 secara kekal?');
+      if (!confirmDel) return;
+
+      const statusEl = document.getElementById('cms-voiceover-status');
+      if (statusEl) {
+        statusEl.className = 'text-[11px] font-medium text-amber-700 bg-amber-50 p-2 rounded-lg';
+        statusEl.innerText = 'Sedang memadam fail audio daripada Cloudflare R2...';
+        statusEl.classList.remove('hidden');
+      }
+
+      try {
+        await fetch('/api/voiceover', { method: 'DELETE' });
+      } catch (e) {}
+
+      liveVoiceoverUrl = '';
+      localStorage.removeItem(STORAGE_KEY_VOICEOVER);
+      updateVoiceoverDisplay();
+
+      if (statusEl) {
+        statusEl.className = 'text-[11px] font-medium text-emerald-700 bg-emerald-50 p-2 rounded-lg';
+        statusEl.innerText = 'Voiceover audio telah dipadam sepenuhnya daripada Cloudflare R2.';
+        setTimeout(() => { if (statusEl) statusEl.classList.add('hidden'); }, 4000);
+      }
+    }
+
+    function updateVoiceoverDisplay() {
+      const badge = document.getElementById('cms-voiceover-badge');
+      const info = document.getElementById('cms-voiceover-info');
+      const previewAudio = document.getElementById('cms-voiceover-preview');
+      const liveAudio = document.getElementById('live-voiceover-player');
+
+      if (liveVoiceoverUrl) {
+        if (badge) {
+          badge.className = 'text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded';
+          badge.innerText = 'Voiceover Aktif (R2)';
+        }
+        if (info) info.innerText = 'Audio voiceover sedia dimainkan di latar belakang siaran langsung.';
+        if (previewAudio) {
+          previewAudio.src = liveVoiceoverUrl;
+          previewAudio.classList.remove('hidden');
+        }
+        if (liveAudio) {
+          liveAudio.src = liveVoiceoverUrl;
+        }
+      } else {
+        if (badge) {
+          badge.className = 'text-[10px] bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded';
+          badge.innerText = 'Tiada Voiceover';
+        }
+        if (info) info.innerText = 'Tiada audio voiceover dimuat naik.';
+        if (previewAudio) {
+          previewAudio.pause();
+          previewAudio.src = '';
+          previewAudio.classList.add('hidden');
+        }
+        if (liveAudio) {
+          liveAudio.pause();
+          liveAudio.src = '';
+        }
+      }
+    }
+
     // Fungsi Tukar Provider AI & Ujian Agent Router
     function switchAiProvider(provider) {
       activeAiProvider = provider;
@@ -2923,6 +3382,16 @@
       // 0. Kemas kini profil & gambar ejen tempatan dahulu
       updateLiveAgentDisplay();
 
+      // 0a. Muat turun pilihan mod media, slaid & voiceover dari storan setempat
+      const savedMode = localStorage.getItem(STORAGE_KEY_MEDIA_MODE);
+      if (savedMode) liveMediaMode = savedMode;
+      try {
+        const savedSlides = localStorage.getItem(STORAGE_KEY_SLIDES);
+        if (savedSlides) liveSlides = JSON.parse(savedSlides);
+      } catch (e) {}
+      const savedVoiceover = localStorage.getItem(STORAGE_KEY_VOICEOVER);
+      if (savedVoiceover) liveVoiceoverUrl = savedVoiceover;
+
       // Penyelarasan Awan Cloudflare (KV & R2) secara automatik
       try {
         const res = await fetch('/api/live-config', { cache: 'no-store' });
@@ -2937,6 +3406,22 @@
           if (cloud.videoUrl) {
             localStorage.setItem(STORAGE_KEY_VIDEO, cloud.videoUrl);
           }
+          if (cloud.mediaMode) {
+            localStorage.setItem(STORAGE_KEY_MEDIA_MODE, cloud.mediaMode);
+            liveMediaMode = cloud.mediaMode;
+          }
+          if (Array.isArray(cloud.slides) && cloud.slides.length > 0) {
+            localStorage.setItem(STORAGE_KEY_SLIDES, JSON.stringify(cloud.slides));
+            liveSlides = cloud.slides;
+          }
+          if (cloud.voiceoverUrl !== undefined) {
+            liveVoiceoverUrl = cloud.voiceoverUrl || '';
+            if (liveVoiceoverUrl) {
+              localStorage.setItem(STORAGE_KEY_VOICEOVER, liveVoiceoverUrl);
+            } else {
+              localStorage.removeItem(STORAGE_KEY_VOICEOVER);
+            }
+          }
           if (Array.isArray(cloud.comments) && cloud.comments.length > 0) {
             localStorage.setItem(STORAGE_KEY_COMMENTS, JSON.stringify(cloud.comments));
             liveCommentsPool = cloud.comments;
@@ -2947,11 +3432,14 @@
         console.log('Cloudflare KV sync skipped');
       }
 
-      // 1. Muat turun video (Cloudflare R2 atau URL tersimpan atau lalai R2)
+      // 1. Tentukan mod media aktif (Video vs Slideshow) & pemain voiceover
+      switchLiveMediaMode(liveMediaMode);
+      updateVoiceoverDisplay();
+
       const videoEl = document.getElementById('live-video-player');
       try {
         const activeVideo = localStorage.getItem(STORAGE_KEY_VIDEO) || CLOUDFLARE_R2_VIDEO_URL;
-        if (videoEl) {
+        if (videoEl && liveMediaMode === 'video') {
           videoEl.src = activeVideo;
           videoEl.play().catch(() => {});
         }
@@ -2971,8 +3459,9 @@
         liveCommentsPool = [...DEFAULT_SERUNAI_COMMENTS];
       }
 
-      // 3. Masukkan komen awal
+      // 3. Masukkan komen awal & gestur leret (swipe)
       renderInitialLiveComments();
+      setupCommentsSwipeGestures();
       updateLikesDisplay();
       updateViewersDisplay();
       startLiveTickers();
@@ -3002,11 +3491,11 @@
       const btn = document.getElementById('follow-btn');
       if (!btn) return;
       if (isFollowing) {
-        btn.className = 'ml-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all active:scale-95 flex items-center gap-1 bg-neutral-800 text-neutral-300 border border-white/20';
-        btn.innerHTML = '<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Diikuti';
+        btn.className = 'ml-0.5 sm:ml-1 px-2 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0 transition-all active:scale-95 flex items-center justify-center gap-1 bg-neutral-800 text-neutral-300 border border-white/20';
+        btn.innerHTML = '<svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Diikuti';
       } else {
-        btn.className = 'ml-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all active:scale-95 flex items-center gap-1 bg-rose-600 hover:bg-rose-500 text-white';
-        btn.innerText = '+ FOLLOW';
+        btn.className = 'ml-0.5 sm:ml-1 px-2 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider whitespace-nowrap shrink-0 transition-all active:scale-95 flex items-center justify-center bg-rose-600 hover:bg-rose-500 text-white';
+        btn.innerText = 'FOLLOW';
       }
     }
 
@@ -3062,6 +3551,100 @@
       }
 
       stream.scrollTop = stream.scrollHeight;
+    }
+
+    // ==========================================================
+    // FUNGSI GESTUR SWIPE: SEMBUNYI (SLIDE KIRI) & BUKA (SLIDE KANAN) KOMEN
+    // ==========================================================
+    let isCommentsHidden = false;
+    let swipeStartX = 0;
+    let swipeStartY = 0;
+    let isSwiping = false;
+    let lastTapWasSwipe = false;
+
+    function hideLiveComments() {
+      const container = document.getElementById('live-comments-container');
+      const restoreTab = document.getElementById('live-comments-restore-tab');
+      if (!container) return;
+      isCommentsHidden = true;
+      container.style.transform = 'translateX(-125%)';
+      container.style.opacity = '0';
+      container.style.pointerEvents = 'none';
+      if (restoreTab) {
+        restoreTab.classList.remove('hidden');
+        restoreTab.classList.add('inline-flex');
+      }
+    }
+
+    function unhideLiveComments(e) {
+      if (e) e.stopPropagation();
+      const container = document.getElementById('live-comments-container');
+      const restoreTab = document.getElementById('live-comments-restore-tab');
+      if (!container) return;
+      isCommentsHidden = false;
+      container.style.transform = 'translateX(0)';
+      container.style.opacity = '1';
+      container.style.pointerEvents = 'auto';
+      if (restoreTab) {
+        restoreTab.classList.add('hidden');
+        restoreTab.classList.remove('inline-flex');
+      }
+    }
+
+    function setupCommentsSwipeGestures() {
+      const liveScreen = document.getElementById('live-screen-container');
+      if (!liveScreen) return;
+
+      const handleStart = (clientX, clientY) => {
+        swipeStartX = clientX;
+        swipeStartY = clientY;
+        isSwiping = true;
+      };
+
+      const handleEnd = (clientX, clientY) => {
+        if (!isSwiping) return;
+        isSwiping = false;
+        const diffX = clientX - swipeStartX;
+        const diffY = clientY - swipeStartY;
+
+        // Semak sekiranya pergerakan mendatar ketara (swipe)
+        if (Math.abs(diffX) > 30 && Math.abs(diffX) > Math.abs(diffY)) {
+          lastTapWasSwipe = true;
+          setTimeout(() => { lastTapWasSwipe = false; }, 200);
+
+          if (diffX < -30) {
+            // Slide ke kiri: sembunyikan komen
+            hideLiveComments();
+          } else if (diffX > 30) {
+            // Slide ke kanan: buka semula komen
+            unhideLiveComments();
+          }
+        }
+      };
+
+      // Sokongan skrin sentuh telefon pintar (Touch events)
+      liveScreen.addEventListener('touchstart', (e) => {
+        if (!e.touches || e.touches.length === 0) return;
+        if (e.target.closest('input, button, textarea, #ai-cms-modal')) return;
+        handleStart(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+
+      liveScreen.addEventListener('touchend', (e) => {
+        if (!e.changedTouches || e.changedTouches.length === 0) return;
+        if (e.target.closest('input, button, textarea, #ai-cms-modal')) return;
+        handleEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      }, { passive: true });
+
+      // Sokongan tetikus drag untuk komputer & DevTools emulator
+      liveScreen.addEventListener('mousedown', (e) => {
+        if (e.target.closest('input, button, textarea, #ai-cms-modal')) return;
+        handleStart(e.clientX, e.clientY);
+      });
+
+      liveScreen.addEventListener('mouseup', (e) => {
+        if (e.target.closest('input, button, textarea, #ai-cms-modal')) return;
+        handleEnd(e.clientX, e.clientY);
+      });
     }
 
     // Mulakan pemasa kitaran komen & fluktuasi penonton
@@ -3217,19 +3800,22 @@
     // Kawalan Audio
     function toggleLiveAudio() {
       const video = document.getElementById('live-video-player');
+      const voiceover = document.getElementById('live-voiceover-player');
       const iconMuted = document.getElementById('audio-icon-muted');
       const iconUnmuted = document.getElementById('audio-icon-unmuted');
 
-      if (!video) return;
+      isLiveAudioActive = !isLiveAudioActive;
 
-      if (video.muted) {
-        video.muted = false;
-        isLiveAudioActive = true;
+      if (isLiveAudioActive) {
+        if (video) video.muted = false;
+        if (voiceover && liveVoiceoverUrl) {
+          voiceover.play().catch(() => {});
+        }
         if (iconMuted) iconMuted.classList.add('hidden');
         if (iconUnmuted) iconUnmuted.classList.remove('hidden');
       } else {
-        video.muted = true;
-        isLiveAudioActive = false;
+        if (video) video.muted = true;
+        if (voiceover) voiceover.pause();
         if (iconMuted) iconMuted.classList.remove('hidden');
         if (iconUnmuted) iconUnmuted.classList.add('hidden');
       }
@@ -3278,7 +3864,8 @@
     }
 
     function handleScreenTap(e) {
-      if (e.target.closest('button, a, input, form, #live-pinned-card, #live-comments-stream')) return;
+      if (lastTapWasSwipe) return;
+      if (e.target.closest('button, a, input, form, #live-pinned-card, #live-comments-container, #live-comments-restore-tab')) return;
       const x = e.clientX;
       const y = e.clientY;
       spawnHeart(x, y);
@@ -3470,6 +4057,21 @@
           const activeVid = localStorage.getItem(STORAGE_KEY_VIDEO) || SAMPLE_PRESET_VIDEOS[0];
           if (previewPlayer) previewPlayer.src = activeVid;
         }
+
+        // 6. Muat turun status slideshow dan voiceover
+        switchLiveMediaMode(liveMediaMode);
+        renderCmsSlidesThumbnails();
+        try {
+          const voRes = await fetch('/api/voiceover', { cache: 'no-store' });
+          if (voRes.ok) {
+            const voData = await voRes.json();
+            if (voData.exists && voData.url) {
+              liveVoiceoverUrl = voData.url;
+              localStorage.setItem(STORAGE_KEY_VOICEOVER, liveVoiceoverUrl);
+            }
+          }
+        } catch (e) {}
+        updateVoiceoverDisplay();
       } catch (e) {
         console.error('Ralat muat medan CMS:', e);
       }
@@ -3576,7 +4178,10 @@
           agentName: agentName || DEFAULT_AGENT_NAME,
           agentAvatar: agentAvatar || DEFAULT_AGENT_AVATAR,
           aiProvider: activeAiProvider,
-          comments: liveCommentsPool
+          comments: liveCommentsPool,
+          mediaMode: liveMediaMode,
+          slides: liveSlides,
+          voiceoverUrl: liveVoiceoverUrl
         };
         if (updatedPassword) payload.newPassword = updatedPassword;
         await fetch('/api/live-config', {
@@ -3589,7 +4194,7 @@
       }
 
       pendingVideoBlob = null;
-      alert('Tetapan AI, profil ejen dan video berjaya disimpan & diselaraskan ke Cloudflare!');
+      alert('Tetapan AI, profil hos, media & voiceover berjaya disimpan & diselaraskan ke Cloudflare!');
       closeAiCmsModal();
     }
 

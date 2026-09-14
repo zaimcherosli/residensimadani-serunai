@@ -3,6 +3,13 @@ const DEFAULT_CONFIG = {
   agentName: 'Zaim Rosli',
   agentAvatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80',
   videoUrl: 'https://pub-b41a57c40e74430eb994919066288290.r2.dev/serunai/video-live.mp4',
+  mediaMode: 'video', // 'video' atau 'slideshow'
+  slides: [
+    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80'
+  ],
+  voiceoverUrl: '',
   password: 'admin123',
   aiProvider: 'gemini',
   comments: []
@@ -74,6 +81,9 @@ export async function onRequestPost(context) {
     if (body.agentName !== undefined) saved.agentName = body.agentName;
     if (body.agentAvatar !== undefined) saved.agentAvatar = body.agentAvatar;
     if (body.videoUrl !== undefined) saved.videoUrl = body.videoUrl;
+    if (body.mediaMode !== undefined) saved.mediaMode = body.mediaMode;
+    if (body.slides !== undefined) saved.slides = body.slides;
+    if (body.voiceoverUrl !== undefined) saved.voiceoverUrl = body.voiceoverUrl;
     if (body.newPassword !== undefined) saved.password = body.newPassword;
     if (body.aiProvider !== undefined) saved.aiProvider = body.aiProvider;
     if (body.comments !== undefined) saved.comments = body.comments;
