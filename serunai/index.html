@@ -388,33 +388,57 @@
       <!-- BAHAGIAN UTAMA CMS (DIBUKA SELEPAS AUTH) -->
       <div id="ai-cms-body" class="hidden space-y-4 text-xs">
         
-        <!-- 1. Google Gemini API Key -->
+        <!-- Pilihan Penyedia AI (Tabs) -->
         <div class="space-y-1.5">
-          <div class="flex items-center justify-between">
-            <label class="font-bold text-slate-800">Google Gemini API Key</label>
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[10.5px] text-purple-600 hover:underline font-semibold">Dapatkan API Key Percuma &rarr;</a>
-          </div>
-          <div class="relative">
-            <input
-              id="gemini-api-key-input"
-              type="password"
-              placeholder="AIzaSy..."
-              class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-purple-500 focus:outline-none bg-slate-50"
-            />
+          <label class="block font-bold text-slate-800">Pilih Penyedia AI (AI Provider)</label>
+          <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl border border-slate-200">
             <button
               type="button"
-              onclick="toggleApiKeyVisibility()"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[11px] font-semibold"
+              id="provider-tab-gemini"
+              onclick="switchAiProvider('gemini')"
+              class="py-2 px-3 rounded-xl text-xs font-bold transition-all bg-white text-purple-700 shadow-sm border border-purple-200 flex items-center justify-center gap-1.5"
             >
-              Lihat
+              Google Gemini
+            </button>
+            <button
+              type="button"
+              id="provider-tab-agentrouter"
+              onclick="switchAiProvider('agentrouter')"
+              class="py-2 px-3 rounded-xl text-xs font-bold transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5"
+            >
+              Agent Router
             </button>
           </div>
         </div>
 
-        <!-- 2. Model Gemini Selection & Test Button (Aligned Cleanly) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 items-end">
-          <div>
-            <label class="block font-bold text-slate-800 mb-1">Model Gemini</label>
+        <!-- 1. Panel Google Gemini -->
+        <div id="ai-provider-gemini-panel" class="space-y-3">
+          <!-- Google Gemini API Key -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="font-bold text-slate-800">Google Gemini API Key</label>
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[10.5px] text-purple-600 hover:underline font-semibold">Dapatkan API Key Percuma &rarr;</a>
+            </div>
+            <div class="relative">
+              <input
+                id="gemini-api-key-input"
+                type="password"
+                placeholder="AIzaSy..."
+                class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-purple-500 focus:outline-none bg-slate-50"
+              />
+              <button
+                type="button"
+                onclick="toggleApiKeyVisibility()"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[11px] font-semibold"
+              >
+                Lihat
+              </button>
+            </div>
+          </div>
+
+          <!-- Model Gemini (Atas) -->
+          <div class="space-y-1">
+            <label class="block font-bold text-slate-800">Model Gemini</label>
             <select
               id="gemini-model-select"
               class="w-full h-10 px-3 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none font-medium"
@@ -425,25 +449,101 @@
               <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
             </select>
           </div>
-          <div>
-            <label class="block font-bold text-slate-800 mb-1">Status Sambungan</label>
+
+          <!-- Status Sambungan Gemini (Bawah) -->
+          <div class="space-y-1">
+            <label class="block font-bold text-slate-800">Status Sambungan</label>
             <button
               id="test-gemini-btn"
               type="button"
               onclick="handleTestGemini()"
-              class="w-full h-10 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 rounded-xl border border-slate-300 transition text-center text-xs flex items-center justify-center gap-1"
+              class="w-full h-10 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 rounded-xl border border-slate-300 transition text-center text-xs flex items-center justify-center gap-1 shadow-sm"
             >
-              Uji Sambungan API
+              Uji Sambungan API Gemini
             </button>
           </div>
+          <div id="gemini-test-status" class="text-[11px] font-medium hidden p-2 rounded-lg"></div>
         </div>
-        <div id="gemini-test-status" class="text-[11px] font-medium hidden p-2 rounded-lg"></div>
+
+        <!-- 2. Panel Agent Router (OpenAI Compatible) -->
+        <div id="ai-provider-agentrouter-panel" class="space-y-3 hidden">
+          <!-- Agent Router API Token -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="font-bold text-slate-800">Agent Router API Token</label>
+              <a href="https://agentrouter.org/console" target="_blank" class="text-[10.5px] text-purple-600 hover:underline font-semibold">Dapatkan Token Agent Router &rarr;</a>
+            </div>
+            <div class="relative">
+              <input
+                id="agentrouter-api-key-input"
+                type="password"
+                placeholder="sk-..."
+                class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-purple-500 focus:outline-none bg-slate-50"
+              />
+              <button
+                type="button"
+                onclick="toggleAgentRouterKeyVisibility()"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[11px] font-semibold"
+              >
+                Lihat
+              </button>
+            </div>
+          </div>
+
+          <!-- Base URL -->
+          <div class="space-y-1">
+            <div class="flex items-center justify-between">
+              <label class="block font-bold text-slate-800">Base URL API</label>
+              <span class="text-[10px] text-slate-400 font-medium">Lalai: agentrouter.org/v1</span>
+            </div>
+            <input
+              id="agentrouter-base-url-input"
+              type="text"
+              placeholder="https://agentrouter.org/v1"
+              value="https://agentrouter.org/v1"
+              class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs font-mono bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            />
+          </div>
+
+          <!-- Model Agent Router (Atas) -->
+          <div class="space-y-1">
+            <label class="block font-bold text-slate-800">Model Agent Router</label>
+            <select
+              id="agentrouter-model-select"
+              class="w-full h-10 px-3 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none font-medium"
+            >
+              <option value="claude-opus-4-8">claude-opus-4-8 (Anthropic)</option>
+              <option value="claude-opus-5">claude-opus-5 (Anthropic)</option>
+              <option value="deepseek-v4-flash">deepseek-v4-flash (DeepSeek)</option>
+              <option value="glm-5.3">glm-5.3 (Zhipu AI)</option>
+              <option value="gpt-5.6-sol" selected>gpt-5.6-sol (OpenAI)</option>
+              <option value="gpt-6-astra">gpt-6-astra (OpenAI)</option>
+            </select>
+          </div>
+
+          <!-- Status Sambungan Agent Router (Bawah) -->
+          <div class="space-y-1">
+            <label class="block font-bold text-slate-800">Status Sambungan</label>
+            <button
+              id="test-agentrouter-btn"
+              type="button"
+              onclick="handleTestAgentRouter()"
+              class="w-full h-10 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-3 rounded-xl border border-slate-300 transition text-center text-xs flex items-center justify-center gap-1 shadow-sm"
+            >
+              Uji Sambungan Agent Router
+            </button>
+          </div>
+          <div id="agentrouter-test-status" class="text-[11px] font-medium hidden p-2 rounded-lg"></div>
+        </div>
 
         <!-- 3. Penjana Komen Live Automatik (AI) -->
         <div class="p-3.5 bg-purple-50/70 border border-purple-200 rounded-2xl space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="font-bold text-purple-950">Jana Komen Live Automatik (Gemini AI)</span>
-            <span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-1.5 py-0.5 rounded">Residensi Serunai</span>
+            <span class="font-bold text-purple-950">Jana Komen Live Automatik (AI)</span>
+            <div class="flex items-center gap-1">
+              <span id="ai-active-provider-badge" class="text-[10px] bg-purple-200 text-purple-800 font-bold px-1.5 py-0.5 rounded">Google Gemini</span>
+              <span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-1.5 py-0.5 rounded">Residensi Serunai</span>
+            </div>
           </div>
           <p class="text-[11px] text-purple-800 leading-relaxed">
             AI akan membaca maklumat tepat Residensi MADANI Serunai (Presint 5 Putrajaya, RM200,000, 3 bilik, syarat Wilayah Persekutuan, kuota 587 unit) untuk mencipta soalan dan komen penonton yang natural dalam Bahasa Melayu.
@@ -2323,10 +2423,13 @@
     const STORAGE_KEY_COMMENTS = 'serunai_live_comments';
     const STORAGE_KEY_VIDEO = 'serunai_live_video_url';
     const STORAGE_KEY_GEMINI = 'hartanah_gemini_config';
+    const STORAGE_KEY_AI_PROVIDER = 'serunai_ai_provider';
+    const STORAGE_KEY_AGENTROUTER = 'serunai_agentrouter_config';
     const STORAGE_KEY_AGENT_NAME = 'serunai_live_agent_name';
     const STORAGE_KEY_AGENT_AVATAR = 'serunai_live_agent_avatar';
     const DEFAULT_AGENT_NAME = 'Zaim Rosli';
     const DEFAULT_AGENT_AVATAR = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80';
+    let activeAiProvider = 'gemini';
 
     const MEDIA_DB_NAME = 'SerunaiMediaDB';
     const MEDIA_DB_VERSION = 1;
@@ -2484,6 +2587,110 @@
         badge.innerText = 'Pautan URL';
       }
       pendingVideoBlob = null;
+    }
+
+    // Fungsi Tukar Provider AI & Ujian Agent Router
+    function switchAiProvider(provider) {
+      activeAiProvider = provider;
+      const tabGemini = document.getElementById('provider-tab-gemini');
+      const tabAgentRouter = document.getElementById('provider-tab-agentrouter');
+      const panelGemini = document.getElementById('ai-provider-gemini-panel');
+      const panelAgentRouter = document.getElementById('ai-provider-agentrouter-panel');
+      const activeBadge = document.getElementById('ai-active-provider-badge');
+
+      if (provider === 'agentrouter') {
+        if (tabAgentRouter) {
+          tabAgentRouter.className = 'py-2 px-3 rounded-xl text-xs font-bold transition-all bg-white text-purple-700 shadow-sm border border-purple-200 flex items-center justify-center gap-1.5';
+        }
+        if (tabGemini) {
+          tabGemini.className = 'py-2 px-3 rounded-xl text-xs font-bold transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5';
+        }
+        if (panelGemini) panelGemini.classList.add('hidden');
+        if (panelAgentRouter) panelAgentRouter.classList.remove('hidden');
+        if (activeBadge) {
+          activeBadge.innerText = 'Agent Router';
+          activeBadge.className = 'text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded';
+        }
+      } else {
+        if (tabGemini) {
+          tabGemini.className = 'py-2 px-3 rounded-xl text-xs font-bold transition-all bg-white text-purple-700 shadow-sm border border-purple-200 flex items-center justify-center gap-1.5';
+        }
+        if (tabAgentRouter) {
+          tabAgentRouter.className = 'py-2 px-3 rounded-xl text-xs font-bold transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5';
+        }
+        if (panelGemini) panelGemini.classList.remove('hidden');
+        if (panelAgentRouter) panelAgentRouter.classList.add('hidden');
+        if (activeBadge) {
+          activeBadge.innerText = 'Google Gemini';
+          activeBadge.className = 'text-[10px] bg-purple-200 text-purple-800 font-bold px-1.5 py-0.5 rounded';
+        }
+      }
+    }
+
+    function toggleAgentRouterKeyVisibility() {
+      const input = document.getElementById('agentrouter-api-key-input');
+      if (input) {
+        input.type = input.type === 'password' ? 'text' : 'password';
+      }
+    }
+
+    async function handleTestAgentRouter() {
+      const keyInput = document.getElementById('agentrouter-api-key-input');
+      const modelSelect = document.getElementById('agentrouter-model-select');
+      const baseInput = document.getElementById('agentrouter-base-url-input');
+      const statusEl = document.getElementById('agentrouter-test-status');
+      const btn = document.getElementById('test-agentrouter-btn');
+
+      const apiKey = keyInput ? keyInput.value.trim() : '';
+      const model = modelSelect ? modelSelect.value : 'gpt-5.6-sol';
+      let baseUrl = (baseInput ? baseInput.value.trim() : '') || 'https://agentrouter.org/v1';
+      baseUrl = baseUrl.replace(/\/+$/, '');
+
+      if (!apiKey) {
+        alert('Sila masukkan API Token Agent Router terlebih dahulu.');
+        return;
+      }
+
+      if (btn) btn.innerText = "Menguji Sambungan...";
+      if (statusEl) {
+        statusEl.classList.remove('hidden', 'bg-rose-100', 'text-rose-800', 'bg-emerald-100', 'text-emerald-800');
+        statusEl.classList.add('bg-slate-100', 'text-slate-700');
+        statusEl.innerText = `Menyambung ke Agent Router (${model})...`;
+      }
+
+      try {
+        const res = await fetch(`${baseUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [{ role: 'user', content: 'Ping: Sila balas "BERSAMBUNG"' }],
+            max_tokens: 15,
+            temperature: 0.1
+          })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData?.error?.message || `Ralat HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        const reply = data?.choices?.[0]?.message?.content?.trim() || 'OK';
+
+        statusEl.classList.remove('bg-slate-100', 'text-slate-700');
+        statusEl.classList.add('bg-emerald-100', 'text-emerald-800');
+        statusEl.innerText = `Sambungan Agent Router berjaya! Model bersedia (${reply}).`;
+      } catch (err) {
+        statusEl.classList.remove('bg-slate-100', 'text-slate-700');
+        statusEl.classList.add('bg-rose-100', 'text-rose-800');
+        statusEl.innerText = `Gagal menyambung Agent Router: ${err.message}`;
+      } finally {
+        if (btn) btn.innerText = "Uji Sambungan Agent Router";
+      }
     }
 
     // State Variables
@@ -3030,25 +3237,40 @@
 
     async function loadAiCmsFields() {
       try {
-        const cfg = JSON.parse(localStorage.getItem(STORAGE_KEY_GEMINI) || '{}');
+        // 1. Muat turun provider aktif
+        const savedProvider = localStorage.getItem(STORAGE_KEY_AI_PROVIDER) || 'gemini';
+        switchAiProvider(savedProvider);
+
+        // 2. Muat turun konfigurasi Gemini
+        const cfgGemini = JSON.parse(localStorage.getItem(STORAGE_KEY_GEMINI) || '{}');
         const keyInput = document.getElementById('gemini-api-key-input');
         const modelSelect = document.getElementById('gemini-model-select');
-        const videoInput = document.getElementById('live-video-url-input');
+        if (keyInput && cfgGemini.apiKey) keyInput.value = cfgGemini.apiKey;
+        if (modelSelect && cfgGemini.model) modelSelect.value = cfgGemini.model;
+
+        // 3. Muat turun konfigurasi Agent Router
+        const cfgAgentRouter = JSON.parse(localStorage.getItem(STORAGE_KEY_AGENTROUTER) || '{}');
+        const arKeyInput = document.getElementById('agentrouter-api-key-input');
+        const arBaseInput = document.getElementById('agentrouter-base-url-input');
+        const arModelSelect = document.getElementById('agentrouter-model-select');
+        if (arKeyInput && cfgAgentRouter.apiKey) arKeyInput.value = cfgAgentRouter.apiKey;
+        if (arBaseInput && cfgAgentRouter.baseUrl) arBaseInput.value = cfgAgentRouter.baseUrl;
+        if (arModelSelect && cfgAgentRouter.model) arModelSelect.value = cfgAgentRouter.model;
+
+        // 4. Muat turun profil ejen
         const agentNameInput = document.getElementById('cms-agent-name-input');
         const agentAvatarInput = document.getElementById('cms-agent-avatar-input');
         const agentPreview = document.getElementById('cms-agent-avatar-preview');
-
-        if (keyInput && cfg.apiKey) keyInput.value = cfg.apiKey;
-        if (modelSelect && cfg.model) modelSelect.value = cfg.model;
         if (agentNameInput) agentNameInput.value = getLiveAgentName();
         if (agentAvatarInput) agentAvatarInput.value = getLiveAgentAvatar();
         if (agentPreview) agentPreview.src = getLiveAgentAvatar();
 
-        // Semak status video (IndexedDB vs URL)
+        // 5. Semak status video (IndexedDB vs URL)
         const record = await getVideoRecordFromDB();
         const previewPlayer = document.getElementById('cms-video-preview-player');
         const fileInfo = document.getElementById('cms-video-file-info');
         const badge = document.getElementById('cms-video-status-badge');
+        const videoInput = document.getElementById('live-video-url-input');
 
         if (record && record.blob) {
           if (currentVideoObjectUrl) URL.revokeObjectURL(currentVideoObjectUrl);
@@ -3091,19 +3313,30 @@
     }
 
     async function saveAiConfigAction() {
+      // Simpan provider aktif
+      localStorage.setItem(STORAGE_KEY_AI_PROVIDER, activeAiProvider);
+
+      // Simpan konfigurasi Gemini
       const keyInput = document.getElementById('gemini-api-key-input');
       const modelSelect = document.getElementById('gemini-model-select');
-      const videoInput = document.getElementById('live-video-url-input');
-      const agentNameInput = document.getElementById('cms-agent-name-input');
-      const agentAvatarInput = document.getElementById('cms-agent-avatar-input');
-
       const apiKey = keyInput ? keyInput.value.trim() : '';
       const model = modelSelect ? modelSelect.value : 'gemini-flash-latest';
-      const videoUrl = videoInput ? videoInput.value.trim() : '';
+      localStorage.setItem(STORAGE_KEY_GEMINI, JSON.stringify({ apiKey, model, isEnabled: Boolean(apiKey) }));
+
+      // Simpan konfigurasi Agent Router
+      const arKeyInput = document.getElementById('agentrouter-api-key-input');
+      const arBaseInput = document.getElementById('agentrouter-base-url-input');
+      const arModelSelect = document.getElementById('agentrouter-model-select');
+      const arApiKey = arKeyInput ? arKeyInput.value.trim() : '';
+      const arBaseUrl = (arBaseInput ? arBaseInput.value.trim() : '') || 'https://agentrouter.org/v1';
+      const arModel = arModelSelect ? arModelSelect.value : 'gpt-5.6-sol';
+      localStorage.setItem(STORAGE_KEY_AGENTROUTER, JSON.stringify({ apiKey: arApiKey, baseUrl: arBaseUrl, model: arModel, isEnabled: Boolean(arApiKey) }));
+
+      // Simpan profil ejen
+      const agentNameInput = document.getElementById('cms-agent-name-input');
+      const agentAvatarInput = document.getElementById('cms-agent-avatar-input');
       const agentName = agentNameInput ? agentNameInput.value.trim() : '';
       const agentAvatar = agentAvatarInput ? agentAvatarInput.value.trim() : '';
-
-      localStorage.setItem(STORAGE_KEY_GEMINI, JSON.stringify({ apiKey, model, isEnabled: Boolean(apiKey) }));
       if (agentName) {
         localStorage.setItem(STORAGE_KEY_AGENT_NAME, agentName);
       }
@@ -3113,6 +3346,8 @@
       updateLiveAgentDisplay();
 
       // Urus fail video tempatan (IndexedDB)
+      const videoInput = document.getElementById('live-video-url-input');
+      const videoUrl = videoInput ? videoInput.value.trim() : '';
       const videoEl = document.getElementById('live-video-player');
       if (pendingVideoBlob === 'RESET') {
         await removeVideoFromDB();
@@ -3137,7 +3372,7 @@
       }
 
       pendingVideoBlob = null;
-      alert('Tetapan dan video berjaya disimpan!');
+      alert('Tetapan AI, profil ejen dan video berjaya disimpan!');
       closeAiCmsModal();
     }
 
@@ -3194,34 +3429,15 @@
     }
 
     async function handleGenerateAiLiveComments() {
-      const keyInput = document.getElementById('gemini-api-key-input');
-      const modelSelect = document.getElementById('gemini-model-select');
       const countSelect = document.getElementById('ai-count-select');
       const modeSelect = document.getElementById('ai-mode-select');
       const btn = document.getElementById('generate-ai-comments-btn');
       const statusEl = document.getElementById('ai-generate-status');
 
-      const apiKey = keyInput ? keyInput.value.trim() : '';
-      const model = modelSelect ? modelSelect.value : 'gemini-flash-latest';
       const count = countSelect ? parseInt(countSelect.value, 10) : 50;
       const mode = modeSelect ? modeSelect.value : 'replace';
-
-      if (!apiKey) {
-        alert('Sila masukkan API Key Google Gemini terlebih dahulu.');
-        return;
-      }
-
-      if (btn) {
-        btn.disabled = true;
-        btn.innerText = "Gemini Sedang Menjana Komen...";
-      }
-      if (statusEl) {
-        statusEl.classList.remove('hidden', 'text-rose-600');
-        statusEl.classList.add('text-purple-700');
-        statusEl.innerText = `Membaca konteks Residensi Serunai dan menjana ${count} komen penonton...`;
-      }
-
       const currentHost = getLiveAgentName();
+
       const systemPrompt = `Anda adalah simulator sembang TikTok Live bagi projek hartanah di Malaysia.
 Maklumat Projek:
 - Nama Projek: Residensi MADANI Serunai
@@ -3246,29 +3462,95 @@ PENTING: Berikan jawapan HANYA dalam format tatasusunan JSON yang sah (valid JSO
   {"id": 2, "user": "${currentHost}", "comment": "Lepas Ahmad, ansuran hanya sekitar RM900 sebulan dan boleh mohon LPPSA atau bank.", "isHost": true}
 ]`;
 
-      try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: systemPrompt }] }],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 4096,
-              responseMimeType: "application/json"
-            }
-          })
-        });
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = `${activeAiProvider === 'agentrouter' ? 'Agent Router' : 'Gemini'} Sedang Menjana...`;
+      }
+      if (statusEl) {
+        statusEl.classList.remove('hidden', 'text-rose-600', 'text-emerald-700');
+        statusEl.classList.add('text-purple-700');
+        statusEl.innerText = `Membaca konteks Residensi Serunai menggunakan ${activeAiProvider === 'agentrouter' ? 'Agent Router' : 'Gemini'} dan menjana ${count} komen...`;
+      }
 
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          throw new Error(errData?.error?.message || `Ralat HTTP ${res.status}`);
+      try {
+        let rawJsonText = '';
+
+        if (activeAiProvider === 'agentrouter') {
+          const arKeyInput = document.getElementById('agentrouter-api-key-input');
+          const arModelSelect = document.getElementById('agentrouter-model-select');
+          const arBaseInput = document.getElementById('agentrouter-base-url-input');
+
+          const apiKey = arKeyInput ? arKeyInput.value.trim() : '';
+          const model = arModelSelect ? arModelSelect.value : 'gpt-5.6-sol';
+          let baseUrl = (arBaseInput ? arBaseInput.value.trim() : '') || 'https://agentrouter.org/v1';
+          baseUrl = baseUrl.replace(/\/+$/, '');
+
+          if (!apiKey) {
+            throw new Error('Sila masukkan API Token Agent Router terlebih dahulu.');
+          }
+
+          const res = await fetch(`${baseUrl}/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [
+                { role: 'system', content: 'Anda adalah penjana komen JSON TikTok Live. Balas HANYA dalam format tatasusunan JSON yang sah (valid JSON array) tanpa markdown atau perbualan lain.' },
+                { role: 'user', content: systemPrompt }
+              ],
+              temperature: 0.7
+            })
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData?.error?.message || `Ralat HTTP Agent Router ${res.status}`);
+          }
+
+          const data = await res.json();
+          rawJsonText = data?.choices?.[0]?.message?.content || '';
+        } else {
+          const keyInput = document.getElementById('gemini-api-key-input');
+          const modelSelect = document.getElementById('gemini-model-select');
+          const apiKey = keyInput ? keyInput.value.trim() : '';
+          const model = modelSelect ? modelSelect.value : 'gemini-flash-latest';
+
+          if (!apiKey) {
+            throw new Error('Sila masukkan API Key Google Gemini terlebih dahulu.');
+          }
+
+          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: systemPrompt }] }],
+              generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 4096,
+                responseMimeType: "application/json"
+              }
+            })
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData?.error?.message || `Ralat HTTP ${res.status}`);
+          }
+
+          const data = await res.json();
+          rawJsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
         }
 
-        const data = await res.json();
-        const rawJsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        const parsedComments = JSON.parse(rawJsonText);
+        let cleaned = rawJsonText.trim();
+        if (cleaned.startsWith('```')) {
+          cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+        }
+
+        const parsedComments = JSON.parse(cleaned);
 
         if (!Array.isArray(parsedComments) || parsedComments.length === 0) {
           throw new Error("Format komen yang dijana tidak sah.");
@@ -3286,7 +3568,7 @@ PENTING: Berikan jawapan HANYA dalam format tatasusunan JSON yang sah (valid JSO
         if (statusEl) {
           statusEl.classList.remove('text-purple-700');
           statusEl.classList.add('text-emerald-700');
-          statusEl.innerText = `Berjaya! ${parsedComments.length} komen baru dijana dan diaktifkan.`;
+          statusEl.innerText = `Berjaya! ${parsedComments.length} komen baru dijana dan diaktifkan (${activeAiProvider === 'agentrouter' ? 'Agent Router' : 'Gemini'}).`;
         }
       } catch (err) {
         if (statusEl) {
