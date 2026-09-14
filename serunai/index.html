@@ -217,6 +217,19 @@
             </span>
           </div>
 
+          <!-- Butang Kawalan Bunyi / Suara Hos (Speaker Mute/Unmute) -->
+          <button
+            id="audio-toggle-btn"
+            type="button"
+            onclick="toggleLiveAudio(event)"
+            aria-label="Hidupkan atau senyapkan bunyi suara hos"
+            title="Hidupkan / Senyapkan Suara"
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-black/70 hover:bg-black text-white backdrop-blur-md border border-white/15 transition active:scale-90 shrink-0"
+          >
+            <svg id="audio-icon-muted" class="w-3.5 h-3.5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+            <svg id="audio-icon-unmuted" class="w-3.5 h-3.5 hidden text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+          </button>
+
           <!-- Admin CMS Button (Gear Icon) -->
           <button
             type="button"
@@ -239,6 +252,16 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
+      </div>
+
+            <!-- Pill Petunjuk Buka Suara (Muncul jika ada audio latar tapi belum dimainkan) -->
+      <div
+        id="live-audio-prompt-pill"
+        onclick="toggleLiveAudio(event)"
+        class="hidden pointer-events-auto cursor-pointer absolute top-14 left-3 z-30 flex items-center gap-1.5 bg-black/80 hover:bg-black text-white text-[10.5px] font-bold px-3 py-1 rounded-full border border-emerald-400/30 shadow-lg backdrop-blur-md transition-all active:scale-95 animate-pulse"
+      >
+        <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+        <span>Ketik untuk buka suara</span>
       </div>
 
       <!-- Right Side Interactions: Heart Like Button & Count -->
@@ -5641,6 +5664,25 @@
       // 1. Tentukan mod media aktif (Video vs Slideshow) & pemain voiceover
       switchLiveMediaMode(liveMediaMode);
       updateVoiceoverDisplay();
+      // Periksa status audio voiceover & cuba mainkan
+      if (liveVoiceoverUrl) {
+        const liveAudio = document.getElementById('live-voiceover-player');
+        const promptPill = document.getElementById('live-audio-prompt-pill');
+        if (liveAudio) {
+          liveAudio.src = liveVoiceoverUrl;
+          liveAudio.play().then(() => {
+            isLiveAudioActive = true;
+            const iconMuted = document.getElementById('audio-icon-muted');
+            const iconUnmuted = document.getElementById('audio-icon-unmuted');
+            if (iconMuted) iconMuted.classList.add('hidden');
+            if (iconUnmuted) iconUnmuted.classList.remove('hidden');
+            if (promptPill) promptPill.classList.add('hidden');
+          }).catch(() => {
+            // Sekatan autoplay pelayar memerlukan sentuhan pengguna pertama
+            if (promptPill) promptPill.classList.remove('hidden');
+          });
+        }
+      }
 
       const videoEl = document.getElementById('live-video-player');
       try {
@@ -6212,26 +6254,45 @@
     }
 
     // Kawalan Audio
-    function toggleLiveAudio() {
+    function toggleLiveAudio(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
       const video = document.getElementById('live-video-player');
       const voiceover = document.getElementById('live-voiceover-player');
       const iconMuted = document.getElementById('audio-icon-muted');
       const iconUnmuted = document.getElementById('audio-icon-unmuted');
+      const promptPill = document.getElementById('live-audio-prompt-pill');
 
       isLiveAudioActive = !isLiveAudioActive;
 
       if (isLiveAudioActive) {
         if (video) video.muted = false;
         if (voiceover && liveVoiceoverUrl) {
-          voiceover.play().catch(() => {});
+          if (!voiceover.src || voiceover.src !== liveVoiceoverUrl) {
+            voiceover.src = liveVoiceoverUrl;
+          }
+          voiceover.play().then(() => {
+            if (promptPill) promptPill.classList.add('hidden');
+          }).catch((err) => {
+            console.log('Voiceover play deferred:', err);
+          });
         }
         if (iconMuted) iconMuted.classList.add('hidden');
         if (iconUnmuted) iconUnmuted.classList.remove('hidden');
+        if (promptPill) promptPill.classList.add('hidden');
       } else {
         if (video) video.muted = true;
         if (voiceover) voiceover.pause();
         if (iconMuted) iconMuted.classList.remove('hidden');
         if (iconUnmuted) iconUnmuted.classList.add('hidden');
+      }
+    }
+
+    function autoStartVoiceoverOnGesture() {
+      if (!isLiveAudioActive && liveVoiceoverUrl) {
+        toggleLiveAudio();
       }
     }
 
@@ -6279,6 +6340,7 @@
 
     function handleScreenTap(e) {
       if (lastTapWasSwipe) return;
+      autoStartVoiceoverOnGesture();
       if (e.target.closest('button, a, input, form, #live-pinned-card, #live-comments-container, #live-comments-restore-tab')) return;
       const x = e.clientX;
       const y = e.clientY;
