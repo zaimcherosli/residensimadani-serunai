@@ -133,7 +133,7 @@
   <!-- SKRIN PENUH SIARAN LANGSUNG (TIKTOK LIVE SESSION)    -->
   <!-- Dipaparkan serta-merta apabila link laman web dibuka -->
   <!-- ==================================================== -->
-  <div id="live-session-overlay" class="hidden fixed inset-0 z-[100] bg-black flex h-[100dvh] w-[100vw] items-center justify-center select-none overflow-hidden">
+  <div id="live-session-overlay" class="fixed inset-0 z-[100] bg-black flex h-[100dvh] w-[100vw] items-center justify-center select-none overflow-hidden">
     <!-- Live Screen Container (9:16 Portrait Aspect) -->
     <div
       id="live-screen-container"
@@ -1192,12 +1192,12 @@
       <div class="flex items-center gap-3 sm:gap-4 shrink-0">
         <!-- Pautan Navigasi Desktop -->
         <div class="hidden md:flex items-center gap-4 text-sm font-semibold text-slate-600">
-          <!-- Butang Tonton Live (Desktop) - Disembunyikan Sementara -->
+          <!-- Butang Tonton Live di sebelah Sewa vs Beli (Desktop) -->
           <button
             type="button"
             id="nav-live-btn-desktop"
             onclick="openLiveSession()"
-            class="hidden items-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-full text-xs font-bold transition active:scale-95 shadow-sm shrink-0"
+            class="flex items-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-full text-xs font-bold transition active:scale-95 shadow-sm shrink-0"
             title="Tonton Siaran Langsung"
           >
             <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
@@ -1213,17 +1213,17 @@
           Pasang App
         </button>
 
-        <!-- Butang Semak / Daftar Minat (Desktop & Mobile) -->
-        <a href="#semak-kelayakan" class="inline-flex bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold py-2 px-4 rounded-lg shadow-sm transition whitespace-nowrap">
+        <!-- Desktop Sahaja: Butang Semak / Daftar Minat -->
+        <a href="#semak-kelayakan" class="hidden md:inline-flex bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold py-2 px-4 rounded-lg shadow-sm transition whitespace-nowrap">
           Daftar Minat
         </a>
 
-        <!-- Butang Tonton Live (Mobile) - Disembunyikan Sementara -->
+        <!-- Mobile Sahaja: Gantikan Daftar Minat dengan Tonton Live! -->
         <button
           type="button"
           id="nav-live-btn-mobile"
           onclick="openLiveSession()"
-          class="hidden items-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold py-1.5 px-3 rounded-full shadow-sm transition whitespace-nowrap active:scale-95"
+          class="md:hidden flex items-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold py-1.5 px-3 rounded-full shadow-sm transition whitespace-nowrap active:scale-95"
           title="Tonton Siaran Langsung"
         >
           <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
