@@ -133,7 +133,7 @@
   <!-- SKRIN PENUH SIARAN LANGSUNG (TIKTOK LIVE SESSION)    -->
   <!-- Dipaparkan serta-merta apabila link laman web dibuka -->
   <!-- ==================================================== -->
-  <div id="live-session-overlay" class="fixed inset-0 z-[100] bg-black flex h-[100dvh] w-[100vw] items-center justify-center select-none overflow-hidden">
+  <div id="live-session-overlay" class="hidden fixed inset-0 z-[100] bg-black flex h-[100dvh] w-[100vw] items-center justify-center select-none overflow-hidden">
     <!-- Live Screen Container (9:16 Portrait Aspect) -->
     <div
       id="live-screen-container"
@@ -525,6 +525,21 @@
 
       <!-- BAHAGIAN UTAMA CMS (DIBUKA SELEPAS AUTH) -->
       <div id="ai-cms-body" class="hidden space-y-4 text-xs">
+        
+        <!-- Butang Pratonton Live (Khusus untuk Pengujian Pantas) -->
+        <div class="p-3 bg-rose-50 border border-rose-200 rounded-2xl flex items-center justify-between gap-2">
+          <div>
+            <div class="font-bold text-rose-950 text-xs">Pratonton Siaran Langsung</div>
+            <div class="text-[10.5px] text-rose-700">Buka simulasi live stream untuk pengujian.</div>
+          </div>
+          <button
+            type="button"
+            onclick="closeAiCmsModal(); openLiveSession();"
+            class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-sm shrink-0 flex items-center gap-1"
+          >
+            <span>Buka Live</span>
+          </button>
+        </div>
         
         <!-- Pilihan Penyedia AI (Tabs) -->
         <div class="space-y-1.5">
@@ -1177,11 +1192,12 @@
       <div class="flex items-center gap-3 sm:gap-4 shrink-0">
         <!-- Pautan Navigasi Desktop -->
         <div class="hidden md:flex items-center gap-4 text-sm font-semibold text-slate-600">
-          <!-- Butang Tonton Live di sebelah Sewa vs Beli (Desktop) -->
+          <!-- Butang Tonton Live (Desktop) - Disembunyikan Sementara -->
           <button
             type="button"
+            id="nav-live-btn-desktop"
             onclick="openLiveSession()"
-            class="flex items-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-full text-xs font-bold transition active:scale-95 shadow-sm shrink-0"
+            class="hidden items-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-full text-xs font-bold transition active:scale-95 shadow-sm shrink-0"
             title="Tonton Siaran Langsung"
           >
             <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
@@ -1197,16 +1213,17 @@
           Pasang App
         </button>
 
-        <!-- Desktop Sahaja: Butang Semak / Daftar Minat -->
-        <a href="#semak-kelayakan" class="hidden md:inline-flex bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold py-2 px-4 rounded-lg shadow-sm transition whitespace-nowrap">
+        <!-- Butang Semak / Daftar Minat (Desktop & Mobile) -->
+        <a href="#semak-kelayakan" class="inline-flex bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold py-2 px-4 rounded-lg shadow-sm transition whitespace-nowrap">
           Daftar Minat
         </a>
 
-        <!-- Mobile Sahaja: Gantikan Daftar Minat dengan Tonton Live! -->
+        <!-- Butang Tonton Live (Mobile) - Disembunyikan Sementara -->
         <button
           type="button"
+          id="nav-live-btn-mobile"
           onclick="openLiveSession()"
-          class="md:hidden flex items-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold py-1.5 px-3 rounded-full shadow-sm transition whitespace-nowrap active:scale-95"
+          class="hidden items-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold py-1.5 px-3 rounded-full shadow-sm transition whitespace-nowrap active:scale-95"
           title="Tonton Siaran Langsung"
         >
           <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
@@ -5641,17 +5658,12 @@
       // 1. Tentukan mod media aktif (Video vs Slideshow) & pemain voiceover
       switchLiveMediaMode(liveMediaMode);
       updateVoiceoverDisplay();
-      // Mainkan voiceover di latar secara automatik tanpa mengganggu susun atur visual
-      if (liveVoiceoverUrl) {
-        initBackgroundVoiceoverAutoplay();
-      }
 
       const videoEl = document.getElementById('live-video-player');
       try {
         const activeVideo = localStorage.getItem(STORAGE_KEY_VIDEO) || CLOUDFLARE_R2_VIDEO_URL;
         if (videoEl && liveMediaMode === 'video') {
           videoEl.src = activeVideo;
-          videoEl.play().catch(() => {});
         }
       } catch (err) {
         console.error('Ralat inisialisasi video:', err);
@@ -5687,10 +5699,21 @@
       setupCommentsSwipeGestures();
       updateLikesDisplay();
       updateViewersDisplay();
-      startLiveTickers();
-      startAudienceTapSimulation();
-      startOfferCountdown();
-      startActivityNotifications();
+
+      // Mulakan simulasi hanya jika tindihan siaran langsung dipaparkan
+      const overlay = document.getElementById('live-session-overlay');
+      if (overlay && !overlay.classList.contains('hidden')) {
+        if (liveVoiceoverUrl) {
+          initBackgroundVoiceoverAutoplay();
+        }
+        if (videoEl && liveMediaMode === 'video') {
+          videoEl.play().catch(() => {});
+        }
+        startLiveTickers();
+        startAudienceTapSimulation();
+        startOfferCountdown();
+        startActivityNotifications();
+      }
     }
 
     function updateLikesDisplay() {
@@ -6078,18 +6101,33 @@
       const video = document.getElementById('live-video-player');
 
       if (overlay) overlay.classList.remove('hidden');
-      if (video) {
+      if (video && liveMediaMode === 'video') {
+        const activeVideo = localStorage.getItem(STORAGE_KEY_VIDEO) || CLOUDFLARE_R2_VIDEO_URL;
+        if (!video.src || video.src !== activeVideo) video.src = activeVideo;
         video.play().catch(() => {});
       }
       startLiveTickers();
       startAudienceTapSimulation();
       startOfferCountdown();
       startActivityNotifications();
+      if (liveVoiceoverUrl && !hasVoiceoverStarted) {
+        initBackgroundVoiceoverAutoplay();
+      } else if (liveVoiceoverUrl && hasVoiceoverStarted) {
+        const voiceover = document.getElementById('live-voiceover-player');
+        if (voiceover && isLiveAudioActive) {
+          voiceover.play().catch(() => {});
+        }
+      }
     }
 
     function closeLiveSession() {
       const overlay = document.getElementById('live-session-overlay');
+      const video = document.getElementById('live-video-player');
+      const voiceover = document.getElementById('live-voiceover-player');
+
       if (overlay) overlay.classList.add('hidden');
+      if (video) video.pause();
+      if (voiceover) voiceover.pause();
 
       if (commentTickerInterval) clearInterval(commentTickerInterval);
       if (viewerCounterInterval) clearInterval(viewerCounterInterval);
